@@ -6,7 +6,28 @@
 2. **La logique est séparée de l'affichage.** `CityState`, `BuildingState` et `Wallet` sont de purs objets `RefCounted`, sans nœud ni rendu. Ils sont testés en mode headless et entièrement sérialisables.
 3. **Les modules communiquent par signaux** (`Events`), sans références croisées.
 4. **Le temps est mesuré en heure Unix** (`GameClock`) : chantiers et production avancent aussi hors ligne.
-5. **Les visuels sont remplaçables.** Chaque `BuildingData` a un `model_scene` (modèle glTF définitif) et une `model_recipe` (modèle procédural provisoire). Renseigner `model_scene` suffit à remplacer le modèle partout : cité, menus, vignettes.
+5. **Les visuels sont remplaçables.** Chaque `BuildingData` a un `model_scene` (modèle glTF) et une `model_recipe` (modèle procédural de secours). Le modèle est utilisé partout : cité, aperçu de placement, vignettes des menus.
+
+## Chaîne des modèles 3D
+
+```
+tools/blender/hv_kit.py        Boîte à outils : pierres biseautées, murs maçonnés, toits à tuiles,
+                               colombages, fenêtres, portes, bannières, cristaux, champignons…
+tools/blender/models/<id>.py   Un script par bâtiment : build(m)
+tools/blender/build_models.py  Export → assets/models/buildings/<id>.glb (+ aperçus Cycles)
+src/city/model_rig.gd          Lecture des conventions à l'import dans Godot
+```
+
+Conventions des noms de nœuds glTF (jetons séparés par `_`) :
+
+| Jeton | Effet dans Godot |
+|---|---|
+| `t0`…`t3` | visible à partir du palier (niveaux 1-2, 3-4, 5-6, 7+) |
+| `spinY35` | rotation continue, 35°/s autour de l'axe Y |
+| `bob8` | flottement vertical de 0,08 |
+| `light_RRGGBB_e14_r50` | repère remplacé par une OmniLight3D (énergie 1,4, portée 5,0) |
+
+Les matériaux sont fusionnés par type (`stone`, `wood`, `roof_blue`, `gold`…) : un bâtiment représente environ 10 à 20 appels de rendu. Les couleurs de sommets ajoutent la variation pierre par pierre et une occlusion ambiante au pied des murs. Les matériaux `crystal*` reçoivent le shader de cristal pulsé.
 
 ## Arborescence
 
@@ -77,7 +98,7 @@ GameState._process ─▶ CityState.update(now) ─▶ task_finished ─▶ Even
 
 ## Ajouter du contenu
 
-**Nouveau bâtiment** : créer `data/buildings/mon_batiment.tres` (type `BuildingData`) avec un `id` unique. Ajouter une fonction `_mon_batiment()` dans `building_models.gd`, ou renseigner `model_scene`. Les tests `test_data` et `test_models` vérifient la cohérence.
+**Nouveau bâtiment** : créer `data/buildings/mon_batiment.tres` (type `BuildingData`) avec un `id` unique, écrire `tools/blender/models/mon_batiment.py`, lancer `build_models.py mon_batiment`, puis renseigner `model_scene`. Les tests `test_data` et `test_models` vérifient la cohérence.
 
 **Nouvelle ressource** : créer `data/resources/x.tres` (type `ResourceTypeData`) avec son icône SVG.
 

@@ -52,6 +52,13 @@ Plan :
 | 11 | Graphismes définitifs | `model_scene` sur chaque donnée pour brancher les modèles glTF |
 | 12 | Optimisation, tests appareils, export APK | préréglage Android prêt |
 
-## Note sur les visuels
+## Visuels (étape 11 entamée en avance)
 
-Les modèles des bâtiments et des décors sont actuellement **procéduraux** : assemblés par code, distincts les uns des autres et animés. Ce sont des modèles provisoires de qualité prototype. Le cahier des charges exige des modèles 3D, illustrations et animations travaillés individuellement ; ils seront produits (modélisation 3D, par exemple Blender vers glTF) et branchés via `model_scene` à l'étape 11. Les logos fournis par le studio sont déjà utilisés tels quels.
+Fait (v0.4.0) :
+- Les 21 bâtiments ont un vrai modèle 3D glTF, construit dans Blender par des scripts versionnés (`tools/blender/`) : maçonnerie, tuiles, colombages, détails par palier de niveau, pièces animées et lumières intégrées.
+- Aperçus Cycles et vitrine en jeu (`tests/model_showcase.tscn`) pour contrôler chaque modèle.
+
+Reste à faire :
+- Décors de la caverne (rochers, cristaux, champignons, ruines) au même niveau de détail ; ils sont encore assemblés en primitives dans `cave_environment.gd`.
+- Textures peintes et animations squelettiques pour les héros et monstres (étape 5).
+- Validation du rendu sur téléphone (renderer Mobile) : les captures actuelles proviennent du renderer de compatibilité sans GPU.

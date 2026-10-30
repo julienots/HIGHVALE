@@ -4,7 +4,7 @@ render_mode diffuse_burley, specular_schlick_ggx;
 
 uniform vec4 rock_light : source_color = vec4(0.26, 0.24, 0.33, 1.0);
 uniform vec4 rock_dark : source_color = vec4(0.10, 0.09, 0.14, 1.0);
-uniform vec4 floor_color : source_color = vec4(0.42, 0.34, 0.27, 1.0);
+uniform vec4 floor_color : source_color = vec4(0.33, 0.29, 0.27, 1.0);
 uniform vec4 moss_color : source_color = vec4(0.16, 0.42, 0.33, 1.0);
 // Zone constructible en coordonnées monde : (min x, min z, max x, max z).
 uniform vec4 buildable = vec4(3.0, 3.0, 37.0, 37.0);
@@ -37,7 +37,7 @@ void fragment() {
 	float inside = 1.0 - smoothstep(-0.6, 0.8, outside);
 
 	// Dallage irrégulier de la cité.
-	vec2 sp = p / 2.0 + vec2(0.0, step(1.0, mod(floor(p.x / 2.0), 2.0)) * 0.5);
+	vec2 sp = p + vec2(0.0, step(1.0, mod(floor(p.x), 2.0)) * 0.5);
 	vec2 cell = floor(sp);
 	vec2 f = fract(sp);
 	float h = hash(cell);

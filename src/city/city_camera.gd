@@ -7,11 +7,11 @@ const PITCH := -40.0
 const YAW := 45.0
 const DISTANCE := 70.0
 
-@export var min_zoom := 9.0
+@export var min_zoom := 6.0
 @export var max_zoom := 34.0
 
 var camera: Camera3D
-var zoom := 18.0
+var zoom := 13.0
 var bounds := Rect2(0, 0, 40, 40)
 var _velocity := Vector3.ZERO
 var _focus_tween: Tween

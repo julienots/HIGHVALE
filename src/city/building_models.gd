@@ -27,13 +27,15 @@ const CRYSTAL_GLOW := Color("7fdcff")
 static func build(data: BuildingData, level: int) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Model"
+	var lvl := maxi(level, 1)
+	var tier := tier_for_level(lvl)
 	if data.model_scene:
-		root.add_child(data.model_scene.instantiate())
+		var model: Node3D = data.model_scene.instantiate()
+		ModelRig.apply(model, tier)
+		root.add_child(model)
 		return root
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(data.id)
-	var lvl := maxi(level, 1)
-	var tier := 0 if lvl < 3 else (1 if lvl < 5 else (2 if lvl < 7 else 3))
 	var fn := "_" + data.model_recipe
 	_base(root, data)
 	if _has_recipe(fn):
@@ -42,6 +44,11 @@ static func build(data: BuildingData, level: int) -> Node3D:
 		_generic(root, data, lvl, tier, rng)
 	_tier_decor(root, data, tier, rng)
 	return root
+
+
+## Palier visuel : niveaux 1-2 = 0, 3-4 = 1, 5-6 = 2, 7+ = 3.
+static func tier_for_level(level: int) -> int:
+	return 0 if level < 3 else (1 if level < 5 else (2 if level < 7 else 3))
 
 
 static var _recipes := {}

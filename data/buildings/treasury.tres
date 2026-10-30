@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/buildings/treasury.glb" id="2_model"]
 
 [resource]
 script = ExtResource("1_script")
@@ -29,6 +30,7 @@ storage_growth = 1.6
 population_base = 0
 population_growth = 1.35
 builders_provided = 0
+model_scene = ExtResource("2_model")
 model_recipe = "treasury"
 primary_color = Color(0.541, 0.416, 0.227, 1)
 accent_color = Color(1.000, 0.773, 0.192, 1)

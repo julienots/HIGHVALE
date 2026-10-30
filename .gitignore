@@ -7,3 +7,4 @@ export_credentials.cfg
 *.apk
 *.aab
 *.keystore
+__pycache__/

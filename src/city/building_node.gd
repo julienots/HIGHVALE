@@ -21,6 +21,7 @@ var _bobbers: Array[Dictionary] = []
 var _selected := false
 var _producing := false
 var _time := 0.0
+var _model_height := 0.0
 
 
 func setup(b: BuildingState) -> void:
@@ -128,6 +129,7 @@ func _rebuild_model(d: BuildingData, level: int) -> void:
 	_model = BuildingModels.build(d, level)
 	_model_level = level
 	add_child(_model)
+	_model_height = clampf(model_height(_model) - global_position.y, 1.2, 4.5)
 	_spinners.clear()
 	_bobbers.clear()
 	_collect_animated(_model)
@@ -221,9 +223,23 @@ func _update_bubble(b: BuildingState, d: BuildingData, now: float) -> void:
 
 
 func _top_height(d: BuildingData) -> float:
+	if _model_height > 0.0:
+		return _model_height
 	match d.footprint.x:
 		4:
 			return 3.4
 		2:
 			return 3.2
 	return 2.0
+
+
+## Hauteur du modèle visible (pour placer minuterie et bulle au-dessus du toit).
+static func model_height(n: Node) -> float:
+	var top := 0.0
+	for c in n.get_children():
+		if c is VisualInstance3D and c.visible and not c is Light3D:
+			var aabb: AABB = c.global_transform * c.get_aabb()
+			top = maxf(top, aabb.end.y)
+		if c is Node3D and c.visible:
+			top = maxf(top, model_height(c))
+	return top

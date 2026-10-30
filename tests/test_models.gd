@@ -23,6 +23,45 @@ func test_models_differ_between_buildings() -> void:
 	check(distinct.size() >= 8, "silhouettes trop similaires")
 
 
+func test_every_building_has_a_3d_model() -> void:
+	for d in DataRegistry.all_buildings():
+		check(d.model_scene != null, "modèle glTF manquant : " + d.id)
+
+
+func test_model_tiers_and_animation_tags() -> void:
+	var d := DataRegistry.building("primordial_temple")
+	var low := BuildingModels.build(d, 1)
+	var high := BuildingModels.build(d, 8)
+	check(_count_visible(low) < _count_visible(high), "le niveau 7+ ajoute des détails")
+	var animated := _with_meta(high, "spin")
+	check(animated > 0, "pièces animées détectées")
+	check(_count_lights(high) > 0, "repères de lumière convertis")
+	low.free()
+	high.free()
+
+
+func _count_visible(n: Node) -> int:
+	var c := 1 if n is MeshInstance3D and n.visible else 0
+	for ch in n.get_children():
+		if not (ch is Node3D and not ch.visible):
+			c += _count_visible(ch)
+	return c
+
+
+func _with_meta(n: Node, key: String) -> int:
+	var c := 1 if n.has_meta(key) else 0
+	for ch in n.get_children():
+		c += _with_meta(ch, key)
+	return c
+
+
+func _count_lights(n: Node) -> int:
+	var c := 1 if n is OmniLight3D else 0
+	for ch in n.get_children():
+		c += _count_lights(ch)
+	return c
+
+
 func _count_meshes(n: Node) -> int:
 	var c := 1 if n is MeshInstance3D else 0
 	for ch in n.get_children():
