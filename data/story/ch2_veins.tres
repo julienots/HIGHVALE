@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StoryChapterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/quests/story_chapter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ch2_veins"
+temple_level = 2
+title = "Les veines de cristal"
+text = "Le Temple s'éveille. Ses fondations vibrent et révèlent des veines de cristaux abyssaux courant sous la cité.\n\nLes anciens textes gravés dans la pierre parlent de machines capables de les extraire. Une Mine cristalline est désormais à votre portée."

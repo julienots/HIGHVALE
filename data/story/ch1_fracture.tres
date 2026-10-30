@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StoryChapterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/quests/story_chapter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ch1_fracture"
+temple_level = 1
+title = "La Fracture Primordiale"
+text = "Il y a des siècles, la Fracture Primordiale a déchiré le monde. Les cités de la surface se sont effondrées et les survivants ont fui sous la terre.\n\nAprès des années d'errance, votre petite colonie découvre une caverne immense, éclairée par des cristaux vivants. En son centre se dresse un temple oublié, encore chaud d'une énergie ancienne : le Temple Primordial.\n\nIci, vous bâtirez HIGHVALE."

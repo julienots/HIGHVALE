@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StoryChapterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/quests/story_chapter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ch5_breath"
+temple_level = 5
+title = "Un souffle venu d'en haut"
+text = "Un courant d'air frais traverse la caverne pour la première fois depuis des générations. Quelque part, très haut au-dessus de HIGHVALE, un passage vers la surface s'est entrouvert.\n\nLes explorateurs se préparent. Le monde d'en haut a changé… et il attend."

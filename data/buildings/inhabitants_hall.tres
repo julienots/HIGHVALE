@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "inhabitants_hall"
+display_name = "Hôtel des habitants"
+description = "Loge les habitants de la cité. Chaque Hôtel accueille un bâtisseur supplémentaire, permettant un chantier de plus en parallèle."
+category = 3
+sort_order = 10
+feature = ""
+footprint = Vector2i(3, 3)
+max_level = 10
+unlock_temple_level = 1
+max_count_by_temple = PackedInt32Array(1, 2, 2, 3, 3, 4, 4, 5, 5, 5)
+level_cap_base = 2
+level_cap_per_temple = 2
+base_cost = {"gold": 200, "stone": 150}
+cost_growth = 1.7
+base_build_seconds = 20.0
+build_time_growth = 2.2
+produces = ""
+base_production_per_hour = 0.0
+production_growth = 1.3
+internal_storage_hours = 1.0
+storage = {}
+storage_growth = 1.6
+population_base = 8
+population_growth = 1.35
+builders_provided = 1
+model_recipe = "inhabitants_hall"
+primary_color = Color(0.690, 0.478, 0.290, 1)
+accent_color = Color(0.239, 0.608, 1.000, 1)

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "primordial_temple"
+display_name = "Temple Primordial"
+description = "Cœur de la civilisation souterraine. Son niveau débloque de nouveaux bâtiments, augmente les niveaux maximum et fait avancer l'histoire."
+category = 0
+sort_order = 0
+feature = ""
+footprint = Vector2i(4, 4)
+max_level = 10
+unlock_temple_level = 1
+max_count_by_temple = PackedInt32Array(1)
+level_cap_base = 10
+level_cap_per_temple = 0
+base_cost = {"gold": 500, "stone": 500, "fungal_wood": 250}
+cost_growth = 2.2
+base_build_seconds = 60.0
+build_time_growth = 3.0
+produces = ""
+base_production_per_hour = 0.0
+production_growth = 1.3
+internal_storage_hours = 1.0
+storage = {"gold": 1000, "stone": 1000, "fungal_wood": 1000, "abyssal_crystal": 200}
+storage_growth = 1.6
+population_base = 10
+population_growth = 1.35
+builders_provided = 0
+model_recipe = "primordial_temple"
+primary_color = Color(0.541, 0.576, 0.651, 1)
+accent_color = Color(1.000, 0.773, 0.192, 1)

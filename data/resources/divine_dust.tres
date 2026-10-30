@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ResourceTypeData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/economy/resource_type_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/resources/divine_dust.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "divine_dust"
+display_name = "Poussière divine"
+description = "Reste d'énergie divine, convoitée par l'Autel divin."
+icon = ExtResource("2_icon")
+color = Color(1.000, 0.945, 0.659, 1)
+sort_order = 7
+base_capacity = 100
+is_premium = false
+show_in_hud = false
+source_hint = "Bientôt : Autel divin et événements."

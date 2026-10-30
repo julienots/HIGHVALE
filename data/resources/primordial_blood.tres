@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ResourceTypeData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/economy/resource_type_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/resources/primordial_blood.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "primordial_blood"
+display_name = "Sang primordial"
+description = "Substance rare nécessaire aux évolutions des héros et monstres."
+icon = ExtResource("2_icon")
+color = Color(0.839, 0.157, 0.247, 1)
+sort_order = 6
+base_capacity = 100
+is_premium = false
+show_in_hud = false
+source_hint = "Bientôt : boss des profondeurs."

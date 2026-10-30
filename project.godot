@@ -1,0 +1,53 @@
+; HIGHVALE — Super Essence Studio
+; Fichier de configuration du projet Godot 4.
+
+config_version=5
+
+[application]
+
+config/name="HIGHVALE"
+config/description="Construisez une civilisation souterraine, collectionnez héros et monstres, combattez au tour par tour."
+config/version="0.3.0"
+run/main_scene="res://scenes/boot/splash.tscn"
+config/features=PackedStringArray("4.3", "Mobile")
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/show_image=false
+config/icon="res://icon.png"
+config/quit_on_go_back=false
+
+[autoload]
+
+Events="*res://src/core/event_bus.gd"
+GameClock="*res://src/core/game_clock.gd"
+DataRegistry="*res://src/core/data_registry.gd"
+Settings="*res://src/core/settings.gd"
+SaveSystem="*res://src/save/save_system.gd"
+GameState="*res://src/core/game_state.gd"
+SceneRouter="*res://src/core/scene_router.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=6
+
+[debug]
+
+gdscript/warnings/unused_parameter=0
+
+[gui]
+
+theme/custom_font="res://assets/fonts/Fredoka.ttf"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+anti_aliasing/quality/msaa_3d=1
+environment/defaults/default_clear_color=Color(0.03, 0.04, 0.08, 1)

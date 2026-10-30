@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StoryChapterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/quests/story_chapter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ch3_whispers"
+temple_level = 3
+title = "Murmures dans les profondeurs"
+text = "La nuit, des cris inconnus montent des galeries inférieures. Des créatures sauvages rôdent aux frontières de la cité.\n\nLes érudits affirment que l'on peut comprendre — et même faire naître — ces êtres grâce à la science oubliée du Laboratoire."

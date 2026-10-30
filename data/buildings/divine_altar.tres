@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "divine_altar"
+display_name = "Autel divin"
+description = "Lieu sacré où l'on tente d'éveiller les dieux."
+category = 5
+sort_order = 200
+feature = "divine"
+footprint = Vector2i(3, 3)
+max_level = 10
+unlock_temple_level = 6
+max_count_by_temple = PackedInt32Array(0, 0, 0, 0, 0, 1, 1, 1, 1, 1)
+level_cap_base = 2
+level_cap_per_temple = 2
+base_cost = {"gold": 8000, "abyssal_crystal": 1500}
+cost_growth = 1.8
+base_build_seconds = 120.0
+build_time_growth = 2.2
+produces = ""
+base_production_per_hour = 0.0
+production_growth = 1.3
+internal_storage_hours = 1.0
+storage = {}
+storage_growth = 1.6
+population_base = 0
+population_growth = 1.35
+builders_provided = 0
+model_recipe = "divine_altar"
+primary_color = Color(0.910, 0.886, 0.816, 1)
+accent_color = Color(1.000, 0.824, 0.235, 1)

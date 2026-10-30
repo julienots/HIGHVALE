@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ResourceTypeData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/economy/resource_type_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/resources/prisms.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "prisms"
+display_name = "Prismes"
+description = "Monnaie premium de HIGHVALE. Accélère les chantiers."
+icon = ExtResource("2_icon")
+color = Color(1.000, 0.310, 0.714, 1)
+sort_order = 100
+base_capacity = -1
+is_premium = true
+show_in_hud = false
+source_hint = "Récompenses et boutique."

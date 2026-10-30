@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ResourceTypeData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/economy/resource_type_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/resources/ancient_shards.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ancient_shards"
+display_name = "Éclats antiques"
+description = "Fragments des civilisations disparues, utilisés pour les invocations."
+icon = ExtResource("2_icon")
+color = Color(0.851, 0.573, 0.353, 1)
+sort_order = 5
+base_capacity = 200
+is_premium = false
+show_in_hud = false
+source_hint = "Bientôt : ruines et expéditions."
