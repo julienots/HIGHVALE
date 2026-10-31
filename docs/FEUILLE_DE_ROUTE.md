@@ -73,11 +73,16 @@ Reste à faire :
 - `SummonBannerData` (5 bannières), `SummonRules` : taux par rareté redistribués si une rareté est vide, garantie Épique, doublons → fragments, élément du jour, Éveil divin (fragments 10-20, 5 % d'éveil complet).
 - Trois dieux (Kryos, Vitalia, Pyros) modélisés avec auréoles et ailes ; Éclats antiques et Poussière divine obtenus dans les ressources sauvages et en récompense de chaque niveau du Temple.
 
+## ✅ Étape 8 — Combat au tour par tour
+
+- `BattleState` (moteur sans affichage, testé), `Combatant`, `BattleAI`, `EncounterData` (10 défis, 2 boss), `BattleSetup` (préparation, bonus de la Caserne, récompenses).
+- `BattleScene` : arène 3D, déplacements de mêlée, projectiles élémentaires, ondes de choc, boucliers, chiffres flottants, caméra cinématique des ultimes, tremblements, ordre des tours, synergies, modes manuel/auto, vitesse ×1-×3, fin de combat.
+- Écran « Défis des profondeurs » : défis, puissance comparée, récompenses, composition de l'équipe.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |
 |---|---|---|
-| 8 | Combat au tour par tour et IA | `SkillData` (cibles, effets, altérations), `CharacterStats` |
 | 9 | Progression et exploration, surface | `ZoneData.is_surface`, Portail antique, Tour des explorateurs |
 | 10 | Boutique et événements | monnaie premium Prismes, bâtiment Marché |
 | 11 | Graphismes définitifs | `model_scene` sur chaque donnée pour brancher les modèles glTF |

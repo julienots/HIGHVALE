@@ -55,7 +55,12 @@ src/
   heroes/      HeroData, CollectionState (héros, fragments, créatures)
   monsters/    MonsterData
   laboratory/  IngredientData (schéma, étape 6)
-  combat/      CharacterStats, SkillData, CharacterRig (personnage animé)
+  combat/      Moteur de combat (BattleState, Combatant, BattleSetup), scène 3D, SkillData, CharacterRig
+  ai/          BattleAI (IA tactique)
+  laboratory/  LabRules, LaboratoryState, LabMachine
+  fusion/      FusionRules, recettes
+  summoning/   Bannières, SummonRules
+  inventory/   Inventory (ingrédients)
   inventory/   ItemData (schéma)
   exploration/ ZoneData (schéma, étape 9)
   quests/      StoryChapterData

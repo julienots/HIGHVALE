@@ -17,6 +17,8 @@ const STARTER_INGREDIENTS := {"ember_stone": 3, "vital_drop": 3, "tide_scale": 2
 const TEMPLE_REWARD := {"prisms": 50, "ancient_shards": 20, "divine_dust": 5}
 var city := CityState.new()
 var profile := {}
+## Défi choisi avant d'ouvrir la scène de combat.
+var pending_encounter := ""
 var is_loaded := false
 
 var _tick_accum := 0.0

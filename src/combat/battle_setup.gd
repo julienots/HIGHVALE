@@ -6,6 +6,18 @@ const BOSS_HP := 2.5
 const BOSS_ATK := 1.25
 
 
+## Entraînement de la Caserne : +3 % d'attaque par niveau.
+static func apply_city_bonus(team: Array, city: CityState) -> float:
+	var lvl := 0
+	for b in city.buildings.values():
+		if b.data_id == "barracks":
+			lvl = maxi(lvl, b.level)
+	var mult := 1.0 + 0.03 * lvl
+	for c: Combatant in team:
+		c.attack = int(c.attack * mult)
+	return mult
+
+
 static func enemies_for(enc: EncounterData) -> Array:
 	var out := []
 	for e in enc.enemies:

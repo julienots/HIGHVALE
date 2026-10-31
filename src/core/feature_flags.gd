@@ -30,6 +30,7 @@ const MODULE_NAMES := {
 	"research": "Recherches (étape 9)",
 	"exploration": "Exploration (étape 9)",
 	"shop": "Commerce (étape 10)",
+	"healing": "Soins et blessures (étape 9)",
 }
 
 

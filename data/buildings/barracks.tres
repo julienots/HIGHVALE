@@ -7,7 +7,7 @@
 script = ExtResource("1_script")
 id = "barracks"
 display_name = "Caserne"
-description = "Entraîne et améliore les unités de combat."
+description = "Entraîne l'équipe de combat : +3 % d'attaque par niveau de la Caserne pour vos héros et créatures."
 category = 6
 sort_order = 130
 feature = "combat"

@@ -233,6 +233,23 @@ func _top_height(d: BuildingData) -> float:
 	return 2.0
 
 
+## Boîte englobante (repère monde) des maillages visibles d'un modèle.
+static func model_aabb(n: Node) -> AABB:
+	var box := AABB()
+	var first := true
+	for c in n.get_children():
+		if c is VisualInstance3D and c.visible and not c is Light3D:
+			var a: AABB = c.global_transform * c.get_aabb()
+			box = a if first else box.merge(a)
+			first = false
+		if c is Node3D and c.visible:
+			var sub := model_aabb(c)
+			if sub.size != Vector3.ZERO:
+				box = sub if first else box.merge(sub)
+				first = false
+	return box
+
+
 ## Hauteur du modèle visible (pour placer minuterie et bulle au-dessus du toit).
 static func model_height(n: Node) -> float:
 	var top := 0.0
