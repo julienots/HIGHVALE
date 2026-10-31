@@ -30,7 +30,7 @@ Reste à faire :
 - Équilibrage complet de la progression du Temple, niveaux 1 à 10.
 - Décorations et obstacles à dégager.
 
-## 🟡 Étape 4 — Population et récolte (base jouable)
+## ✅ Étape 4 — Population et récolte
 
 Fait (v0.5.0) :
 - Croissance de la population jusqu'à la capacité des logements, y compris hors ligne.
@@ -38,10 +38,14 @@ Fait (v0.5.0) :
 - Habitants modélisés (mineur, mineur de cristaux, cultivatrice, porteur, bâtisseur, habitante) qui marchent sur la grille (A*), travaillent, livrent leur récolte et construisent les chantiers.
 - Tests : croissance, affectation, efficacité, souhaits du joueur, perte de logements.
 
-Reste à faire :
-- Besoins des habitants (nourriture, bien-être) et leur effet sur la croissance.
-- Récolte manuelle de filons et de champignons sauvages autour de la cité.
-- Métiers supplémentaires pour les bâtiments des étapes suivantes.
+Fait (v0.6.0) :
+- Bien-être (0-100 %) : base, confort des bâtiments (Temple, décorations), festins payés en Nectar souterrain ; il règle la vitesse d'arrivée des habitants.
+- Nectarerie : premier producteur de Nectar souterrain.
+- Trois décorations : Fontaine de cristal, Jardin des lueurs, Statue du Fondateur.
+- Ressources sauvages (filon, champignons, cristaux) : apparition régulière, aussi hors ligne, sur les cases libres ; elles bloquent la construction et se récoltent d'un toucher.
+
+Plus tard :
+- Métiers des bâtiments des étapes suivantes (forgerons, laborantins…).
 
 ## ⏳ Étapes suivantes
 
