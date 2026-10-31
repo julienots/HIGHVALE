@@ -1,11 +1,12 @@
 """Construit les modèles 3D de HIGHVALE et les exporte en .glb.
 
 Utilisation (module bpy ou Blender en ligne de commande) :
-    python tools/blender/build_models.py [identifiants…] [--preview DOSSIER]
+    python tools/blender/build_models.py [identifiants…] [--preview DOSSIER] [--tier N]
     blender -b -P tools/blender/build_models.py -- [identifiants…] [--preview DOSSIER]
 
-Chaque fichier models/<id>.py expose build(m: Model). Le résultat est écrit dans
-assets/models/buildings/<id>.glb ; --preview rend aussi une image Cycles.
+Chaque fichier models/<id>.py (bâtiments), props/<id>.py (décors) ou
+characters/<id>.py (habitants) expose build(m: Model). Le résultat est écrit dans
+assets/models/<catégorie>/<id>.glb ; --preview rend aussi une image Cycles.
 """
 import importlib
 import math
@@ -21,7 +22,12 @@ from mathutils import Vector  # noqa: E402
 
 import hv_kit  # noqa: E402
 
-OUT_DIR = os.path.join(ROOT, "assets", "models", "buildings")
+# Dossier source -> dossier d'export
+CATEGORIES = {
+    "models": os.path.join(ROOT, "assets", "models", "buildings"),
+    "props": os.path.join(ROOT, "assets", "models", "props"),
+    "characters": os.path.join(ROOT, "assets", "models", "characters"),
+}
 
 
 def render_preview(path, extent):
@@ -82,13 +88,19 @@ def main(argv):
         i = argv.index("--preview")
         preview = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
-    ids = argv or sorted(f[:-3] for f in os.listdir(os.path.join(HERE, "models")) if f.endswith(".py") and not f.startswith("_"))
-    os.makedirs(OUT_DIR, exist_ok=True)
+    index = {}
+    for cat in CATEGORIES:
+        for f in sorted(os.listdir(os.path.join(HERE, cat))):
+            if f.endswith(".py") and not f.startswith("_"):
+                index[f[:-3]] = cat
+    ids = argv or list(index)
     for model_id in ids:
-        mod = importlib.import_module("models." + model_id)
+        cat = index[model_id]
+        mod = importlib.import_module("%s.%s" % (cat, model_id))
         m = hv_kit.Model(seed=sum(map(ord, model_id)))
         mod.build(m)
-        faces = m.export(os.path.join(OUT_DIR, model_id + ".glb"))
+        os.makedirs(CATEGORIES[cat], exist_ok=True)
+        faces = m.export(os.path.join(CATEGORIES[cat], model_id + ".glb"))
         print("%-22s %6d faces" % (model_id, faces))
         if preview:
             os.makedirs(preview, exist_ok=True)

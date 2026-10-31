@@ -9,24 +9,20 @@ const GROUND_SHADER := preload("res://assets/shaders/cave_ground.gdshader")
 const WATER_SHADER := preload("res://assets/shaders/water.gdshader")
 const WATERFALL_SHADER := preload("res://assets/shaders/waterfall.gdshader")
 
-const ROCK := Color("4a4560")
-const ROCK_L := Color("6a6585")
-const CRYSTAL_SETS := [
-	[Color("2fa8ff"), Color("7fdcff")],
-	[Color("7a5cff"), Color("c2b4ff")],
-	[Color("1ad6c0"), Color("9bfff0")],
-]
-
 var grid_size := Vector2i(40, 40)
 var buildable := Rect2i(3, 3, 34, 34)
 var _rng := RandomNumberGenerator.new()
 var _sun: DirectionalLight3D
+var _props: PropScatter
 
 
 func build(p_grid: Vector2i, p_buildable: Rect2i) -> void:
 	grid_size = p_grid
 	buildable = p_buildable
 	_rng.seed = 424242
+	_props = PropScatter.new()
+	_props.name = "Props"
+	add_child(_props)
 	_environment()
 	_ground()
 	_cliffs()
@@ -35,6 +31,7 @@ func build(p_grid: Vector2i, p_buildable: Rect2i) -> void:
 	_mushrooms()
 	_ruins()
 	_spores()
+	_props.build()
 	_merge_static()
 	Events.settings_changed.connect(_apply_settings)
 	_apply_settings()
@@ -96,34 +93,26 @@ func _ground() -> void:
 
 ## Falaises hautes à l'arrière (côtés x≈0 et z≈0), rochers bas à l'avant pour garder la vue.
 func _cliffs() -> void:
-	var mat := K.mat(ROCK, 0.95)
-	var mat_l := K.mat(ROCK_L, 0.95)
 	var n := grid_size.x
-	for i in range(-12, n + 14, 2):
+	var cliffs := ["cliff_a", "cliff_b", "cliff_c"]
+	for i in range(-10, n + 12, 3):
 		var t := float(i)
-		# Paroi du fond le long de z = 0
-		_rock(Vector3(t + _rng.randf_range(-0.8, 0.8), 0, -2.5 - _rng.randf_range(0, 2.5)), _rng.randf_range(2.5, 4.5), _rng.randf_range(3.0, 7.0), mat if i % 4 else mat_l)
-		# Paroi du fond le long de x = 0
-		_rock(Vector3(-2.5 - _rng.randf_range(0, 2.5), 0, t + _rng.randf_range(-0.8, 0.8)), _rng.randf_range(2.5, 4.5), _rng.randf_range(3.0, 7.0), mat_l if i % 4 else mat)
-		# Arrière-plan plus lointain
-		_rock(Vector3(t, 0, -8 - _rng.randf_range(0, 3)), 5.0, _rng.randf_range(6.0, 11.0), mat)
-		_rock(Vector3(-8 - _rng.randf_range(0, 3), 0, t), 5.0, _rng.randf_range(6.0, 11.0), mat)
-	# Bordure avant basse
-	for i in range(0, n + 2, 3):
+		# Première rangée, contre la cité
+		_props.add(cliffs[_rng.randi() % 3], Vector3(t + _rng.randf_range(-0.6, 0.6), 0, -3.2 - _rng.randf_range(0, 1.5)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
+		_props.add(cliffs[_rng.randi() % 3], Vector3(-3.2 - _rng.randf_range(0, 1.5), 0, t + _rng.randf_range(-0.6, 0.6)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
+		# Arrière-plan, plus massif
+		_props.add(cliffs[_rng.randi() % 3], Vector3(t, 0, -8.5 - _rng.randf_range(0, 2.5)), _rng.randf_range(1.5, 2.1), _rng.randf() * TAU)
+		_props.add(cliffs[_rng.randi() % 3], Vector3(-8.5 - _rng.randf_range(0, 2.5), 0, t), _rng.randf_range(1.5, 2.1), _rng.randf() * TAU)
+	# Bordure avant basse : rochers moussus
+	for i in range(0, n + 3, 3):
 		var t := float(i)
-		_rock(Vector3(t + _rng.randf(), 0, n + 1.5 + _rng.randf_range(0, 2)), _rng.randf_range(1.0, 2.0), _rng.randf_range(0.6, 1.2), mat_l)
-		_rock(Vector3(n + 1.5 + _rng.randf_range(0, 2), 0, t + _rng.randf()), _rng.randf_range(1.0, 2.0), _rng.randf_range(0.6, 1.2), mat)
+		_props.add("boulder", Vector3(t + _rng.randf(), 0, n + 1.2 + _rng.randf_range(0, 1.5)), _rng.randf_range(0.6, 1.0), _rng.randf() * TAU)
+		_props.add("boulder", Vector3(n + 1.2 + _rng.randf_range(0, 1.5), 0, t + _rng.randf()), _rng.randf_range(0.6, 1.0), _rng.randf() * TAU)
 	# Stalagmites
-	for i in 26:
-		var p := _border_point(1.0)
-		var h := _rng.randf_range(1.0, 3.2)
-		if p.x > n - 2 or p.z > n - 2:
-			h *= 0.5
-		K.part(self, K.cylinder(_rng.randf_range(0.3, 0.5), h, 0.03, 7), mat_l, p + Vector3(0, h / 2, 0), Vector3(_rng.randf_range(-6, 6), _rng.randf() * 360, _rng.randf_range(-6, 6)))
-
-
-func _rock(pos: Vector3, size: float, height: float, mat: Material) -> void:
-	K.part(self, K.rock(_rng.randi()), mat, pos, Vector3(0, _rng.randf() * 360, 0), Vector3(size, height, size))
+	for i in 18:
+		var p := _border_point(1.2)
+		var k := 0.5 if p.x > n - 2 or p.z > n - 2 else _rng.randf_range(0.7, 1.3)
+		_props.add("stalagmite", p, k, _rng.randf() * TAU)
 
 
 ## Point aléatoire dans la bande non constructible autour de la cité.
@@ -154,9 +143,9 @@ func _waterfall(pos: Vector3) -> void:
 	var w := K.part(self, pool, wm, pos + Vector3(0, 0.06, 0.9))
 	w.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	w.set_meta("no_merge", true)
-	for i in 10:
-		var a := PI * i / 9.0
-		_rock(pos + Vector3(cos(a) * 3.4, 0, 0.9 + sin(a) * 1.7), _rng.randf_range(0.5, 0.8), _rng.randf_range(0.4, 0.7), K.mat(ROCK_L))
+	for i in 9:
+		var a := PI * i / 8.0
+		_props.add("boulder", pos + Vector3(cos(a) * 3.4, 0, 0.9 + sin(a) * 1.7), _rng.randf_range(0.4, 0.6), _rng.randf() * TAU)
 	var light := OmniLight3D.new()
 	light.light_color = Color("6fd8ff")
 	light.light_energy = 0.8
@@ -166,44 +155,38 @@ func _waterfall(pos: Vector3) -> void:
 
 
 func _crystals() -> void:
+	var kinds := ["crystals_blue", "crystals_violet", "crystals_teal"]
+	var glows := [Color("7fdcff"), Color("c2b4ff"), Color("9bfff0")]
 	var lights := 0
-	for i in 18:
-		var p := _border_point(0.6)
-		var colors: Array = CRYSTAL_SETS[i % CRYSTAL_SETS.size()]
-		var size := _rng.randf_range(0.7, 1.6)
-		K.crystal_cluster(self, p, size, colors[0], colors[1], _rng, _rng.randi_range(3, 6))
-		if lights < 6 and size > 1.0:
+	for i in 14:
+		var p := _border_point(1.0)
+		var k := i % 3
+		var size := _rng.randf_range(0.6, 1.2)
+		_props.add(kinds[k], p, size, _rng.randf() * TAU)
+		if lights < 6 and size > 0.9:
 			lights += 1
 			var l := OmniLight3D.new()
-			l.light_color = colors[1]
+			l.light_color = glows[k]
 			l.light_energy = 1.5
 			l.omni_range = 6.5
-			l.position = p + Vector3(0, 1.2, 0)
+			l.position = p + Vector3(0, 1.4, 0)
 			add_child(l)
 	# Grands cristaux dans les parois du fond
-	for p in [Vector3(4, 0, -3.5), Vector3(-3.5, 0, 26), Vector3(30, 0, -4), Vector3(-4, 0, 9)]:
-		K.crystal_cluster(self, p, 3.2, Color("2fa8ff"), Color("9be6ff"), _rng, 5)
+	for p in [Vector3(4, 0, -3.0), Vector3(-3.0, 0, 26), Vector3(30, 0, -3.5), Vector3(-3.5, 0, 9)]:
+		_props.add("crystals_blue", p, 2.2, _rng.randf() * TAU)
 
 
 func _mushrooms() -> void:
-	var caps := [Color("3fd6c0"), Color("7a5cff"), Color("ff6ad5")]
-	for i in 14:
-		var p := _border_point(0.4)
-		var s := _rng.randf_range(0.5, 1.6)
-		var c: Color = caps[i % caps.size()]
-		K.part(self, K.cylinder(0.12 * s, 1.1 * s, 0.08 * s, 8), K.mat(Color("e8e0cc")), p + Vector3(0, 0.55 * s, 0))
-		var cap := K.part(self, K.sphere(0.5 * s, true, 12), K.mat(c, 0.6), p + Vector3(0, 1.05 * s, 0))
-		cap.scale = Vector3(1, 0.65, 1)
-		K.part(self, K.sphere(0.46 * s, true, 12), K.glow_mat(c.lightened(0.25), 1.6), p + Vector3(0, 1.04 * s, 0), Vector3(180, 0, 0), Vector3(1, 0.2, 1))
+	var kinds := ["mushrooms_teal", "mushrooms_violet", "mushrooms_pink"]
+	for i in 10:
+		_props.add(kinds[i % 3], _border_point(1.0), _rng.randf_range(0.6, 1.1), _rng.randf() * TAU)
 
 
 func _ruins() -> void:
-	var stone := K.mat(Color("8a8496"))
-	for p in [Vector3(38.5, 0, 6), Vector3(1.6, 0, 37), Vector3(38.6, 0, 30), Vector3(20, 0, 38.8), Vector3(1.4, 0, 18)]:
-		var h := _rng.randf_range(1.0, 2.6)
-		K.part(self, K.cylinder(0.32, h, 0.3, 10), stone, p + Vector3(0, h / 2, 0), Vector3(_rng.randf_range(-8, 8), 0, _rng.randf_range(-8, 8)))
-		K.part(self, K.box(Vector3(0.8, 0.2, 0.8)), stone, p + Vector3(0, 0.1, 0))
-		K.part(self, K.cylinder(0.3, 0.8, -1, 10), stone, p + Vector3(0.8, 0.3, 0.4), Vector3(0, 30, 90))
+	for p in [Vector3(38.5, 0, 6), Vector3(1.6, 0, 37), Vector3(38.6, 0, 30), Vector3(1.4, 0, 18)]:
+		_props.add("ruin_pillar", p, _rng.randf_range(0.8, 1.1), _rng.randf() * TAU)
+	_props.add("ruin_arch", Vector3(20, 0, 38.9), 1.0, 0.0)
+	_props.add("ruin_arch", Vector3(38.9, 0, 16), 0.9, PI / 2.0)
 
 
 ## Fusionne les décors statiques par matériau : quelques appels de rendu au lieu
@@ -238,7 +221,7 @@ func _static_meshes(n: Node) -> Array[MeshInstance3D]:
 	for c in n.get_children():
 		if c is MeshInstance3D and not c.has_meta("no_merge"):
 			out.append(c)
-		elif c is Node3D and not (c is GPUParticles3D or c is Light3D or c is WorldEnvironment):
+		elif c is Node3D and not (c is GPUParticles3D or c is Light3D or c is WorldEnvironment or c is PropScatter):
 			out.append_array(_static_meshes(c))
 	return out
 

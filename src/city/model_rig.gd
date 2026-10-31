@@ -58,24 +58,34 @@ static func _prepare_materials(mi: MeshInstance3D) -> void:
 		return
 	for i in mesh.get_surface_count():
 		var m := mesh.surface_get_material(i)
-		if not m is StandardMaterial3D:
-			continue
-		var name := m.resource_name.to_lower()
-		if name.begins_with("crystal"):
-			mi.set_surface_override_material(i, _crystal(m))
-			continue
-		if _prepared_materials.has(m.get_instance_id()):
-			continue
+		var prepared := surface_material(m)
+		if prepared != m:
+			mi.set_surface_override_material(i, prepared)
+
+
+## Matériau prêt pour le rendu HIGHVALE : couleurs de sommets, métal adouci,
+## ou shader pulsé pour les cristaux (retourne alors un autre matériau).
+static func surface_material(m: Material) -> Material:
+	if not m is StandardMaterial3D:
+		return m
+	if m.resource_name.to_lower().begins_with("crystal"):
+		return _crystal(m)
+	if not _prepared_materials.has(m.get_instance_id()):
 		_prepared_materials[m.get_instance_id()] = true
-		m.vertex_color_use_as_albedo = true
-		# Caverne sans ciel : un métal pur ne refléterait que le noir.
-		if m.metallic > 0.4:
-			m.metallic = 0.4
-			m.roughness = maxf(m.roughness, 0.35)
-			m.albedo_color = m.albedo_color.lightened(0.12)
-		m.rim_enabled = true
-		m.rim = 0.08
-		m.rim_tint = 0.7
+		_prepare_standard(m)
+	return m
+
+
+static func _prepare_standard(m: StandardMaterial3D) -> void:
+	m.vertex_color_use_as_albedo = true
+	# Caverne sans ciel : un métal pur ne refléterait que le noir.
+	if m.metallic > 0.4:
+		m.metallic = 0.4
+		m.roughness = maxf(m.roughness, 0.35)
+		m.albedo_color = m.albedo_color.lightened(0.12)
+	m.rim_enabled = true
+	m.rim = 0.08
+	m.rim_tint = 0.7
 
 
 static func _crystal(src: StandardMaterial3D) -> Material:
