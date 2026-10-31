@@ -70,6 +70,17 @@ PALETTE = {
     "brew_violet": ("b464ff", 0.3, 0.0, "a050ff", 3.0),
     "brew_green": ("5bff8a", 0.3, 0.0, "3ae070", 3.0),
     "glow_gold": ("fff1a8", 0.4, 0.0, "ffd84a", 4.0),
+    "skin": ("f2c39c", 0.7, 0.0, None, 0),
+    "skin_dark": ("a8714a", 0.7, 0.0, None, 0),
+    "hair_brown": ("5a3a24", 0.8, 0.0, None, 0),
+    "hair_red": ("b8502a", 0.8, 0.0, None, 0),
+    "hair_white": ("e8e4dc", 0.8, 0.0, None, 0),
+    "cloth_green": ("4f8a3a", 0.95, 0.0, None, 0),
+    "cloth_brown": ("8a5a34", 0.95, 0.0, None, 0),
+    "cloth_orange": ("e8862a", 0.95, 0.0, None, 0),
+    "leather": ("6a4228", 0.8, 0.0, None, 0),
+    "helmet_yellow": ("f2b62a", 0.45, 0.0, None, 0),
+    "palette": ("ffffff", 0.8, 0.0, None, 0),
     "glow_teal": ("a8fff2", 0.5, 0.0, "6ff5e0", 2.5),
     "glow_violet": ("d8c8ff", 0.5, 0.0, "b49cff", 2.5),
     "glow_pink": ("ffc8f0", 0.5, 0.0, "ff8ae0", 2.5),
@@ -123,8 +134,12 @@ def _mat4(loc, rot, scale=(1, 1, 1)):
 
 
 class Model:
-    def __init__(self, seed=1):
+    def __init__(self, seed=1, flat_palette=False):
+        """flat_palette : toutes les couleurs non émissives passent par un seul
+        matériau « palette » (couleur portée par les sommets) — idéal pour les
+        personnages animés, qui ne peuvent pas être fusionnés entre eux."""
         reset_scene()
+        self.flat_palette = flat_palette
         self.rng = random.Random(seed)
         self.acc = {}  # (groupe, matériau) -> (bmesh, couche couleur)
         self.group = "t0"
@@ -170,11 +185,17 @@ class Model:
         return self.acc[key]
 
     def add(self, src, mat, matrix, tint=None, smooth=None):
-        bm, col = self._target(mat)
         if tint is None:
             tint = self.jitter(0.06)
         if not isinstance(tint, (tuple, list)):
             tint = (tint, tint, tint)
+        if self.flat_palette and PALETTE[mat][3] is None:
+            # Couche de couleur en octets : Blender l'interprète déjà comme sRGB.
+            h = PALETTE[mat][0]
+            base = tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+            tint = (tint[0] * base[0], tint[1] * base[1], tint[2] * base[2])
+            mat = "palette"
+        bm, col = self._target(mat)
         src.normal_update()
         vmap = {v: bm.verts.new(matrix @ v.co) for v in src.verts}
         for f in src.faces:

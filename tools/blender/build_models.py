@@ -97,7 +97,7 @@ def main(argv):
     for model_id in ids:
         cat = index[model_id]
         mod = importlib.import_module("%s.%s" % (cat, model_id))
-        m = hv_kit.Model(seed=sum(map(ord, model_id)))
+        m = hv_kit.Model(seed=sum(map(ord, model_id)), flat_palette=getattr(mod, "FLAT_PALETTE", False))
         mod.build(m)
         os.makedirs(CATEGORIES[cat], exist_ok=True)
         faces = m.export(os.path.join(CATEGORIES[cat], model_id + ".glb"))

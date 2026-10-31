@@ -61,6 +61,7 @@ func _ready() -> void:
 	Events.resource_changed.connect(func(id, _a): _refresh_chip(id))
 	Events.capacities_changed.connect(_refresh_all)
 	Events.game_loaded.connect(_refresh_all)
+	Events.population_changed.connect(_refresh_counters)
 	_refresh_all()
 
 
@@ -105,6 +106,9 @@ func _build_top_bar() -> void:
 	bar.add_child(builders)
 	var pop := _info_chip(ICON_POP)
 	_pop_label = pop.get_meta("label")
+	pop.gui_input.connect(func(e):
+		if e is InputEventMouseButton and not e.pressed:
+			_show_population())
 	bar.add_child(pop)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -224,7 +228,7 @@ func _refresh_counters() -> void:
 	var city := GameState.city
 	_temple_label.text = "Niv. %d" % city.temple_level()
 	_builders_label.text = "%d/%d" % [city.builders_total() - city.builders_busy(), city.builders_total()]
-	_pop_label.text = Fmt.amount(city.population_capacity())
+	_pop_label.text = "%d/%d" % [city.inhabitants, city.population_capacity()]
 
 
 func _show_resource_info(id: String) -> void:
@@ -266,6 +270,34 @@ func _show_all_resources() -> void:
 		row.custom_minimum_size = Vector2(300, 0)
 		grid.add_child(row)
 	DialogBox.open(root, "Ressources", grid, [], 760)
+
+
+func _show_population() -> void:
+	var city := GameState.city
+	var now := GameClock.now()
+	var body := VBoxContainer.new()
+	body.add_theme_constant_override("separation", 8)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 30)
+	for row in [["Habitants", "%d / %d" % [city.inhabitants, city.population_capacity()]],
+			["Au travail", str(city.workers_total())], ["Libres", str(city.idle_inhabitants())],
+			["Prochaine arrivée", "Logements pleins" if city.next_arrival_in(now) < 0 else Fmt.duration(city.next_arrival_in(now))]]:
+		grid.add_child(UiTheme.label(row[0], "", 22))
+		grid.add_child(UiTheme.label(row[1], "HudLabel", 24))
+	body.add_child(grid)
+	body.add_child(HSeparator.new())
+	var any := false
+	for b in city.buildings.values():
+		if b.worker_slots() > 0:
+			any = true
+			body.add_child(UiTheme.label("%s (niv. %d) : %d / %d ouvriers — %d %%" % [b.data().display_name, b.level, b.workers, b.worker_slots(), roundi(b.efficiency() * 100)], "", 20))
+	if not any:
+		body.add_child(UiTheme.label("Aucun bâtiment de production.", "DimLabel", 18))
+	var hint := UiTheme.label("Les habitants arrivent tant qu'il reste des logements (Hôtel des habitants, Temple). Ils sont affectés aux postes libres ; un bâtiment sans ouvrier produit à 25 %.", "DimLabel", 17)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(hint)
+	DialogBox.open(root, "Population", body, [], 680)
 
 
 func _show_builders_info() -> void:

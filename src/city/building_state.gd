@@ -18,6 +18,9 @@ var task_cost := {}
 ## La production s'accumule depuis prod_since ; prod_carry contient le reste déjà produit.
 var prod_since := 0.0
 var prod_carry := 0.0
+## Habitants affectés et nombre souhaité par le joueur (-1 = tous les postes).
+var workers := 0
+var desired_workers := -1
 
 
 func data() -> BuildingData:
@@ -46,6 +49,31 @@ func task_progress(now: float) -> float:
 	return clampf((now - task_start) / (task_end - task_start), 0.0, 1.0)
 
 
+func worker_slots() -> int:
+	return data().worker_slots(level)
+
+
+## Nombre d'ouvriers visé : souhait du joueur borné par les postes disponibles.
+func worker_target() -> int:
+	var slots := worker_slots()
+	return slots if desired_workers < 0 else mini(desired_workers, slots)
+
+
+## Efficacité de production : 25 % sans ouvrier, 100 % avec tous les postes pourvus.
+func efficiency() -> float:
+	var slots := worker_slots()
+	if slots <= 0:
+		return 1.0
+	return 0.25 + 0.75 * clampf(float(workers) / slots, 0.0, 1.0)
+
+
+## Fige la production accumulée avant un changement de rythme (ouvriers, chantier).
+func flush(now: float) -> void:
+	prod_carry = stored_production(now)
+	if not is_busy():
+		prod_since = now
+
+
 ## Quantité produite en attente de collecte. La production est en pause pendant un chantier.
 func stored_production(now: float) -> float:
 	var d := data()
@@ -54,7 +82,7 @@ func stored_production(now: float) -> float:
 	var cap := float(d.internal_capacity(level))
 	if is_busy():
 		return minf(prod_carry, cap)
-	var produced := d.production_per_hour(level) / 3600.0 * maxf(now - prod_since, 0.0)
+	var produced := d.production_per_hour(level) * efficiency() / 3600.0 * maxf(now - prod_since, 0.0)
 	return minf(prod_carry + produced, cap)
 
 
@@ -63,6 +91,7 @@ func to_dict() -> Dictionary:
 		"uid": uid, "id": data_id, "level": level, "x": cell.x, "y": cell.y,
 		"task": task, "task_start": task_start, "task_end": task_end, "task_cost": task_cost,
 		"prod_since": prod_since, "prod_carry": prod_carry,
+		"workers": workers, "desired_workers": desired_workers,
 	}
 
 
@@ -81,4 +110,6 @@ static func from_dict(d: Dictionary) -> BuildingState:
 		b.task_cost[str(k)] = int(tc[k])
 	b.prod_since = float(d.get("prod_since", 0.0))
 	b.prod_carry = float(d.get("prod_carry", 0.0))
+	b.workers = int(d.get("workers", 0))
+	b.desired_workers = int(d.get("desired_workers", -1))
 	return b

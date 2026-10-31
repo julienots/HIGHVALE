@@ -12,6 +12,11 @@ extends Resource
 @export var buildable_rect := Rect2i(3, 3, 34, 34)
 @export var base_builders := 1
 
+@export_group("Population")
+@export var starting_inhabitants := 6
+## Un nouvel habitant arrive à cet intervalle tant qu'il reste des logements.
+@export var population_growth_seconds := 20.0
+
 @export_group("Accélération")
 ## En dessous de ce temps restant, la fin de chantier est gratuite.
 @export var free_speedup_seconds := 30.0

@@ -7,6 +7,7 @@ signal building_added(b: BuildingState)
 signal building_removed(b: BuildingState)
 signal building_changed(b: BuildingState)
 signal task_finished(b: BuildingState)
+signal population_changed
 
 const TEMPLE_ID := "primordial_temple"
 const CANCEL_REFUND_RATIO := 0.5
@@ -14,6 +15,10 @@ const CANCEL_REFUND_RATIO := 0.5
 var grid_size := Vector2i(40, 40)
 var buildable_rect := Rect2i(3, 3, 34, 34)
 var base_builders := 1
+var growth_seconds := 20.0
+## Habitants présents et horodatage de référence de la croissance.
+var inhabitants := 0
+var growth_since := 0.0
 var buildings := {}  # uid -> BuildingState
 var _occupancy := {}  # Vector2i -> uid
 var _next_uid := 1
@@ -23,6 +28,7 @@ func configure(config: GameConfig) -> void:
 	grid_size = config.grid_size
 	buildable_rect = config.buildable_rect
 	base_builders = config.base_builders
+	growth_seconds = config.population_growth_seconds
 
 
 # --- Requêtes -------------------------------------------------------------
@@ -203,6 +209,7 @@ func remove(b: BuildingState) -> void:
 	_set_occupancy(b, false)
 	buildings.erase(b.uid)
 	building_removed.emit(b)
+	update_population(growth_since)
 
 
 ## Coût en monnaie premium pour terminer immédiatement un chantier.
@@ -250,7 +257,94 @@ func update(now: float) -> Array[BuildingState]:
 	done.sort_custom(func(a, c): return a.task_end < c.task_end)
 	for b in done:
 		_finish_task(b, b.task_end)
+	update_population(now)
 	return done
+
+
+# --- Population -------------------------------------------------------------
+
+func workers_total() -> int:
+	var n := 0
+	for b in buildings.values():
+		n += b.workers
+	return n
+
+
+func idle_inhabitants() -> int:
+	return maxi(inhabitants - workers_total(), 0)
+
+
+## Secondes avant l'arrivée du prochain habitant (-1 si les logements sont pleins).
+func next_arrival_in(now: float) -> float:
+	if inhabitants >= population_capacity():
+		return -1.0
+	return maxf(growth_seconds - (now - growth_since), 0.0)
+
+
+## Croissance de la population (aussi hors ligne) puis affectation aux postes libres.
+func update_population(now: float) -> void:
+	var cap := population_capacity()
+	var before := inhabitants
+	if inhabitants > cap:
+		inhabitants = cap
+		_trim_workers(now)
+	if inhabitants >= cap:
+		growth_since = now
+	elif growth_seconds > 0.0 and now > growth_since:
+		var arrivals := int((now - growth_since) / growth_seconds)
+		if arrivals > 0:
+			inhabitants = mini(inhabitants + arrivals, cap)
+			growth_since = now if inhabitants >= cap else growth_since + arrivals * growth_seconds
+	if inhabitants != before:
+		population_changed.emit()
+	auto_assign(now)
+
+
+## Répartit les habitants libres vers les postes les moins pourvus.
+func auto_assign(now: float) -> void:
+	var changed: Array[BuildingState] = []
+	while idle_inhabitants() > 0:
+		var best: BuildingState = null
+		var best_ratio := 2.0
+		for b in buildings.values():
+			if b.level < 1 or b.workers >= b.worker_target():
+				continue
+			var ratio: float = float(b.workers) / b.worker_slots()
+			if ratio < best_ratio or (ratio == best_ratio and best and b.uid < best.uid):
+				best = b
+				best_ratio = ratio
+		if best == null:
+			break
+		best.flush(now)
+		best.workers += 1
+		if not best in changed:
+			changed.append(best)
+	for b in changed:
+		building_changed.emit(b)
+	if not changed.is_empty():
+		population_changed.emit()
+
+
+## Choix du joueur : nombre d'ouvriers souhaité dans un bâtiment.
+func set_desired_workers(b: BuildingState, count: int, now: float) -> void:
+	b.desired_workers = clampi(count, 0, b.worker_slots())
+	if b.workers > b.worker_target():
+		b.flush(now)
+		b.workers = b.worker_target()
+	auto_assign(now)
+	building_changed.emit(b)
+	population_changed.emit()
+
+
+func _trim_workers(now: float) -> void:
+	while workers_total() > inhabitants:
+		var most: BuildingState = null
+		for b in buildings.values():
+			if b.workers > 0 and (most == null or b.workers > most.workers):
+				most = b
+		most.flush(now)
+		most.workers -= 1
+		building_changed.emit(most)
 
 
 # --- Interne --------------------------------------------------------------
@@ -279,6 +373,7 @@ func _finish_task(b: BuildingState, at: float) -> void:
 	b.task = BuildingState.Task.NONE
 	b.task_cost = {}
 	b.prod_since = at
+	auto_assign(at)
 	building_changed.emit(b)
 	task_finished.emit(b)
 
@@ -299,13 +394,15 @@ func to_dict() -> Dictionary:
 	var list := []
 	for b in buildings.values():
 		list.append(b.to_dict())
-	return {"next_uid": _next_uid, "buildings": list}
+	return {"next_uid": _next_uid, "buildings": list, "inhabitants": inhabitants, "growth_since": growth_since}
 
 
 func from_dict(d: Dictionary) -> void:
 	buildings.clear()
 	_occupancy.clear()
 	_next_uid = int(d.get("next_uid", 1))
+	inhabitants = int(d.get("inhabitants", 0))
+	growth_since = float(d.get("growth_since", 0.0))
 	for bd in d.get("buildings", []):
 		var b := BuildingState.from_dict(bd)
 		if b.data() == null:

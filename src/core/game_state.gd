@@ -43,6 +43,9 @@ func new_game() -> void:
 		wallet.set_amount(str(id), int(config().starting_resources[id]))
 	for entry in config().starting_layout:
 		city.add_built(entry.get("id", ""), entry.get("cell", Vector2i.ZERO), entry.get("level", 1), now)
+	city.inhabitants = config().starting_inhabitants
+	city.growth_since = now
+	city.auto_assign(now)
 	profile = {"player_name": "Fondateur", "created_at": now, "story_seen": []}
 	is_loaded = true
 	save()
@@ -82,6 +85,7 @@ func _new_city() -> CityState:
 	city.building_removed.connect(_on_building_removed)
 	city.building_changed.connect(func(b): Events.building_changed.emit(b.uid))
 	city.task_finished.connect(_on_task_finished)
+	city.population_changed.connect(func(): Events.population_changed.emit())
 	wallet.capacity_provider = city.storage_capacity
 	return city
 

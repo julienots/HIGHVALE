@@ -19,6 +19,7 @@ func _ready() -> void:
 		var n := BuildingNode.new()
 		add_child(n)
 		n.setup(b)
+	add_child(PopulationView.new())
 	_pivot = Node3D.new()
 	_pivot.position = Vector3(cfg.grid_size.x / 2.0, 0, cfg.grid_size.y / 2.0)
 	add_child(_pivot)

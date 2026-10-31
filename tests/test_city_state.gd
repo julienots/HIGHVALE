@@ -57,6 +57,8 @@ func test_construction_completes_in_order() -> void:
 func test_production_accumulates_and_caps() -> void:
 	var c := _city_with_temple()
 	var b := c.add_built("stone_mine", Vector2i(5, 5), 1, T0)
+	c.inhabitants = 2
+	c.auto_assign(T0)
 	var d := b.data()
 	var half_hour := b.stored_production(T0 + 1800.0)
 	check(absf(half_hour - d.production_per_hour(1) / 2.0) < 0.01, "production proportionnelle au temps")
@@ -66,6 +68,8 @@ func test_production_accumulates_and_caps() -> void:
 func test_collect_respects_wallet_space() -> void:
 	var c := _city_with_temple()
 	var b := c.add_built("stone_mine", Vector2i(5, 5), 1, T0)
+	c.inhabitants = 2
+	c.auto_assign(T0)
 	var w := new_wallet(c)
 	var cap := w.capacity("stone")
 	w.set_amount("stone", cap - 100)
@@ -140,3 +144,58 @@ func test_serialization_roundtrip() -> void:
 	eq(c2.building_at(Vector2i(6, 6)), b2, "occupation reconstruite")
 	var b3 := c2.add_built("fungal_grove", Vector2i(9, 9), 1, T0)
 	check(b3.uid > b.uid, "identifiants uniques après chargement")
+
+
+func test_population_grows_to_capacity() -> void:
+	var c := _city_with_temple()
+	c.inhabitants = 2
+	c.growth_since = T0
+	var cap := c.population_capacity()
+	c.update_population(T0 + c.growth_seconds * 3 + 1.0)
+	eq(c.inhabitants, 5, "trois arrivées en trois intervalles")
+	c.update_population(T0 + 100000.0)
+	eq(c.inhabitants, cap, "plafonné par les logements (y compris hors ligne)")
+	eq(c.next_arrival_in(T0 + 100000.0), -1.0, "plus d'arrivée quand c'est plein")
+
+
+func test_workers_assigned_and_efficiency() -> void:
+	var c := _city_with_temple()
+	var mine := c.add_built("stone_mine", Vector2i(5, 5), 1, T0)
+	var grove := c.add_built("fungal_grove", Vector2i(9, 5), 1, T0)
+	eq(mine.efficiency(), 0.25, "25 % sans ouvrier")
+	c.inhabitants = 3
+	c.auto_assign(T0)
+	eq(mine.workers + grove.workers, 3, "habitants libres affectés")
+	check(absi(mine.workers - grove.workers) <= 1, "répartition équilibrée")
+	c.inhabitants = 10
+	c.auto_assign(T0)
+	eq(mine.workers, mine.worker_slots(), "postes pourvus")
+	eq(mine.efficiency(), 1.0, "100 % avec tous les postes")
+	eq(c.idle_inhabitants(), 10 - mine.workers - grove.workers, "le reste est libre")
+
+
+func test_efficiency_changes_production_rate() -> void:
+	var c := _city_with_temple()
+	var mine := c.add_built("stone_mine", Vector2i(5, 5), 1, T0)
+	var rate := mine.data().production_per_hour(1)
+	check(absf(mine.stored_production(T0 + 360.0) - rate * 0.1 * 0.25) < 0.01, "production réduite sans ouvrier")
+	c.inhabitants = 2
+	c.auto_assign(T0 + 360.0)
+	var before := mine.stored_production(T0 + 360.0)
+	check(absf(mine.stored_production(T0 + 720.0) - before - rate * 0.1) < 0.01, "production complète ensuite, l'acquis est conservé")
+
+
+func test_desired_workers_and_capacity_drop() -> void:
+	var c := _city_with_temple()
+	var mine := c.add_built("stone_mine", Vector2i(5, 5), 1, T0)
+	c.inhabitants = 2
+	c.auto_assign(T0)
+	c.set_desired_workers(mine, 1, T0)
+	eq(mine.workers, 1, "le joueur retire un ouvrier")
+	eq(c.idle_inhabitants(), 1, "il redevient libre")
+	c.set_desired_workers(mine, 5, T0)
+	eq(mine.workers, mine.worker_slots(), "borné aux postes disponibles")
+	c.inhabitants = c.population_capacity()
+	c.remove(c.building_at(Vector2i(13, 18)))
+	check(c.inhabitants <= c.population_capacity(), "habitants réduits si des logements disparaissent")
+	check(c.workers_total() <= c.inhabitants, "jamais plus d'ouvriers que d'habitants")

@@ -7,6 +7,7 @@ extends RefCounted
 const ENABLED := {
 	"city": true,
 	"economy": true,
+	"population": true,
 }
 
 const MODULE_NAMES := {

@@ -40,6 +40,8 @@ const CATEGORY_NAMES := ["Cœur", "Ressources", "Stockage", "Population", "Créa
 @export var production_growth := 1.3
 ## Durée de production que le bâtiment peut contenir avant collecte.
 @export var internal_storage_hours := 1.0
+## Postes d'ouvriers au niveau 1 (+1 tous les deux niveaux). 0 = pas d'ouvriers.
+@export var base_workers := 0
 
 @export_group("Stockage")
 ## Capacité ajoutée au niveau 1 : { resource_id: quantité }.
@@ -76,6 +78,12 @@ func production_per_hour(level: int) -> float:
 	if produces.is_empty() or level < 1:
 		return 0.0
 	return round(base_production_per_hour * pow(production_growth, level - 1))
+
+
+func worker_slots(level: int) -> int:
+	if base_workers <= 0 or level < 1:
+		return 0
+	return base_workers + (level - 1) / 2
 
 
 func internal_capacity(level: int) -> int:

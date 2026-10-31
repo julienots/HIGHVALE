@@ -30,14 +30,18 @@ Reste à faire :
 - Équilibrage complet de la progression du Temple, niveaux 1 à 10.
 - Décorations et obstacles à dégager.
 
-## ⏳ Étape 4 — Population et récolte (prochaine étape proposée)
+## 🟡 Étape 4 — Population et récolte (base jouable)
 
-Plan :
-1. `PopulationState` : habitants, logements (Hôtel), métiers (mineur, cultivateur, transporteur, bâtisseur), besoins (nourriture, bien-être).
-2. Affectation des habitants aux bâtiments ; la production dépend des travailleurs affectés.
-3. Habitants visibles qui marchent dans la cité (pathfinding sur la grille avec `AStarGrid2D`) : aller-retour mine ↔ entrepôt, bâtisseurs sur les chantiers.
-4. Récolte manuelle de filons et de champignons sauvages autour de la cité.
-5. Débloquer le module « population » dans `FeatureFlags`.
+Fait (v0.5.0) :
+- Croissance de la population jusqu'à la capacité des logements, y compris hors ligne.
+- Postes d'ouvriers dans les bâtiments de production ; l'efficacité dépend des ouvriers affectés ; réglage − / + par le joueur ; fenêtre « Population ».
+- Habitants modélisés (mineur, mineur de cristaux, cultivatrice, porteur, bâtisseur, habitante) qui marchent sur la grille (A*), travaillent, livrent leur récolte et construisent les chantiers.
+- Tests : croissance, affectation, efficacité, souhaits du joueur, perte de logements.
+
+Reste à faire :
+- Besoins des habitants (nourriture, bien-être) et leur effet sur la croissance.
+- Récolte manuelle de filons et de champignons sauvages autour de la cité.
+- Métiers supplémentaires pour les bâtiments des étapes suivantes.
 
 ## ⏳ Étapes suivantes
 

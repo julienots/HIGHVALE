@@ -78,6 +78,16 @@ func _run() -> void:
 	await _frames(15)
 	await _shot("10_collect_and_panel")
 	city.deselect()
+	# Habitants : gros plan après quelques secondes de vie
+	city.cam.zoom = 6.5
+	city.cam.camera.size = 6.5
+	city.cam.position = Vector3(21, 0, 22)
+	await _frames(240)
+	await _shot("10b_villagers")
+	print("habitants visibles : ", city.population.villagers.size())
+	city.cam.zoom = 13.0
+	city.cam.camera.size = 13.0
+	city.deselect()
 	SettingsPanel.open(city.hud.root, true)
 	await _frames(15)
 	await _shot("11_settings")

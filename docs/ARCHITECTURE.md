@@ -59,6 +59,7 @@ src/
   inventory/   ItemData (schéma)
   exploration/ ZoneData (schéma, étape 9)
   quests/      StoryChapterData
+  population/  CityNav (A*), Villager, PopulationView
 tests/                   Tests headless et visite visuelle
 ```
 
@@ -95,6 +96,15 @@ GameState._process ─▶ CityState.update(now) ─▶ task_finished ─▶ Even
 - **Bâtisseurs** = `base_builders` + `builders_provided` des bâtiments (Hôtel des habitants).
 - **Production** : accumulée depuis `prod_since`, plafonnée par la réserve interne, en pause pendant un chantier. La collecte est limitée à la place libre ; le surplus reste dans le bâtiment.
 - **Modules futurs** : `BuildingData.feature` et `FeatureFlags` verrouillent les bâtiments dont le système n'est pas encore livré.
+
+## Population
+
+- `CityState` porte les habitants (`inhabitants`, `growth_since`) : un arrivant toutes les `population_growth_seconds` jusqu'à la capacité des logements, calcul par horodatage (progression hors ligne).
+- `BuildingData.base_workers` définit les postes (+1 tous les deux niveaux). `BuildingState.workers` et `desired_workers` sont sauvegardés.
+- Efficacité = 25 % + 75 % × ouvriers / postes ; la production accumulée est figée (`flush`) avant chaque changement.
+- `auto_assign` répartit les habitants libres vers les postes les moins pourvus ; `set_desired_workers` applique le choix du joueur.
+- Affichage : `PopulationView` crée jusqu'à 26 habitants visibles (deux par bâtiment de production, un par chantier, six flâneurs). `Villager` suit une petite machine à états (marche, travail, attente) et anime ses pièces articulées.
+- Les personnages utilisent un matériau unique « palette » (couleurs portées par les sommets) : environ 6 appels de rendu par habitant.
 
 ## Ajouter du contenu
 

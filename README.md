@@ -5,19 +5,22 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.4.0)
+## État actuel (v0.5.0)
 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Architecture du projet Godot | ✅ terminée |
 | 2 | Cité isométrique jouable | ✅ terminée |
 | 3 | Bâtiments et économie | 🟡 base jouable (voir [la feuille de route](docs/FEUILLE_DE_ROUTE.md)) |
-| 4 → 12 | Population, collections, laboratoire, invocation, combat… | ⏳ à venir |
+| 4 | Population et vie de la cité | 🟡 base jouable |
+| 5 → 12 | Collections, laboratoire, invocation, combat… | ⏳ à venir |
 
 **Ce qui est jouable et testé :**
 
 - Écran du studio, puis logo HIGHVALE avec chargement réel ; menu principal avec la cité du joueur en 3D en arrière-plan.
-- Grande caverne 3D : falaises, cristaux lumineux pulsants, champignons géants, ruines, cascade et bassin animés, spores flottantes.
+- Grande caverne 3D : falaises en strates, cristaux lumineux pulsants, bosquets de champignons géants, stalagmites, ruines antiques, cascade et bassin animés, spores flottantes. Les décors sont des modèles glTF instanciés par MultiMesh.
+- **Habitants** : la population augmente tant qu'il reste des logements, y compris jeu fermé. Les habitants sont affectés aux postes de production ; un bâtiment produit à 25 % sans ouvrier et à 100 % avec tous ses postes pourvus. Le joueur règle le nombre d'ouvriers avec − / +.
+- **Cité vivante** : mineurs, cultivatrices, porteurs, bâtisseurs et flâneurs modélisés en 3D se déplacent sur la grille (A*). Ils travaillent avec leur outil, rapportent leur récolte à l'Entrepôt ou au Temple, et les bâtisseurs martèlent sur les chantiers.
 - Caméra isométrique : glisser avec inertie, pincer ou molette pour zoomer.
 - **21 bâtiments modélisés en 3D** (fichiers glTF `assets/models/buildings/`, 2 500 à 15 000 faces chacun) : maçonnerie pierre par pierre, toits à tuiles, colombages, fenêtres éclairées, bannières, cristaux taillés, champignons géants. Chaque modèle s'enrichit aux niveaux 3, 5 et 7 et possède des pièces animées (roues, foreuse, cristal flottant, portails) et ses propres lumières.
 - Construction : menu par catégories avec vignettes 3D, aperçu translucide vert ou rouge, déplacement au doigt, validation.
@@ -31,6 +34,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 ## Modèles 3D
 
 Les modèles sont produits par des scripts Blender versionnés (`tools/blender/`), ce qui permet de les régénérer, de les retoucher dans Blender et de garantir un style cohérent :
+
+Catégories : `models/` (bâtiments), `props/` (décors de la caverne), `characters/` (habitants).
 
 ```bash
 # Avec Blender 4.2+ installé
@@ -51,8 +56,9 @@ Sur ordinateur, la souris simule le toucher : clic = toucher, glisser = déplace
 ## Tests
 
 ```bash
-# Tests logiques : économie, cité, sauvegarde, données, modèles
-godot --headless res://tests/test_runner.tscn
+# Tests logiques : économie, cité, population, sauvegarde, données, modèles
+# (échoue aussi sur toute erreur de script)
+tests/run_tests.sh /chemin/vers/godot
 
 # Visite visuelle automatique avec captures et vérification des entrées tactiles
 xvfb-run godot --rendering-method gl_compatibility res://tests/visual_tour.tscn -- /chemin/captures

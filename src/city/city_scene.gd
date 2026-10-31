@@ -9,6 +9,7 @@ const TAP_THRESHOLD := 14.0
 var cam: CityCamera
 var hud: CityHud
 var env: CaveEnvironment
+var population: PopulationView
 var nodes := {}  # uid -> BuildingNode
 var selected_uid := 0
 
@@ -36,6 +37,9 @@ func _ready() -> void:
 	_buildings_root.name = "Buildings"
 	add_child(_buildings_root)
 	_build_grid_overlay(cfg.buildable_rect)
+	population = PopulationView.new()
+	population.name = "Population"
+	add_child(population)
 	cam = CityCamera.new()
 	cam.name = "CameraRig"
 	cam.bounds = Rect2(cfg.buildable_rect)
@@ -351,6 +355,17 @@ func collect(uid: int) -> void:
 			n.play_pop(1.05)
 	elif b.stored_production(GameClock.now()) >= 1.0:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
+
+
+func change_workers(uid: int, delta: int) -> void:
+	var b := GameState.city.get_building(uid)
+	if b == null:
+		return
+	var city := GameState.city
+	if delta > 0 and city.idle_inhabitants() == 0 and b.workers >= b.worker_target():
+		Events.toast_requested.emit("Aucun habitant libre : agrandissez les logements", "error")
+	city.set_desired_workers(b, b.workers + delta, GameClock.now())
+	GameState.save()
 
 
 func open_upgrade(uid: int) -> void:
