@@ -214,7 +214,22 @@ func _damage(actor: Combatant, t: Combatant, skill: SkillData) -> Array:
 	if not t.is_alive():
 		t.statuses.clear()
 		events.append({"type": "death", "target": t})
+	elif t.is_boss:
+		events.append_array(_boss_phase(t))
 	return events
+
+
+## Boss à phases : à 66 % puis 33 % de vie, il se purifie, se protège et s'enrage.
+func _boss_phase(t: Combatant) -> Array:
+	var thresholds := [0.66, 0.33]
+	if t.phase >= thresholds.size() or t.hp_ratio() > thresholds[t.phase]:
+		return []
+	t.phase += 1
+	t.statuses = t.statuses.filter(func(s): return not s.effect in Combatant.NEGATIVE)
+	t.attack = int(t.attack * 1.2)
+	t.shield += int(t.max_hp * 0.15)
+	t.energy = 100
+	return [{"type": "phase", "target": t, "phase": t.phase + 1}]
 
 
 func _end_turn(actor: Combatant) -> void:

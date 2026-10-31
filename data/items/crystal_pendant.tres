@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/inventory/item_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/items/crystal_pendant.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "crystal_pendant"
+display_name = "Pendentif de cristal"
+description = "+8 vitesse, +10 énergie de départ"
+icon = ExtResource("2_icon")
+kind = 1
+rarity = 1
+slot = 6
+stat_bonus = {"speed": 8, "energy": 10}
+craft_cost = {"gold": 1500, "abyssal_crystal": 40}
+max_stack = 99

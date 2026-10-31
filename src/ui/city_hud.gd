@@ -20,6 +20,7 @@ var laboratory_screen: LaboratoryScreen
 var fusion_screen: FusionScreen
 var summon_screen: SummonScreen
 var stages_screen: StagesScreen
+var forge_screen: ForgeScreen
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
 var _builders_label: Label
@@ -70,6 +71,8 @@ func _ready() -> void:
 	root.add_child(summon_screen)
 	stages_screen = StagesScreen.new()
 	root.add_child(stages_screen)
+	forge_screen = ForgeScreen.new()
+	root.add_child(forge_screen)
 	_fps = UiTheme.label("", "DimLabel", 16)
 	_fps.position = Vector2(12, 92)
 	root.add_child(_fps)

@@ -434,6 +434,7 @@ func _fill_detail() -> void:
 			star_btn.custom_minimum_size = Vector2(0, 58)
 			star_btn.pressed.connect(func(): _do(coll.star_up_hero(id), "Évolution réussie !"))
 			actions.add_child(star_btn)
+			_gear_and_talents(id)
 		else:
 			_paragraph("Héros non débloqué : réunissez %d fragments. On en trouve dans les cristaux affleurants de la cité ; le Sanctuaire des héros permettra bientôt de les invoquer (étape 7)." % data.fragments_to_unlock)
 	else:
@@ -482,6 +483,77 @@ func _fill_detail() -> void:
 		_detail_info.add_child(box)
 	_detail_info.add_child(UiTheme.label("Histoire", "HeaderLabel", 24))
 	_paragraph(data.lore)
+
+
+func _gear_and_talents(id: String) -> void:
+	var coll := GameState.collection
+	_detail_info.add_child(UiTheme.label("Équipement", "HeaderLabel", 24))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	_detail_info.add_child(row)
+	for slot in CollectionState.EQUIP_SLOTS:
+		var item_id: String = coll.gear(id).get(str(slot), "")
+		var tile: PanelContainer
+		if item_id != "":
+			var it := DataRegistry.item(item_id)
+			tile = ModalScreen.item_tile(it.icon, it.display_name.split(" ")[0], it.rarity, 86)
+			tile.tooltip_text = "%s : %s" % [it.display_name, it.description]
+		else:
+			tile = ModalScreen.item_tile(preload("res://assets/icons/ui/info.svg"), ItemData.SLOT_NAMES[slot], 0, 86)
+			tile.modulate = Color(1, 1, 1, 0.5)
+		ModalScreen.on_tap(tile, func(): _choose_gear(id, slot))
+		row.add_child(tile)
+	var bonus := coll.hero_bonus(id)
+	if not bonus.is_empty():
+		var parts := []
+		for k in bonus:
+			parts.append({"atk_pct": "+%d %% ATQ", "hp_pct": "+%d %% PV", "def_pct": "+%d %% DÉF", "speed": "+%d VIT", "crit": "+%d %% CRIT", "energy": "+%d énergie"}[k] % bonus[k])
+		_detail_info.add_child(UiTheme.label("Bonus : " + ", ".join(parts), "HudLabel", 17, UiTheme.GREEN))
+	_detail_info.add_child(UiTheme.label("Talents", "HeaderLabel", 24))
+	var chosen := coll.talents(id)
+	for tier in CollectionState.TALENTS.size():
+		var trow := HBoxContainer.new()
+		trow.add_theme_constant_override("separation", 10)
+		trow.add_child(UiTheme.label("Niv. %d" % CollectionState.TALENT_LEVELS[tier], "HudLabel", 18))
+		for choice in ["a", "b"]:
+			var t: Dictionary = CollectionState.TALENTS[tier][choice]
+			var picked: bool = tier < chosen.size() and chosen[tier] == choice
+			var b := UiTheme.button("%s\n%s" % [t.name, t.desc], "SuccessButton" if picked else "SecondaryButton", null, 15)
+			b.custom_minimum_size = Vector2(200, 56)
+			b.disabled = not picked and coll.talent_reason(id, tier) != ""
+			if tier < chosen.size() and not picked:
+				b.modulate = Color(1, 1, 1, 0.4)
+			b.pressed.connect(func():
+				if not picked:
+					_do(coll.choose_talent(id, tier, choice), "Talent appris : " + t.name))
+			trow.add_child(b)
+		_detail_info.add_child(trow)
+
+
+func _choose_gear(id: String, slot: int) -> void:
+	var coll := GameState.collection
+	var list := VBoxContainer.new()
+	var any := false
+	for it in DataRegistry.all_items():
+		if it.slot != slot or GameState.inventory.count(it.id) < 1:
+			continue
+		any = true
+		var b := UiTheme.button("%s (%s) — %s" % [it.display_name, GameEnums.rarity_name(it.rarity), it.description], "SecondaryButton", it.icon, 17)
+		b.pressed.connect(func():
+			for c in get_parent().get_children():
+				if c is DialogBox:
+					c.close()
+			_do(coll.equip(id, it.id, GameState.inventory), it.display_name + " équipé"))
+		list.add_child(b)
+	if not any:
+		list.add_child(UiTheme.label("Aucun objet de ce type. Fabriquez-en à la Forge.", "DimLabel", 18))
+	var buttons := [{"text": "Fermer", "variation": "SecondaryButton"}]
+	if coll.gear(id).has(str(slot)):
+		buttons.push_front({"text": "Retirer", "variation": "DangerButton", "action": func():
+			coll.unequip(id, slot, GameState.inventory)
+			GameState.save()
+			_fill_detail()})
+	DialogBox.open(get_parent(), "Choisir : " + ItemData.SLOT_NAMES[slot], list, buttons, 720)
 
 
 func _action(parent: Control, text: String, variation: String, cost: Dictionary, reason: String, cb: Callable) -> void:

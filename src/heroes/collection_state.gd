@@ -10,6 +10,17 @@ const BASE_STARS := [1, 2, 3, 4, 5]
 const MAX_STARS := 6
 const STAR_UP_FRAGMENTS := [0, 10, 20, 40, 80, 120, 0]
 const BASE_MONSTER_CAPACITY := 4
+const EQUIP_SLOTS := [1, 2, 6]
+## Talents : un choix par palier (niveaux 10, 20, 30).
+const TALENT_LEVELS := [10, 20, 30]
+const TALENTS := [
+	{"a": {"name": "Force brute", "desc": "+8 % d'attaque", "stats": {"atk_pct": 8}},
+	 "b": {"name": "Constitution", "desc": "+10 % de PV", "stats": {"hp_pct": 10}}},
+	{"a": {"name": "Réflexes", "desc": "+10 de vitesse", "stats": {"speed": 10}},
+	 "b": {"name": "Œil acéré", "desc": "+8 % de critique", "stats": {"crit": 8}}},
+	{"a": {"name": "Maîtrise", "desc": "+15 % d'attaque", "stats": {"atk_pct": 15}},
+	 "b": {"name": "Éveil", "desc": "+30 d'énergie au début du combat", "stats": {"energy": 30}}},
+]
 
 ## id -> { level, stars }
 var heroes := {}
@@ -218,6 +229,93 @@ func release_monster(uid: int) -> bool:
 	return true
 
 
+# --- Équipement et talents -------------------------------------------------
+
+func gear(id: String) -> Dictionary:
+	return heroes.get(id, {}).get("gear", {})
+
+
+func equip(id: String, item_id: String, inventory: Inventory) -> String:
+	var item := DataRegistry.item(item_id)
+	if not owns_hero(id) or item == null:
+		return "Impossible"
+	if inventory.count(item_id) < 1:
+		return "Objet absent de l'inventaire"
+	var g: Dictionary = heroes[id].get("gear", {})
+	var key := str(item.slot)
+	if g.has(key):
+		inventory.add(g[key])
+	inventory.remove(item_id)
+	g[key] = item_id
+	heroes[id]["gear"] = g
+	changed.emit()
+	return ""
+
+
+func unequip(id: String, slot: int, inventory: Inventory) -> void:
+	var g: Dictionary = heroes.get(id, {}).get("gear", {})
+	if g.has(str(slot)):
+		inventory.add(g[str(slot)])
+		g.erase(str(slot))
+		changed.emit()
+
+
+func talents(id: String) -> Array:
+	return heroes.get(id, {}).get("talents", [])
+
+
+func talent_reason(id: String, tier: int) -> String:
+	if not owns_hero(id):
+		return "Héros non débloqué"
+	if talents(id).size() != tier:
+		return "Palier précédent requis" if talents(id).size() < tier else "Déjà choisi"
+	if hero_level(id) < TALENT_LEVELS[tier]:
+		return "Niveau %d requis" % TALENT_LEVELS[tier]
+	return ""
+
+
+func choose_talent(id: String, tier: int, choice: String) -> String:
+	var reason := talent_reason(id, tier)
+	if reason != "":
+		return reason
+	var t: Array = heroes[id].get("talents", [])
+	t.append(choice)
+	heroes[id]["talents"] = t
+	changed.emit()
+	return ""
+
+
+## Bonus cumulés de l'équipement et des talents.
+func hero_bonus(id: String) -> Dictionary:
+	var bonus := {}
+	var sources := []
+	for slot in gear(id):
+		sources.append(DataRegistry.item(gear(id)[slot]).stat_bonus)
+	var t := talents(id)
+	for i in t.size():
+		sources.append(TALENTS[i][t[i]].stats)
+	for s in sources:
+		for k in s:
+			bonus[k] = int(bonus.get(k, 0)) + int(s[k])
+	return bonus
+
+
+static func apply_bonus(c: Combatant, bonus: Dictionary) -> void:
+	c.max_hp = int(c.max_hp * (1.0 + bonus.get("hp_pct", 0) / 100.0))
+	c.hp = c.max_hp
+	c.attack = int(c.attack * (1.0 + bonus.get("atk_pct", 0) / 100.0))
+	c.defense = int(c.defense * (1.0 + bonus.get("def_pct", 0) / 100.0))
+	c.speed += int(bonus.get("speed", 0))
+	c.crit_chance += bonus.get("crit", 0) / 100.0
+	c.energy = mini(int(bonus.get("energy", 0)), 100)
+
+
+func hero_combatant(id: String) -> Combatant:
+	var c := Combatant.from_hero(DataRegistry.hero(id), hero_level(id), hero_stars(id))
+	apply_bonus(c, hero_bonus(id))
+	return c
+
+
 # --- Équipe -------------------------------------------------------------------
 
 func in_team(kind: String, key: Variant) -> bool:
@@ -270,7 +368,7 @@ func build_team_combatants() -> Array:
 	var out := []
 	for e in team:
 		if e.kind == "h":
-			out.append(Combatant.from_hero(DataRegistry.hero(e.id), hero_level(e.id), hero_stars(e.id)))
+			out.append(hero_combatant(e.id))
 		else:
 			var m: Dictionary = monsters[e.uid]
 			out.append(Combatant.from_monster(DataRegistry.monster(m.id), m.level, 2 if m.get("variant", "") != "" else 1))
@@ -336,7 +434,8 @@ func from_dict(d: Dictionary) -> void:
 	for id in d.get("heroes", {}):
 		if DataRegistry.hero(str(id)):
 			var h: Dictionary = d.heroes[id]
-			heroes[str(id)] = {"level": int(h.get("level", 1)), "stars": int(h.get("stars", 1))}
+			heroes[str(id)] = {"level": int(h.get("level", 1)), "stars": int(h.get("stars", 1)),
+				"gear": h.get("gear", {}).duplicate(), "talents": h.get("talents", []).duplicate()}
 	for id in d.get("fragments", {}):
 		fragments[str(id)] = int(d.fragments[id])
 	_next_monster_uid = int(d.get("next_monster_uid", 1))

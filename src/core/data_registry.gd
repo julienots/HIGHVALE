@@ -14,6 +14,7 @@ const INGREDIENTS_DIR := "res://data/ingredients"
 const BANNERS_DIR := "res://data/banners"
 const FUSION_DIR := "res://data/fusion"
 const ENCOUNTERS_DIR := "res://data/encounters"
+const ITEMS_DIR := "res://data/items"
 
 var config: GameConfig
 var _resource_types := {}  # id -> ResourceTypeData
@@ -26,6 +27,7 @@ var _ingredients := {}  # id -> IngredientData
 var _banners: Array[SummonBannerData] = []
 var _fusion: Array[FusionRecipeData] = []
 var _encounters: Array[EncounterData] = []
+var _items := {}
 
 
 func _ready() -> void:
@@ -44,6 +46,7 @@ func reload() -> void:
 	_banners.sort_custom(func(a, b): return a.sort_order < b.sort_order)
 	_fusion.assign(load_dir(FUSION_DIR))
 	_encounters.assign(load_dir(ENCOUNTERS_DIR))
+	_items = _index_by_id(load_dir(ITEMS_DIR))
 	_encounters.sort_custom(func(a, b): return a.order < b.order)
 	_story.clear()
 	for r in load_dir(STORY_DIR):
@@ -160,6 +163,17 @@ func banner(id: String) -> SummonBannerData:
 		if b.id == id:
 			return b
 	return null
+
+
+func item(id: String) -> ItemData:
+	return _items.get(id)
+
+
+func all_items() -> Array[ItemData]:
+	var list: Array[ItemData] = []
+	list.assign(_items.values())
+	list.sort_custom(func(a, b): return a.slot < b.slot if a.slot != b.slot else a.rarity < b.rarity)
+	return list
 
 
 func encounters() -> Array[EncounterData]:

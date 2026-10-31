@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/inventory/item_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/items/abyssal_armor.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "abyssal_armor"
+display_name = "Armure abyssale"
+description = "+22 % PV, +15 % défense"
+icon = ExtResource("2_icon")
+kind = 1
+rarity = 2
+slot = 2
+stat_bonus = {"hp_pct": 22, "def_pct": 15}
+craft_cost = {"gold": 4000, "abyssal_crystal": 60, "dark_ore": 25}
+max_stack = 99

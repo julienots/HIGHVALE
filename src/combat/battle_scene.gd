@@ -262,6 +262,12 @@ func _play(events: Array) -> void:
 				_set_shield(e.target)
 			"status":
 				_float(e.target, STATUS_NAMES.get(e.effect, ""), UnitBar.STATUS_COLORS.get(e.effect, Color.WHITE), 0.9, 0.5)
+			"phase":
+				_float(e.target, "Phase %d : le boss s'enrage !" % e.phase, Color("ff5a5a"), 1.2)
+				_glow(e.target, Color("ff5a5a"))
+				_shake(0.15)
+				_set_shield(e.target)
+				await get_tree().create_timer(0.7).timeout
 			"skip":
 				_float(e.target, "Passe son tour", Color("c8d0e0"), 0.9)
 				await get_tree().create_timer(0.5).timeout

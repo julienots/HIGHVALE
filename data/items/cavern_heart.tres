@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/inventory/item_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/items/cavern_heart.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "cavern_heart"
+display_name = "Cœur de la caverne"
+description = "+10 % attaque, +10 % PV, +10 % défense, +10 vitesse"
+icon = ExtResource("2_icon")
+kind = 1
+rarity = 3
+slot = 6
+stat_bonus = {"atk_pct": 10, "hp_pct": 10, "def_pct": 10, "speed": 10}
+craft_cost = {"gold": 10000, "dark_ore": 60, "divine_dust": 5}
+max_stack = 99

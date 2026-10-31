@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/inventory/item_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/items/steel_plate.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "steel_plate"
+display_name = "Plastron d'acier"
+description = "+15 % PV, +10 % défense"
+icon = ExtResource("2_icon")
+kind = 1
+rarity = 1
+slot = 2
+stat_bonus = {"hp_pct": 15, "def_pct": 10}
+craft_cost = {"gold": 1500, "stone": 800}
+max_stack = 99

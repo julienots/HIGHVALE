@@ -12,6 +12,7 @@ var slot := 0
 var source_id := ""  # id de HeroData ou MonsterData
 var is_hero := false
 var is_boss := false
+var phase := 0
 var element := 0
 var rarity := 0
 var max_hp := 1
