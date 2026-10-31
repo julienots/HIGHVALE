@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_script")
-starting_resources = {"gold": 1000, "stone": 800, "fungal_wood": 800, "prisms": 100}
+starting_resources = {"gold": 1000, "stone": 800, "fungal_wood": 800, "prisms": 100, "ancient_shards": 30}
 starting_layout = Array[Dictionary]([{"id": "primordial_temple", "cell": Vector2i(18, 18), "level": 1}, {"id": "inhabitants_hall", "cell": Vector2i(13, 18), "level": 1}, {"id": "stone_mine", "cell": Vector2i(24, 16), "level": 1}, {"id": "fungal_grove", "cell": Vector2i(24, 21), "level": 1}])
 grid_size = Vector2i(40, 40)
 buildable_rect = Rect2i(3, 3, 34, 34)

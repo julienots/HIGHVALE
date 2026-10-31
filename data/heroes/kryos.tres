@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/hero_kryos.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_kryos.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/kryos_lance.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/kryos_prison.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/kryos_genesis.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 1500
+attack = 120
+defense = 70
+speed = 118
+crit_chance = 0.16999999999999998
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "kryos"
+display_name = "Kryos"
+title = "Dieu des cristaux"
+lore = "Endormi au cœur du premier cristal, Kryos a façonné les veines lumineuses de la caverne. Son réveil fait chanter toutes les pierres de HIGHVALE."
+rarity = 4
+element = 6
+hero_class = 3
+is_god = true
+max_level = 60
+fragments_to_unlock = 200
+signature_color = Color(0.498, 0.863, 1.000, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

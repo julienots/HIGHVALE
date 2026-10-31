@@ -9,6 +9,12 @@ const STARTER_MONSTERS := ["gloubi", "shroomling"]
 
 var wallet := Wallet.new()
 var collection := CollectionState.new()
+var inventory := Inventory.new()
+var lab := LaboratoryState.new()
+
+const STARTER_INGREDIENTS := {"ember_stone": 3, "vital_drop": 3, "tide_scale": 2, "resonant_shard": 2}
+## Récompense de chaque nouveau niveau du Temple Primordial.
+const TEMPLE_REWARD := {"prisms": 50, "ancient_shards": 20, "divine_dust": 5}
 var city := CityState.new()
 var profile := {}
 var is_loaded := false
@@ -21,6 +27,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	wallet.changed.connect(func(id, amount): Events.resource_changed.emit(id, amount))
 	collection.changed.connect(func(): Events.collection_changed.emit())
+	inventory.changed.connect(func(): Events.inventory_changed.emit())
+	lab.changed.connect(func(): Events.inventory_changed.emit())
 	_new_city()
 
 
@@ -55,6 +63,8 @@ func new_game() -> void:
 		city.spawn_wild(int(now) + i * 7919)
 	city.next_wild_at = now + config().wild_spawn_seconds
 	collection.from_dict({})
+	inventory.from_dict({})
+	lab.from_dict({})
 	_give_starters()
 	profile = {"player_name": "Fondateur", "created_at": now, "story_seen": []}
 	is_loaded = true
@@ -75,7 +85,8 @@ func save() -> void:
 
 
 func to_dict() -> Dictionary:
-	return {"profile": profile, "wallet": wallet.to_dict(), "city": city.to_dict(), "collection": collection.to_dict()}
+	return {"profile": profile, "wallet": wallet.to_dict(), "city": city.to_dict(), "collection": collection.to_dict(),
+		"inventory": inventory.to_dict(), "lab": lab.to_dict()}
 
 
 func _apply(data: Dictionary) -> void:
@@ -84,6 +95,11 @@ func _apply(data: Dictionary) -> void:
 	wallet.from_dict(data.get("wallet", {}))
 	profile = data.get("profile", {})
 	collection.from_dict(data.get("collection", {}))
+	inventory.from_dict(data.get("inventory", {}))
+	lab.from_dict(data.get("lab", {}))
+	if not data.has("inventory"):
+		for id in STARTER_INGREDIENTS:
+			inventory.add(id, STARTER_INGREDIENTS[id])
 	if not data.has("collection"):
 		# Sauvegarde antérieure à la collection : héros et créatures de départ.
 		_give_starters()
@@ -96,6 +112,8 @@ func _give_starters() -> void:
 		collection.unlock_hero(id)
 	for id in STARTER_MONSTERS:
 		collection.add_monster(id)
+	for id in STARTER_INGREDIENTS:
+		inventory.add(id, STARTER_INGREDIENTS[id])
 
 
 ## Remplace la cité courante par une cité vide reliée aux signaux globaux.
@@ -157,5 +175,8 @@ func _on_task_finished(b: BuildingState) -> void:
 	Events.building_task_finished.emit(b.uid)
 	Events.capacities_changed.emit()
 	if b.data_id == CityState.TEMPLE_ID:
+		for id in TEMPLE_REWARD:
+			wallet.add(id, TEMPLE_REWARD[id])
+		Events.toast_requested.emit("Le Temple récompense la cité : prismes, éclats antiques et poussière divine !", "reward")
 		Events.temple_level_changed.emit(b.level)
 		request_story_for_level(b.level)

@@ -14,4 +14,4 @@ sort_order = 5
 base_capacity = 200
 is_premium = false
 show_in_hud = false
-source_hint = "Bientôt : ruines et expéditions."
+source_hint = "Trouvés dans les filons et cristaux sauvages, et offerts par le Temple. Servent aux invocations classiques."

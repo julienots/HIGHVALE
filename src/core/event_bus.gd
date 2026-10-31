@@ -13,6 +13,7 @@ signal temple_level_changed(level: int)
 signal population_changed
 signal wilds_changed
 signal collection_changed
+signal inventory_changed
 signal toast_requested(text: String, kind: String)
 signal story_chapter_requested(chapter: StoryChapterData)
 signal settings_changed

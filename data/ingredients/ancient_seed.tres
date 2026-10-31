@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IngredientData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/laboratory/ingredient_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/icons/ingredients/ancient_seed.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ancient_seed"
+display_name = "Graine ancienne"
+description = "Graine dormante d'avant la Fracture."
+icon = ExtResource("2_icon")
+rarity = 1
+element = 5
+power = 2
+genetic_affinities = {"vegetal": 1.5, "antique": 0.5}
+rarity_boost = 0.1

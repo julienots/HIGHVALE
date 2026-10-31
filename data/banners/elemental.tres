@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SummonBannerData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/summoning/summon_banner_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "elemental"
+display_name = "Invocation élémentaire"
+description = "Uniquement les héros de l'élément du jour."
+sort_order = 2
+cost = {"prisms": 150}
+rarity_rates = PackedFloat32Array(35, 40, 18, 7, 0)
+element = -2
+gods_only = false
+pity_epic = 10
+accent_color = Color(0.102, 0.839, 0.753, 1)

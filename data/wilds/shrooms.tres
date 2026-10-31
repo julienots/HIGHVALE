@@ -11,4 +11,5 @@ weight = 3.0
 rewards = {"fungal_wood": Vector2i(100, 200), "underground_nectar": Vector2i(15, 35)}
 premium_chance = 0.0
 premium_amount = Vector2i(1, 3)
+item_drops = {"vital_drop": Vector3(0.4, 1, 2), "glow_spore": Vector3(0.3, 1, 2), "ancient_seed": Vector3(0.08, 1, 1), "vital_essence": Vector3(0.5, 3, 8)}
 model_scene = ExtResource("2_model")

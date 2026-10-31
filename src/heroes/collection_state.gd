@@ -17,6 +17,9 @@ var heroes := {}
 var fragments := {}
 ## uid -> { id, level }
 var monsters := {}
+## Invocations sans Épique par bannière (garantie) et recettes de fusion découvertes.
+var pity := {}
+var discovered_recipes: Array = []
 var _next_monster_uid := 1
 
 
@@ -147,12 +150,12 @@ func monster_capacity(city: CityState) -> int:
 	return n
 
 
-func add_monster(id: String) -> int:
+func add_monster(id: String, level := 1, variant := "") -> int:
 	if DataRegistry.monster(id) == null:
 		return 0
 	var uid := _next_monster_uid
 	_next_monster_uid += 1
-	monsters[uid] = {"id": id, "level": 1}
+	monsters[uid] = {"id": id, "level": level, "variant": variant}
 	changed.emit()
 	return uid
 
@@ -198,7 +201,15 @@ func feed_monster(uid: int, wallet: Wallet) -> String:
 func monster_power(uid: int) -> int:
 	var m: Dictionary = monsters[uid]
 	var d := DataRegistry.monster(m.id)
-	return power(effective_stats(d.stats, m.level, 1))
+	return power(effective_stats(d.stats, m.level, 2 if m.get("variant", "") != "" else 1))
+
+
+func release_monster(uid: int) -> bool:
+	if not monsters.has(uid) or monsters.size() <= 1:
+		return false
+	monsters.erase(uid)
+	changed.emit()
+	return true
 
 
 # --- Trouvailles ---------------------------------------------------------------
@@ -210,13 +221,13 @@ const FRAGMENT_WEIGHTS := [6.0, 3.0, 1.0, 0.3, 0.0]
 ## cristaux, œuf de créature dans les champignons. Retourne ce qui a été obtenu.
 func roll_wild_bonus(kind_id: String, rng: RandomNumberGenerator, city: CityState) -> Dictionary:
 	if kind_id == "crystal" and rng.randf() < 0.6:
-		var id := _weighted_pick(DataRegistry.all_heroes(), rng)
+		var id := _weighted_pick(DataRegistry.all_heroes().filter(func(h): return not h.is_god), rng)
 		if id != "":
 			var n := rng.randi_range(3, 6)
 			var unlocked := add_fragments(id, n)
 			return {"fragments": {id: n}, "unlocked": id if unlocked else ""}
 	elif kind_id == "shrooms" and rng.randf() < 0.08 and monsters.size() < monster_capacity(city):
-		var candidates := DataRegistry.all_monsters().filter(func(m): return m.rarity <= GameEnums.Rarity.RARE)
+		var candidates := DataRegistry.all_monsters().filter(func(m): return m.rarity <= GameEnums.Rarity.RARE and m.lab_weight > 0.0)
 		var id := _weighted_pick(candidates, rng)
 		if id != "":
 			add_monster(id)
@@ -241,8 +252,9 @@ func _weighted_pick(list: Array, rng: RandomNumberGenerator) -> String:
 func to_dict() -> Dictionary:
 	var mons := []
 	for uid in monsters:
-		mons.append({"uid": uid, "id": monsters[uid].id, "level": monsters[uid].level})
-	return {"heroes": heroes.duplicate(true), "fragments": fragments.duplicate(), "monsters": mons, "next_monster_uid": _next_monster_uid}
+		mons.append({"uid": uid, "id": monsters[uid].id, "level": monsters[uid].level, "variant": monsters[uid].get("variant", "")})
+	return {"heroes": heroes.duplicate(true), "fragments": fragments.duplicate(), "monsters": mons, "next_monster_uid": _next_monster_uid,
+		"pity": pity.duplicate(), "recipes": discovered_recipes.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -256,8 +268,10 @@ func from_dict(d: Dictionary) -> void:
 	for id in d.get("fragments", {}):
 		fragments[str(id)] = int(d.fragments[id])
 	_next_monster_uid = int(d.get("next_monster_uid", 1))
+	pity = d.get("pity", {}).duplicate()
+	discovered_recipes = d.get("recipes", []).duplicate()
 	for m in d.get("monsters", []):
 		if DataRegistry.monster(str(m.get("id", ""))):
 			var uid := int(m.get("uid", 0))
-			monsters[uid] = {"id": str(m.id), "level": int(m.get("level", 1))}
+			monsters[uid] = {"id": str(m.id), "level": int(m.get("level", 1)), "variant": str(m.get("variant", ""))}
 			_next_monster_uid = maxi(_next_monster_uid, uid + 1)

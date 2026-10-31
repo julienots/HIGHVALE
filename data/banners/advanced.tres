@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SummonBannerData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/summoning/summon_banner_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "advanced"
+display_name = "Invocation avancée"
+description = "Héros rares ou mieux plus fréquents. Épique garanti en 10 invocations."
+sort_order = 1
+cost = {"prisms": 120}
+rarity_rates = PackedFloat32Array(40, 42, 14, 4, 0)
+element = -1
+gods_only = false
+pity_epic = 10
+accent_color = Color(0.698, 0.361, 1.000, 1)

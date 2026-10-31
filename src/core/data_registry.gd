@@ -10,6 +10,9 @@ const STORY_DIR := "res://data/story"
 const WILDS_DIR := "res://data/wilds"
 const HEROES_DIR := "res://data/heroes"
 const MONSTERS_DIR := "res://data/monsters"
+const INGREDIENTS_DIR := "res://data/ingredients"
+const BANNERS_DIR := "res://data/banners"
+const FUSION_DIR := "res://data/fusion"
 
 var config: GameConfig
 var _resource_types := {}  # id -> ResourceTypeData
@@ -18,6 +21,9 @@ var _story: Array[StoryChapterData] = []
 var _wilds := {}  # id -> WildResourceData
 var _heroes := {}  # id -> HeroData
 var _monsters := {}  # id -> MonsterData
+var _ingredients := {}  # id -> IngredientData
+var _banners: Array[SummonBannerData] = []
+var _fusion: Array[FusionRecipeData] = []
 
 
 func _ready() -> void:
@@ -31,6 +37,10 @@ func reload() -> void:
 	_wilds = _index_by_id(load_dir(WILDS_DIR))
 	_heroes = _index_by_id(load_dir(HEROES_DIR))
 	_monsters = _index_by_id(load_dir(MONSTERS_DIR))
+	_ingredients = _index_by_id(load_dir(INGREDIENTS_DIR))
+	_banners.assign(load_dir(BANNERS_DIR))
+	_banners.sort_custom(func(a, b): return a.sort_order < b.sort_order)
+	_fusion.assign(load_dir(FUSION_DIR))
 	_story.clear()
 	for r in load_dir(STORY_DIR):
 		if r is StoryChapterData:
@@ -124,6 +134,32 @@ func all_monsters() -> Array[MonsterData]:
 	list.assign(_monsters.values())
 	list.sort_custom(func(a, b): return a.display_name < b.display_name if a.rarity == b.rarity else a.rarity > b.rarity)
 	return list
+
+
+func ingredient(id: String) -> IngredientData:
+	return _ingredients.get(id)
+
+
+func all_ingredients() -> Array[IngredientData]:
+	var list: Array[IngredientData] = []
+	list.assign(_ingredients.values())
+	list.sort_custom(func(a, b): return a.display_name < b.display_name if a.rarity == b.rarity else a.rarity < b.rarity)
+	return list
+
+
+func banners() -> Array[SummonBannerData]:
+	return _banners
+
+
+func banner(id: String) -> SummonBannerData:
+	for b in _banners:
+		if b.id == id:
+			return b
+	return null
+
+
+func fusion_recipes() -> Array[FusionRecipeData]:
+	return _fusion
 
 
 func story_chapters() -> Array[StoryChapterData]:

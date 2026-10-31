@@ -14,4 +14,4 @@ sort_order = 4
 base_capacity = 200
 is_premium = false
 show_in_hud = false
-source_hint = "Bientôt : habitats des monstres et exploration."
+source_hint = "Produite par l'Habitat des monstres et trouvée dans les champignons sauvages. Alimente le Laboratoire et la Fusionnerie."

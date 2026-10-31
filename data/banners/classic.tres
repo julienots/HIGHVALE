@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SummonBannerData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/summoning/summon_banner_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "classic"
+display_name = "Invocation classique"
+description = "Appel aux héros des cavernes."
+sort_order = 0
+cost = {"ancient_shards": 10}
+rarity_rates = PackedFloat32Array(70, 24, 5, 1, 0)
+element = -1
+gods_only = false
+pity_epic = 0
+accent_color = Color(0.239, 0.608, 1.000, 1)

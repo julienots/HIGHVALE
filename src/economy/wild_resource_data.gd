@@ -12,4 +12,15 @@ extends Resource
 ## Chance d'obtenir aussi de la monnaie premium.
 @export_range(0.0, 1.0) var premium_chance := 0.0
 @export var premium_amount := Vector2i(1, 3)
+## Trouvailles éventuelles : { id: Vector3(chance, min, max) } — ressource ou ingrédient.
+@export var item_drops := {}
 @export var model_scene: PackedScene
+
+
+func roll_items(rng: RandomNumberGenerator) -> Dictionary:
+	var out := {}
+	for id in item_drops:
+		var d: Vector3 = item_drops[id]
+		if rng.randf() < d.x:
+			out[id] = rng.randi_range(int(d.y), int(d.z))
+	return out

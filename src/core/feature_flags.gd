@@ -10,6 +10,10 @@ const ENABLED := {
 	"population": true,
 	"heroes": true,
 	"monsters": true,
+	"laboratory": true,
+	"fusion": true,
+	"summoning": true,
+	"divine": true,
 }
 
 const MODULE_NAMES := {

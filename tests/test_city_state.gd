@@ -39,7 +39,7 @@ func test_max_count_and_temple_lock() -> void:
 	var w := new_wallet(c, {"gold": 3000, "fungal_wood": 3000, "stone": 3000})
 	check(c.can_build_reason(DataRegistry.building("crystal_mine"), w).begins_with("Temple"), "mine cristalline verrouillée au Temple 1")
 	check(c.can_build_reason(DataRegistry.building("primordial_temple"), w).begins_with("Nombre maximal"), "un seul Temple")
-	check(c.can_build_reason(DataRegistry.building("laboratory"), w).begins_with("Prochainement"), "module non livré verrouillé")
+	check(c.can_build_reason(DataRegistry.building("forge"), w).begins_with("Prochainement"), "module non livré verrouillé")
 
 
 func test_construction_completes_in_order() -> void:

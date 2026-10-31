@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FusionRecipeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/fusion/fusion_recipe_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "golem_awakening"
+parent_a = "rock_beetle"
+parent_b = "wisp"
+result = "crystal_golem"
+chance = 0.5
