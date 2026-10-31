@@ -47,11 +47,24 @@ Fait (v0.6.0) :
 Plus tard :
 - Métiers des bâtiments des étapes suivantes (forgerons, laborantins…).
 
+## 🟡 Étape 5 — Collection des héros et des monstres (base jouable)
+
+Fait (v0.7.0) :
+- 12 héros (Guerrier, Gardien, Assassin, Mage, Prêtre, Archer, Invocateur, Contrôleur, Berserker, Support ; Commun à Légendaire) et 10 créatures (terrestre, volante, aquatique, magique, végétale, élémentaire, antique), chacun avec modèle 3D articulé, portrait rendu, statistiques, compétences (52 au total) et histoire.
+- `CollectionState` : héros (niveau, étoiles, fragments), créatures en plusieurs exemplaires, sauvegarde ; héros et créatures de départ (aussi pour les anciennes sauvegardes).
+- Progression : niveau des héros (or, puis cristaux abyssaux à partir du niveau 10), plafond relevé par les étoiles, évolution par fragments ; niveau des créatures avec le nectar.
+- Sources : fragments dans les cristaux affleurants, œufs dans les champignons sauvages ; capacité de créatures augmentée par l'Habitat des monstres (désormais constructible).
+- Écran Collection : cartes par rareté, filtres, silhouettes des personnages non découverts, fiche avec vitrine 3D orientable, annonces de découverte.
+
+Reste à faire :
+- Monter progressivement jusqu'à 150 héros et 120 créatures (les outils de modélisation et la chaîne de données sont prêts : un script Blender et un fichier .tres par personnage).
+- Équipements, talents et arbres de compétences, variantes visuelles (étape 9).
+- Créatures visibles dans leur Habitat.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |
 |---|---|---|
-| 5 | Collections des héros et monstres | `HeroData`, `MonsterData`, `CharacterStats`, raretés et éléments |
 | 6 | Laboratoire et Fusionnerie | `IngredientData` (affinités génétiques, bonus de rareté), `MonsterData.genetic_tags` |
 | 7 | Invocations et dieux | `HeroData.is_god`, Sanctuaire et Autel divin dans les données |
 | 8 | Combat au tour par tour et IA | `SkillData` (cibles, effets, altérations), `CharacterStats` |

@@ -8,12 +8,16 @@ const RESOURCE_TYPES_DIR := "res://data/resources"
 const BUILDINGS_DIR := "res://data/buildings"
 const STORY_DIR := "res://data/story"
 const WILDS_DIR := "res://data/wilds"
+const HEROES_DIR := "res://data/heroes"
+const MONSTERS_DIR := "res://data/monsters"
 
 var config: GameConfig
 var _resource_types := {}  # id -> ResourceTypeData
 var _buildings := {}  # id -> BuildingData
 var _story: Array[StoryChapterData] = []
 var _wilds := {}  # id -> WildResourceData
+var _heroes := {}  # id -> HeroData
+var _monsters := {}  # id -> MonsterData
 
 
 func _ready() -> void:
@@ -25,6 +29,8 @@ func reload() -> void:
 	_resource_types = _index_by_id(load_dir(RESOURCE_TYPES_DIR))
 	_buildings = _index_by_id(load_dir(BUILDINGS_DIR))
 	_wilds = _index_by_id(load_dir(WILDS_DIR))
+	_heroes = _index_by_id(load_dir(HEROES_DIR))
+	_monsters = _index_by_id(load_dir(MONSTERS_DIR))
 	_story.clear()
 	for r in load_dir(STORY_DIR):
 		if r is StoryChapterData:
@@ -94,6 +100,29 @@ func all_wilds() -> Array[WildResourceData]:
 	var list: Array[WildResourceData] = []
 	list.assign(_wilds.values())
 	list.sort_custom(func(a, b): return a.id < b.id)
+	return list
+
+
+func hero(id: String) -> HeroData:
+	return _heroes.get(id)
+
+
+func monster(id: String) -> MonsterData:
+	return _monsters.get(id)
+
+
+## Triés par rareté décroissante puis par nom.
+func all_heroes() -> Array[HeroData]:
+	var list: Array[HeroData] = []
+	list.assign(_heroes.values())
+	list.sort_custom(func(a, b): return a.display_name < b.display_name if a.rarity == b.rarity else a.rarity > b.rarity)
+	return list
+
+
+func all_monsters() -> Array[MonsterData]:
+	var list: Array[MonsterData] = []
+	list.assign(_monsters.values())
+	list.sort_custom(func(a, b): return a.display_name < b.display_name if a.rarity == b.rarity else a.rarity > b.rarity)
 	return list
 
 

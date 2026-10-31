@@ -4,7 +4,11 @@ extends Node
 
 const TICK_SECONDS := 0.25
 
+const STARTER_HEROES := ["bram", "lysa", "mirela"]
+const STARTER_MONSTERS := ["gloubi", "shroomling"]
+
 var wallet := Wallet.new()
+var collection := CollectionState.new()
 var city := CityState.new()
 var profile := {}
 var is_loaded := false
@@ -16,6 +20,7 @@ var _autosave_accum := 0.0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	wallet.changed.connect(func(id, amount): Events.resource_changed.emit(id, amount))
+	collection.changed.connect(func(): Events.collection_changed.emit())
 	_new_city()
 
 
@@ -49,6 +54,8 @@ func new_game() -> void:
 	for i in config().starting_wilds:
 		city.spawn_wild(int(now) + i * 7919)
 	city.next_wild_at = now + config().wild_spawn_seconds
+	collection.from_dict({})
+	_give_starters()
 	profile = {"player_name": "Fondateur", "created_at": now, "story_seen": []}
 	is_loaded = true
 	save()
@@ -68,7 +75,7 @@ func save() -> void:
 
 
 func to_dict() -> Dictionary:
-	return {"profile": profile, "wallet": wallet.to_dict(), "city": city.to_dict()}
+	return {"profile": profile, "wallet": wallet.to_dict(), "city": city.to_dict(), "collection": collection.to_dict()}
 
 
 func _apply(data: Dictionary) -> void:
@@ -76,8 +83,19 @@ func _apply(data: Dictionary) -> void:
 	city.from_dict(data.get("city", {}))
 	wallet.from_dict(data.get("wallet", {}))
 	profile = data.get("profile", {})
+	collection.from_dict(data.get("collection", {}))
+	if not data.has("collection"):
+		# Sauvegarde antérieure à la collection : héros et créatures de départ.
+		_give_starters()
 	if not profile.has("story_seen"):
 		profile["story_seen"] = []
+
+
+func _give_starters() -> void:
+	for id in STARTER_HEROES:
+		collection.unlock_hero(id)
+	for id in STARTER_MONSTERS:
+		collection.add_monster(id)
 
 
 ## Remplace la cité courante par une cité vide reliée aux signaux globaux.

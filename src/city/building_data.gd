@@ -56,6 +56,9 @@ const CATEGORY_NAMES := ["Cœur", "Ressources", "Stockage", "Population", "Créa
 ## Points de bien-être apportés (décorations, Temple…).
 @export var comfort_base := 0
 @export var comfort_per_level := 0
+## Créatures supplémentaires hébergées (Habitat des monstres).
+@export var monster_capacity_base := 0
+@export var monster_capacity_per_level := 0
 
 @export_group("Visuel")
 ## Modèle 3D définitif (glTF importé). Si absent, le modèle procédural « model_recipe » est utilisé.
@@ -107,6 +110,12 @@ func population_for_level(level: int) -> int:
 	if level < 1 or population_base <= 0:
 		return 0
 	return int(round(population_base * pow(population_growth, level - 1)))
+
+
+func monster_capacity_for_level(level: int) -> int:
+	if level < 1 or monster_capacity_base <= 0:
+		return 0
+	return monster_capacity_base + (level - 1) * monster_capacity_per_level
 
 
 func comfort_for_level(level: int) -> int:

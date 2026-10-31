@@ -69,6 +69,40 @@ def render_preview(path, extent):
     bpy.ops.render.render(write_still=True)
 
 
+def render_portrait(path, extent):
+    """Portrait de carte : vue de trois quarts face, fond transparent."""
+    scene = bpy.context.scene
+    scene.render.engine = "CYCLES"
+    scene.cycles.samples = 32
+    scene.cycles.use_denoising = True
+    scene.render.resolution_x = scene.render.resolution_y = 384
+    scene.render.film_transparent = True
+    scene.render.image_settings.color_mode = "RGBA"
+    world = bpy.data.worlds.new("pw")
+    world.use_nodes = True
+    world.node_tree.nodes["Background"].inputs[0].default_value = (0.55, 0.6, 0.8, 1)
+    world.node_tree.nodes["Background"].inputs[1].default_value = 0.9
+    scene.world = world
+    cam_data = bpy.data.cameras.new("pcam")
+    cam_data.type = "ORTHO"
+    cam_data.ortho_scale = extent * 2.4
+    cam = bpy.data.objects.new("pcam", cam_data)
+    yaw, pitch = math.radians(-28), math.radians(12)
+    d = Vector((math.sin(-yaw) * math.cos(pitch), -math.cos(yaw) * math.cos(pitch), math.sin(pitch)))
+    target = Vector((0, 0, extent * 1.05))
+    cam.location = target + d * 10
+    cam.rotation_euler = (-d).to_track_quat("-Z", "Y").to_euler()
+    scene.collection.objects.link(cam)
+    scene.camera = cam
+    for name, energy, rot in (("key", 4.0, (50, 0, -35)), ("rim", 3.0, (60, 0, 160))):
+        lo = bpy.data.objects.new(name, bpy.data.lights.new(name, "SUN"))
+        lo.data.energy = energy
+        lo.rotation_euler = [math.radians(a) for a in rot]
+        scene.collection.objects.link(lo)
+    scene.render.filepath = path
+    bpy.ops.render.render(write_still=True)
+
+
 def hide_above_tier(tier):
     import re
     for o in bpy.context.scene.objects:
@@ -80,6 +114,9 @@ def hide_above_tier(tier):
 def main(argv):
     preview = None
     tier = 3
+    portraits = "--portraits" in argv
+    if portraits:
+        argv = [a for a in argv if a != "--portraits"]
     if "--tier" in argv:
         i = argv.index("--tier")
         tier = int(argv[i + 1])
@@ -102,6 +139,10 @@ def main(argv):
         os.makedirs(CATEGORIES[cat], exist_ok=True)
         faces = m.export(os.path.join(CATEGORIES[cat], model_id + ".glb"))
         print("%-22s %6d faces" % (model_id, faces))
+        if portraits and cat == "characters" and (model_id.startswith("hero_") or model_id.startswith("monster_")):
+            out = os.path.join(ROOT, "assets", "portraits", model_id + ".png")
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            render_portrait(out, getattr(mod, "EXTENT", 0.3))
         if preview:
             os.makedirs(preview, exist_ok=True)
             hide_above_tier(tier)

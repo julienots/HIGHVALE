@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_crystal_golem.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_crystal_golem.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/golem_smash.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/golem_wall.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/golem_shatter.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 1100
+attack = 62
+defense = 70
+speed = 70
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "crystal_golem"
+display_name = "Golem de cristal"
+lore = "Gardien façonné par une civilisation disparue, il s'est réveillé quand le Temple a retrouvé sa lumière. Il protège HIGHVALE sans se lasser."
+rarity = 2
+element = 6
+category = 6
+family = "Golems"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 6
+genetic_tags = PackedStringArray("antique", "cristal")
+lab_weight = 1.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

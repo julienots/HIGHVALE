@@ -88,6 +88,30 @@ func _run() -> void:
 	city.cam.zoom = 13.0
 	city.cam.camera.size = 13.0
 	city.deselect()
+	# Collection
+	city.hud.collection_screen.show_screen(0)
+	await _frames(20)
+	await _shot("12_collection_heroes")
+	city.hud.collection_screen.open_detail("h:bram")
+	await _frames(40)
+	await _shot("13_hero_detail")
+	city.hud.collection_screen.open_detail("h:seraphine")
+	await _frames(40)
+	await _shot("13b_hero_locked")
+	city.hud.collection_screen.show_screen(1)
+	await _frames(20)
+	await _shot("14_collection_monsters")
+	var uid: int = GameState.collection.monsters.keys()[0]
+	city.hud.collection_screen.open_detail("m:%d" % uid)
+	await _frames(40)
+	await _shot("15_monster_detail")
+	city.hud.collection_screen.visible = false
+	city.hud.collection_screen.announce_monster("dragonling")
+	await _frames(20)
+	await _shot("16_announce")
+	for c in city.hud.root.get_children():
+		if c is DialogBox:
+			c.close()
 	SettingsPanel.open(city.hud.root, true)
 	await _frames(15)
 	await _shot("11_settings")

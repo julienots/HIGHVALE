@@ -8,6 +8,8 @@ const ENABLED := {
 	"city": true,
 	"economy": true,
 	"population": true,
+	"heroes": true,
+	"monsters": true,
 }
 
 const MODULE_NAMES := {

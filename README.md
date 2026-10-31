@@ -5,7 +5,7 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.6.0)
+## État actuel (v0.7.0)
 
 | Étape | Contenu | État |
 |---|---|---|
@@ -13,7 +13,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 | 2 | Cité isométrique jouable | ✅ terminée |
 | 3 | Bâtiments et économie | 🟡 base jouable (voir [la feuille de route](docs/FEUILLE_DE_ROUTE.md)) |
 | 4 | Population et vie de la cité | ✅ terminée |
-| 5 → 12 | Collections, laboratoire, invocation, combat… | ⏳ à venir |
+| 5 | Collection des héros et des monstres | 🟡 base jouable (12 héros, 10 créatures) |
+| 6 → 12 | Laboratoire, invocation, combat… | ⏳ à venir |
 
 **Ce qui est jouable et testé :**
 
@@ -22,6 +23,7 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Habitants** : la population augmente tant qu'il reste des logements, y compris jeu fermé. Les habitants sont affectés aux postes de production ; un bâtiment produit à 25 % sans ouvrier et à 100 % avec tous ses postes pourvus. Le joueur règle le nombre d'ouvriers avec − / +.
 - **Bien-être** : décorations (Fontaine de cristal, Jardin des lueurs, Statue du Fondateur), niveau du Temple et festins payés en Nectar souterrain (produit par la Nectarerie) accélèrent l'arrivée des habitants.
 - **Récolte manuelle** : filons de pierre, champignons sauvages et cristaux affleurants apparaissent sur les cases libres (y compris jeu fermé) et se récoltent d'un toucher ; les cristaux peuvent contenir des Prismes.
+- **Collection** : 12 héros (les 10 classes, de Commun à Légendaire) et 10 créatures (7 catégories), chacun avec son modèle 3D, son portrait, ses statistiques, 2 à 3 compétences et son histoire. Écran de collection avec cartes par rareté, filtres et fiche détaillée (vitrine 3D orientable, statistiques, compétences). Les héros montent de niveau (or, puis cristaux) et évoluent avec des fragments (étoiles), qui relèvent leur niveau maximal ; les créatures se nourrissent de nectar pour grandir. Fragments trouvés dans les cristaux affleurants, œufs parfois cachés dans les champignons sauvages ; l'Habitat des monstres augmente le nombre de créatures hébergées.
 - **Cité vivante** : mineurs, cultivatrices, porteurs, bâtisseurs et flâneurs modélisés en 3D se déplacent sur la grille (A*). Ils travaillent avec leur outil, rapportent leur récolte à l'Entrepôt ou au Temple, et les bâtisseurs martèlent sur les chantiers.
 - Caméra isométrique : glisser avec inertie, pincer ou molette pour zoomer.
 - **25 bâtiments modélisés en 3D** (fichiers glTF `assets/models/buildings/`, 2 500 à 15 000 faces chacun) : maçonnerie pierre par pierre, toits à tuiles, colombages, fenêtres éclairées, bannières, cristaux taillés, champignons géants. Chaque modèle s'enrichit aux niveaux 3, 5 et 7 et possède des pièces animées (roues, foreuse, cristal flottant, portails) et ses propres lumières.

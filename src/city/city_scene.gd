@@ -369,6 +369,7 @@ func harvest(cell: Vector2i) -> void:
 	deselect()
 	var node := wild_view.node_at(cell)
 	var origin := node.global_position if node else Vector3(cell.x + 0.5, 0, cell.y + 0.5)
+	var kind_id := GameState.city.wild_at(cell)
 	var got := GameState.city.harvest_wild(cell, GameState.wallet, GameState.config().premium_resource, GameClock.now())
 	if got.is_empty():
 		Events.toast_requested.emit("Réserves pleines : rien n'a pu être récolté", "error")
@@ -378,6 +379,17 @@ func harvest(cell: Vector2i) -> void:
 		var rt := DataRegistry.resource_type(id)
 		_float_at(origin + Vector3(0, 0.8 + i * 0.45, 0), "+%s %s" % [Fmt.amount(got[id]), rt.display_name], rt.color.lightened(0.25))
 		i += 1
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var bonus := GameState.collection.roll_wild_bonus(kind_id, rng, GameState.city)
+	if bonus.has("fragments"):
+		for hid in bonus.fragments:
+			var h := DataRegistry.hero(hid)
+			_float_at(origin + Vector3(0, 0.8 + i * 0.45, 0), "+%d fragments : %s" % [bonus.fragments[hid], h.display_name], Color("d8b4ff"))
+		if bonus.unlocked != "":
+			hud.collection_screen.announce_hero(bonus.unlocked)
+	elif bonus.has("monster"):
+		hud.collection_screen.announce_monster(bonus.monster)
 	GameState.save()
 
 
@@ -576,7 +588,9 @@ func _handle_back() -> void:
 		if c is DialogBox:
 			c.close()
 			return
-	if hud.build_menu.visible:
+	if hud.collection_screen.visible:
+		hud.collection_screen.back()
+	elif hud.build_menu.visible:
 		hud.build_menu.hide_menu()
 	elif _ghost:
 		cancel_placement()

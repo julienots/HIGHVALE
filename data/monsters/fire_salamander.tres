@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_fire_salamander.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_fire_salamander.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/sala_flame.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/sala_burst.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 520
+attack = 58
+defense = 30
+speed = 104
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "fire_salamander"
+display_name = "Salamandre ignée"
+lore = "Née dans les forges oubliées, la salamandre se nourrit de braises. Sa crête s'embrase quand elle est en colère."
+rarity = 1
+element = 1
+category = 5
+family = "Reptiles"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 1
+genetic_tags = PackedStringArray("igne", "reptile")
+lab_weight = 1.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

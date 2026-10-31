@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_shroomling.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_shroomling.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/shroom_spore.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/shroom_heal.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 460
+attack = 32
+defense = 30
+speed = 84
+crit_chance = 0.05
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "shroomling"
+display_name = "Champignard"
+lore = "Un jeune champignon qui a appris à marcher. Il sème des spores apaisantes partout où il passe."
+rarity = 0
+element = 5
+category = 4
+family = "Fongiques"
+max_level = 50
+food_per_hour = {"underground_nectar": 4}
+habitat_element = 5
+genetic_tags = PackedStringArray("vegetal", "fongique")
+lab_weight = 1.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

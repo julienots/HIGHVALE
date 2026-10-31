@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/hero_gorrak.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_gorrak.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/gorrak_cleave.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/gorrak_rage.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/gorrak_whirl.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 820
+attack = 74
+defense = 26
+speed = 90
+crit_chance = 0.11
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "gorrak"
+display_name = "Gorrak"
+title = "le Furieux"
+lore = "Venu des tunnels sauvages, Gorrak a rejoint HIGHVALE après avoir perdu un duel contre Bram. Sa rage grandit à chaque blessure."
+rarity = 2
+element = 1
+hero_class = 8
+is_god = false
+max_level = 60
+fragments_to_unlock = 80
+signature_color = Color(0.416, 0.659, 0.290, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

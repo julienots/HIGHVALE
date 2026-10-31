@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/hero_mirela.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_mirela.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/mirela_tap.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/mirela_bloom.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 540
+attack = 34
+defense = 28
+speed = 96
+crit_chance = 0.05
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "mirela"
+display_name = "Sœur Mirela"
+title = "Guérisseuse des cavernes"
+lore = "Mirela soigne les mineurs blessés depuis la fondation de la cité. Son bâton capte la lumière des champignons pour refermer les plaies."
+rarity = 0
+element = 5
+hero_class = 4
+is_god = false
+max_level = 60
+fragments_to_unlock = 20
+signature_color = Color(0.910, 0.886, 0.816, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_wisp.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_wisp.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/wisp_spark.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/wisp_glow.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 400
+attack = 60
+defense = 20
+speed = 128
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "wisp"
+display_name = "Feu follet"
+lore = "Un fragment de lumière errante qui guide — ou égare — les voyageurs. Il adore les festins et danse autour des fontaines."
+rarity = 1
+element = 7
+category = 3
+family = "Esprits"
+max_level = 50
+food_per_hour = {"underground_nectar": 5}
+habitat_element = 7
+genetic_tags = PackedStringArray("magique", "lumineux")
+lab_weight = 1.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

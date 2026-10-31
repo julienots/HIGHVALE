@@ -15,6 +15,7 @@ var controller: Node  # CityScene
 var root: Control
 var building_panel: BuildingPanel
 var build_menu: BuildMenu
+var collection_screen: CollectionScreen
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
 var _builders_label: Label
@@ -55,6 +56,8 @@ func _ready() -> void:
 	build_menu = BuildMenu.new()
 	root.add_child(build_menu)
 	build_menu.build_requested.connect(func(d): controller.start_new_building(d))
+	collection_screen = CollectionScreen.new()
+	root.add_child(collection_screen)
 	_fps = UiTheme.label("", "DimLabel", 16)
 	_fps.position = Vector2(12, 92)
 	root.add_child(_fps)
@@ -151,6 +154,16 @@ func _build_bottom() -> void:
 	settings.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	settings.pressed.connect(func(): SettingsPanel.open(root, true))
 	root.add_child(settings)
+	var coll := UiTheme.button("Collection", "SecondaryButton", preload("res://assets/icons/ui/collection.svg"), 24)
+	coll.add_theme_constant_override("icon_max_width", 40)
+	coll.custom_minimum_size = Vector2(0, 72)
+	coll.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 16)
+	coll.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	coll.position.x += 88
+	coll.pressed.connect(func():
+		controller.deselect()
+		collection_screen.show_screen())
+	root.add_child(coll)
 	_build_button = UiTheme.button("Construire", "PrimaryButton", ICON_BUILD, 30)
 	_build_button.add_theme_constant_override("icon_max_width", 48)
 	_build_button.custom_minimum_size = Vector2(230, 84)

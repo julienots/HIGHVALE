@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "gorrak_cleave"
+display_name = "Fendoir"
+description = "Frappe un ennemi avec ses deux haches."
+kind = 0
+element = 1
+target = 0
+hits = 1
+power = 1.1
+heal_power = 0.0
+shield_power = 0.0
+energy_cost = 0
+energy_gain = 25
+cooldown_turns = 0
+status_effect = 0
+status_chance = 0.0
+status_turns = 2
+cinematic = false

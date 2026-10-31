@@ -52,10 +52,10 @@ src/
   city/        CityState, BuildingState, BuildingData, vue 3D, caméra, modèles
   save/        SaveSystem
   ui/          Thème, HUD, menus, fenêtres
-  heroes/      HeroData (schéma, étape 5)
-  monsters/    MonsterData (schéma, étape 5)
+  heroes/      HeroData, CollectionState (héros, fragments, créatures)
+  monsters/    MonsterData
   laboratory/  IngredientData (schéma, étape 6)
-  combat/      CharacterStats, SkillData (schémas, étape 8)
+  combat/      CharacterStats, SkillData, CharacterRig (personnage animé)
   inventory/   ItemData (schéma)
   exploration/ ZoneData (schéma, étape 9)
   quests/      StoryChapterData
@@ -96,6 +96,13 @@ GameState._process ─▶ CityState.update(now) ─▶ task_finished ─▶ Even
 - **Bâtisseurs** = `base_builders` + `builders_provided` des bâtiments (Hôtel des habitants).
 - **Production** : accumulée depuis `prod_since`, plafonnée par la réserve interne, en pause pendant un chantier. La collecte est limitée à la place libre ; le surplus reste dans le bâtiment.
 - **Modules futurs** : `BuildingData.feature` et `FeatureFlags` verrouillent les bâtiments dont le système n'est pas encore livré.
+
+## Collection
+
+- Données : `data/heroes`, `data/monsters`, `data/skills` (chargés par `DataRegistry`). Chaque personnage référence son modèle (`assets/models/characters/`) et son portrait (`assets/portraits/`, rendu par `build_models.py --portraits`).
+- `CollectionState` (dans `GameState.collection`, sauvegardé sous `collection`) : héros `{level, stars}`, `fragments`, créatures `{uid: {id, level}}`.
+- Étoiles de départ selon la rareté (1 à 4) ; niveau maximal = 10 + 10 × étoiles ; statistiques +10 % par étoile au-delà de la première.
+- `CharacterRig` anime un personnage articulé (respiration, bras, ailes, queue) ; `CharacterViewer` l'affiche dans une SubViewport.
 
 ## Population
 
