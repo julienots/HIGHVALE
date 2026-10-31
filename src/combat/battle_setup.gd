@@ -58,7 +58,7 @@ static func grant_victory(enc: EncounterData, collection: CollectionState, walle
 		collection.stages_cleared = enc.order
 	var frag := {}
 	if enc.fragment_reward > 0:
-		var pool := DataRegistry.all_heroes().filter(func(h): return not h.is_god)
+		var pool := DataRegistry.all_heroes().filter(func(h): return not h.is_god and h.requires_temple == 0)
 		var h: HeroData = pool[rng.randi() % pool.size()]
 		collection.add_fragments(h.id, enc.fragment_reward)
 		frag[h.id] = enc.fragment_reward

@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_helga.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/helga_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/helga_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 709
+attack = 44
+defense = 38
+speed = 112
+crit_chance = 0.08
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "helga"
+display_name = "Helga"
+title = "Architecte du Temple"
+lore = "Helga a dessiné les plans du Temple Primordial ; ses compas tracent aussi des boucliers de cristal."
+rarity = 1
+element = 6
+hero_class = 9
+is_god = false
+requires_temple = 0
+max_level = 60
+fragments_to_unlock = 40
+signature_color = Color(0.416, 0.784, 0.847, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/hero_helga.glb"
+portrait = ExtResource("4_portrait")

@@ -126,6 +126,14 @@ Reste au studio : essais sur plusieurs téléphones, clé de publication et fich
 - Fragments de héros de surface réservés aux zones de surface ; carte « recherche en cours » corrigée dans la Bibliothèque.
 - 61 tests automatisés.
 
+## ✅ v0.15.0 — Les 150 héros
+
+- 126 nouveaux héros (25 Communs, 49 Rares, 33 Épiques, 19 Légendaires), tous les couples classe/élément représentés, 21 venus de la surface (Temple 5).
+- Kit de modélisation enrichi : chapeaux (mage, sorcière, bandana, béret, large bord, casque à cornes, diadème, fleur), oreilles d'elfe et de bête, cornes, ailes, queues, écharpes, lunettes, masques, sacoches, 5 nouvelles coiffures et 15 nouvelles armes (lance, trident, masse, arbalète, luth, lanterne, griffes, fouet, katana, pioche, baguette, orbe, éventail, chakram, gantelet).
+- Générateur de données versionné (`tools/data/`) : statistiques et compétences dérivées de la classe, de l'élément et de la rareté ; 34 héros supplémentaires écrits et gardés en réserve.
+- Modèles 3D chargés à la demande (`model_path`) et portraits compressés pour la mémoire des téléphones.
+- Les fragments des héros de surface ne sortent plus des défis, de la boutique ni des zones souterraines.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |

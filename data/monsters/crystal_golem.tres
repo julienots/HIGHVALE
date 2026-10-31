@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="MonsterData" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
-[ext_resource type="PackedScene" path="res://assets/models/characters/monster_crystal_golem.glb" id="3_model"]
 [ext_resource type="Texture2D" path="res://assets/portraits/monster_crystal_golem.png" id="4_portrait"]
 [ext_resource type="Resource" path="res://data/skills/golem_smash.tres" id="s0"]
 [ext_resource type="Resource" path="res://data/skills/golem_wall.tres" id="s1"]
@@ -34,5 +33,5 @@ genetic_tags = PackedStringArray("antique", "cristal")
 lab_weight = 1.0
 stats = SubResource("stats")
 skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
-model_scene = ExtResource("3_model")
+model_path = "res://assets/models/characters/monster_crystal_golem.glb"
 portrait = ExtResource("4_portrait")

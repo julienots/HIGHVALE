@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "rosalind_s"
+display_name = "Prière d'Aurore"
+description = "Soigne toute l'équipe."
+kind = 1
+element = 7
+target = 5
+hits = 1
+power = 0.0
+heal_power = 0.45
+shield_power = 0.0
+energy_cost = 60
+energy_gain = 25
+cooldown_turns = 2
+status_effect = 0
+status_chance = 0.0
+status_turns = 2
+cinematic = false

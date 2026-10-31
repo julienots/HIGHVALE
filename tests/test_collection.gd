@@ -5,7 +5,17 @@ extends TestCase
 func test_content_is_complete() -> void:
 	var heroes := DataRegistry.all_heroes()
 	var monsters := DataRegistry.all_monsters()
-	check(heroes.size() >= 12, "au moins 12 héros")
+	eq(heroes.size(), 150, "150 héros (objectif du document de conception)")
+	var names := {}
+	for h in heroes:
+		check(not names.has(h.display_name), "nom en double : " + h.display_name)
+		names[h.display_name] = true
+		check(h.model_path.ends_with("hero_%s.glb" % h.id), "modèle chargé à la demande : " + h.id)
+	var rarities := {}
+	for h in heroes:
+		rarities[h.rarity] = int(rarities.get(h.rarity, 0)) + 1
+	for r in range(4):
+		check(int(rarities.get(r, 0)) >= 20, "au moins 20 héros de rareté %d" % r)
 	check(monsters.size() >= 10, "au moins 10 monstres")
 	var classes := {}
 	var categories := {}

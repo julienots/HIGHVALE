@@ -30,6 +30,10 @@ var _picking_skill: SkillData
 var _waiting_input := false
 
 
+## Échelle commune des héros (silhouette d'environ 0,5 unité).
+const HERO_SCALE := 2.1
+
+
 func _ready() -> void:
 	encounter = DataRegistry.encounters()[0]
 	if GameState.pending_battle != null:
@@ -143,6 +147,8 @@ func _spawn_units() -> void:
 		var box := BuildingNode.model_aabb(rig)
 		var horiz := maxf(box.size.x, box.size.z)
 		var s := minf(1.05 / maxf(box.size.y, 0.05), 1.15 / maxf(horiz, 0.05))
+		if c.is_hero and not DataRegistry.hero(c.source_id).is_god:
+			s = HERO_SCALE  # même gabarit pour tous les héros : chapeaux et ailes ne les rapetissent pas
 		rig.scale = Vector3.ONE * s * (1.35 if c.is_boss else 1.0)
 		rig.position = _slot_pos(c)
 		rig.rotation.y = PI / 2.0 if c.side == 0 else -PI / 2.0

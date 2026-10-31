@@ -38,7 +38,7 @@ func _ready() -> void:
 	GameState.pending_zone = "renewal_plains"
 	GameState.pending_stage = 2
 	GameState.collection.team.clear()
-	for id in ["sol", "aria", "luma", "orin", "draven"]:
+	for id in ["aegis", "magnus", "seren", "malakar", "leo"]:
 		GameState.collection.unlock_hero(id)
 		GameState.collection.toggle_team("h", id)
 	var surf: BattleScene = load("res://scenes/combat/battle.tscn").instantiate()

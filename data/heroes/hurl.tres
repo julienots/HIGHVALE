@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_hurl.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/hurl_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/hurl_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 545
+attack = 65
+defense = 27
+speed = 120
+crit_chance = 0.08
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "hurl"
+display_name = "Hurl"
+title = "Dynamiteur"
+lore = "Hurl ouvre les nouvelles galeries à coups d'explosifs et lance ses bâtons fumants avec une précision effrayante."
+rarity = 1
+element = 1
+hero_class = 5
+is_god = false
+requires_temple = 0
+max_level = 60
+fragments_to_unlock = 40
+signature_color = Color(1.000, 0.541, 0.227, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/hero_hurl.glb"
+portrait = ExtResource("4_portrait")

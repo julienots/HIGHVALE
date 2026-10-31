@@ -25,4 +25,13 @@ extends Resource
 @export var lab_weight := 1.0
 @export_group("Visuel")
 @export var portrait: Texture2D
-@export var model_scene: PackedScene
+## Modèle 3D chargé à la demande (évite de charger toute la collection au démarrage).
+@export_file("*.glb") var model_path := ""
+var model_scene: PackedScene:
+	get:
+		if _model == null and model_path != "":
+			_model = load(model_path)
+		return _model
+	set(value):
+		_model = value
+var _model: PackedScene

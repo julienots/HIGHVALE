@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_azazel.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/azazel_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/azazel_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/azazel_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 912
+attack = 86
+defense = 34
+speed = 106
+crit_chance = 0.11
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "azazel"
+display_name = "Azazel"
+title = "Démon des forges"
+lore = "Azazel est sorti d'une faille de lave ; il a trouvé la cité si amusante qu'il a décidé d'y rester."
+rarity = 2
+element = 1
+hero_class = 8
+is_god = false
+requires_temple = 0
+max_level = 60
+fragments_to_unlock = 80
+signature_color = Color(0.753, 0.165, 0.102, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/hero_azazel.glb"
+portrait = ExtResource("4_portrait")

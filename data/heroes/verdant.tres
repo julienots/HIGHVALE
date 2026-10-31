@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_verdant.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/verdant_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/verdant_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/verdant_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 788
+attack = 75
+defense = 44
+speed = 119
+crit_chance = 0.14
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "verdant"
+display_name = "Verdant"
+title = "Seigneur des racines"
+lore = "Verdant commande à chaque racine de la caverne ; le sol lui-même se soulève à son appel."
+rarity = 3
+element = 5
+hero_class = 7
+is_god = false
+requires_temple = 0
+max_level = 60
+fragments_to_unlock = 160
+signature_color = Color(0.165, 0.604, 0.290, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/hero_verdant.glb"
+portrait = ExtResource("4_portrait")

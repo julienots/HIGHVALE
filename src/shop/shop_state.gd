@@ -39,7 +39,7 @@ func daily_offers() -> Array:
 	var out := []
 	var ings := DataRegistry.all_ingredients()
 	var items := DataRegistry.all_items().filter(func(i): return i.rarity <= GameEnums.Rarity.EPIC)
-	var heroes := DataRegistry.all_heroes().filter(func(h): return not h.is_god)
+	var heroes := DataRegistry.all_heroes().filter(func(h): return not h.is_god and h.requires_temple == 0)
 	for i in DAILY_COUNT:
 		var kind := i % 3
 		if kind == 0:
@@ -96,7 +96,7 @@ func open_chest(id: String, wallet: Wallet, inventory: Inventory, collection: Co
 			inventory.add(pick.id)
 			got[pick.display_name] = int(got.get(pick.display_name, 0)) + 1
 	else:
-		var heroes := DataRegistry.all_heroes().filter(func(h): return not h.is_god)
+		var heroes := DataRegistry.all_heroes().filter(func(h): return not h.is_god and h.requires_temple == 0)
 		var h: HeroData = heroes[rng.randi() % heroes.size()]
 		var n := rng.randi_range(15, 30)
 		collection.add_fragments(h.id, n)

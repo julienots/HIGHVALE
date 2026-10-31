@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/heroes/hero_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/hero_morgane.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/morgane_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/morgane_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/morgane_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 676
+attack = 76
+defense = 29
+speed = 106
+crit_chance = 0.11
+growth_per_level = 1.08
+
+[resource]
+script = ExtResource("1_script")
+id = "morgane"
+display_name = "Morgane"
+title = "Sorcière des marées"
+lore = "Morgane fait monter les eaux d'un geste et les retire d'un autre ; ses ennemis se noient de surprise."
+rarity = 2
+element = 2
+hero_class = 3
+is_god = false
+requires_temple = 0
+max_level = 60
+fragments_to_unlock = 80
+signature_color = Color(0.102, 0.416, 0.847, 1)
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/hero_morgane.glb"
+portrait = ExtResource("4_portrait")

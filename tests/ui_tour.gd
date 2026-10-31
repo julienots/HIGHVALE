@@ -30,6 +30,12 @@ func _ready() -> void:
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(out.path_join("ui_%s.png" % s[0]))
 		s[1].close_screen()
+	for id in ["noctis", "aegis", "seren", "malakar", "verdant", "leo", "magnus", "zircon", "vesper", "hilda", "kraken", "lilith"]:
+		GameState.collection.unlock_hero(id)
+	city.hud.collection_screen.show_screen(0)
+	await _frames(20)
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(out.path_join("ui_collection.png"))
 	SaveSystem.delete_save()
 	print("UI_TOUR_OK")
 	get_tree().quit()
