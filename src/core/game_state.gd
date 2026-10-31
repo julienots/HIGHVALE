@@ -56,6 +56,7 @@ func start_or_load() -> void:
 	else:
 		_apply(data)
 	is_loaded = true
+	collection.level_cost_discount = city.research.value("training")
 	# Progression hors ligne : terminer les chantiers échus pendant l'absence.
 	city.update(GameClock.now())
 	quests.roll(GameClock.now())
@@ -78,6 +79,7 @@ func new_game() -> void:
 		city.spawn_wild(int(now) + i * 7919)
 	city.next_wild_at = now + config().wild_spawn_seconds
 	collection.from_dict({})
+	collection.level_cost_discount = 0.0
 	inventory.from_dict({})
 	lab.from_dict({})
 	exploration.from_dict({})
@@ -159,8 +161,17 @@ func _new_city() -> CityState:
 	city.task_finished.connect(_on_task_finished)
 	city.population_changed.connect(func(): Events.population_changed.emit())
 	city.wilds_changed.connect(func(): Events.wilds_changed.emit())
+	city.research.changed.connect(_on_research_changed)
 	wallet.capacity_provider = city.storage_capacity
 	return city
+
+
+func _on_research_changed() -> void:
+	city.apply_research(GameClock.now())
+	collection.level_cost_discount = city.research.value("training")
+	Events.research_changed.emit()
+	Events.capacities_changed.emit()
+	save()
 
 
 func _process(delta: float) -> void:

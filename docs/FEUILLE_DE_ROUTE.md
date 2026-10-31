@@ -109,6 +109,15 @@ Reste à faire : créatures et héros propres à la surface, bâtiments spécifi
 
 Reste au studio : essais sur plusieurs téléphones, clé de publication et fiche Play Store, achats intégrés (Google Play Billing), contenu jusqu'à 150 héros et 120 créatures, créatures et bâtiments propres à la surface.
 
+## ✅ v0.13.0 — Contenu, Infirmerie et Recherches
+
+- 9 nouveaux héros (Aria, Sol, Thalia, Korin, Mira, Ezra, Draven, Luma, Orin) et 8 nouvelles créatures (Loup des plaines, Aigle tempête, Sylphe du vent, Colosse d'Aurore, Sylvain ancien, Crabe des marées, Phénix d'aurore, Serpent du Néant), modélisés dans Blender avec portraits, compétences et histoire.
+- Héros de surface (`requires_temple`) absents des invocations et des cristaux avant le Temple 5.
+- Plaines du Renouveau, Ruines d'Aurore, Pics tempétueux, Lacs abyssaux et Abîme du Néant peuplés de leurs propres créatures et gardiens.
+- Infirmerie : blessures des héros K.O., écran de soins, équipe filtrée, lancement de combat refusé si toute l'équipe est blessée.
+- Recherches (`src/research/research_state.gd`) : 4 technologies de cité à la Bibliothèque, 4 technologies de héros à l'Académie. Tous les bâtiments ont désormais un module livré.
+- 60 tests automatisés.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |

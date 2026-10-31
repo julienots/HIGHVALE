@@ -15,6 +15,7 @@ signal wilds_changed
 signal collection_changed
 signal inventory_changed
 signal quests_changed
+signal research_changed
 ## Action du joueur suivie par les missions (collect, build, harvest, battle_win…).
 signal action_done(kind: String, amount: int)
 signal toast_requested(text: String, kind: String)

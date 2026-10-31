@@ -20,6 +20,8 @@ var prod_since := 0.0
 var prod_carry := 0.0
 ## Habitants affectés et nombre souhaité par le joueur (-1 = tous les postes).
 var workers := 0
+## Multiplicateur de production (recherches), fixé par la cité ; non sauvegardé.
+var prod_mult := 1.0
 var desired_workers := -1
 
 
@@ -82,7 +84,7 @@ func stored_production(now: float) -> float:
 	var cap := float(d.internal_capacity(level))
 	if is_busy():
 		return minf(prod_carry, cap)
-	var produced := d.production_per_hour(level) * efficiency() / 3600.0 * maxf(now - prod_since, 0.0)
+	var produced := d.production_per_hour(level) * prod_mult * efficiency() / 3600.0 * maxf(now - prod_since, 0.0)
 	return minf(prod_carry + produced, cap)
 
 

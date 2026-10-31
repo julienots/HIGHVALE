@@ -371,7 +371,7 @@ func collect(uid: int) -> void:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
 
 
-const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal", "market", "infirmary"]
+const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal", "market", "infirmary", "library", "academy"]
 
 
 func has_screen(data_id: String) -> bool:
@@ -402,6 +402,8 @@ func open_building_screen(uid: int) -> void:
 			hud.shop_screen.open_screen()
 		"infirmary":
 			hud.infirmary_screen.open_screen()
+		"library", "academy":
+			hud.research_screen.open_for(b.data_id)
 		"explorer_tower", "ancient_portal":
 			hud.exploration_screen.open_screen()
 
@@ -520,7 +522,7 @@ func open_upgrade(uid: int) -> void:
 	cost_row.add_theme_constant_override("separation", 20)
 	cost_row.add_child(UiTheme.cost_row(d.cost_for_level(next), GameState.wallet, 24))
 	cost_row.add_child(UiTheme.icon_rect(preload("res://assets/icons/ui/clock.svg"), 28))
-	cost_row.add_child(UiTheme.label(Fmt.duration(d.build_seconds_for_level(next)), "HudLabel", 24))
+	cost_row.add_child(UiTheme.label(Fmt.duration(GameState.city.build_seconds(d, next)), "HudLabel", 24))
 	body.add_child(cost_row)
 	if reason != "":
 		body.add_child(UiTheme.label(reason, "HudLabel", 22, UiTheme.RED))
@@ -649,7 +651,7 @@ func _handle_back() -> void:
 		if c is DialogBox:
 			c.close()
 			return
-	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen, hud.infirmary_screen, hud.exploration_screen, hud.missions_screen, hud.shop_screen]:
+	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen, hud.infirmary_screen, hud.research_screen, hud.exploration_screen, hud.missions_screen, hud.shop_screen]:
 		if s.visible:
 			s.close_screen()
 			return

@@ -5,15 +5,15 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.12.0)
+## État actuel (v0.13.0)
 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Architecture du projet Godot | ✅ terminée |
 | 2 | Cité isométrique jouable | ✅ terminée |
-| 3 | Bâtiments et économie | 🟡 base jouable (voir [la feuille de route](docs/FEUILLE_DE_ROUTE.md)) |
+| 3 | Bâtiments et économie | ✅ les 25 bâtiments sont fonctionnels |
 | 4 | Population et vie de la cité | ✅ terminée |
-| 5 | Collection des héros et des monstres | 🟡 base jouable (15 héros dont 3 dieux, 12 créatures) |
+| 5 | Collection des héros et des monstres | 🟡 base jouable (24 héros dont 3 dieux, 20 créatures) |
 | 6 | Laboratoire et Fusionnerie | ✅ terminée |
 | 7 | Invocation et dieux | ✅ terminée |
 | 8 | Combat au tour par tour | ✅ terminée |
@@ -29,7 +29,7 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Habitants** : la population augmente tant qu'il reste des logements, y compris jeu fermé. Les habitants sont affectés aux postes de production ; un bâtiment produit à 25 % sans ouvrier et à 100 % avec tous ses postes pourvus. Le joueur règle le nombre d'ouvriers avec − / +.
 - **Bien-être** : décorations (Fontaine de cristal, Jardin des lueurs, Statue du Fondateur), niveau du Temple et festins payés en Nectar souterrain (produit par la Nectarerie) accélèrent l'arrivée des habitants.
 - **Récolte manuelle** : filons de pierre, champignons sauvages et cristaux affleurants apparaissent sur les cases libres (y compris jeu fermé) et se récoltent d'un toucher ; les cristaux peuvent contenir des Prismes.
-- **Collection** : 12 héros (les 10 classes, de Commun à Légendaire) et 10 créatures (7 catégories), chacun avec son modèle 3D, son portrait, ses statistiques, 2 à 3 compétences et son histoire. Écran de collection avec cartes par rareté, filtres et fiche détaillée (vitrine 3D orientable, statistiques, compétences). Les héros montent de niveau (or, puis cristaux) et évoluent avec des fragments (étoiles), qui relèvent leur niveau maximal ; les créatures se nourrissent de nectar pour grandir. Fragments trouvés dans les cristaux affleurants, œufs parfois cachés dans les champignons sauvages ; l'Habitat des monstres augmente le nombre de créatures hébergées.
+- **Collection** : 24 héros (les 10 classes, de Commun à Divin ; Aria, Sol et Orin viennent de la surface et ne s'invoquent qu'à partir du Temple 5) et 20 créatures, chacun avec son modèle 3D, son portrait, ses statistiques, 2 à 3 compétences et son histoire. Écran de collection avec cartes par rareté, filtres et fiche détaillée (vitrine 3D orientable, statistiques, compétences). Les héros montent de niveau (or, puis cristaux) et évoluent avec des fragments (étoiles), qui relèvent leur niveau maximal ; les créatures se nourrissent de nectar pour grandir. Fragments trouvés dans les cristaux affleurants, œufs parfois cachés dans les champignons sauvages ; l'Habitat des monstres augmente le nombre de créatures hébergées.
 - **Laboratoire** : 12 ingrédients aux affinités génétiques ; jusqu'à 4 emplacements selon le niveau ; probabilités affichées (par rareté et par espèce) ; résultat tiré au lancement, révélé à la fin du compte à rebours ; machine animée (liquides, bulles, arcs électriques) ; synthèse d'ingrédients à partir des ressources.
 - **Fusionnerie** : deux créatures fusionnées en une espèce apparentée de rareté égale ou supérieure ; recettes secrètes (dont deux créatures exclusives : Gelée de magma, Chimère de cristal) ; mutations rares en variantes dorée, d'ombre ou de cristal.
 - **Sanctuaire des héros** : invocations classique, avancée, élémentaire (élément du jour) et légendaire, avec taux affichés, garantie Épique et doublons convertis en fragments. **Autel divin** : éveil des dieux Kryos, Vitalia et Pyros (fragments divins, éveil complet exceptionnel).
@@ -37,6 +37,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Combat au tour par tour** : arène 3D dans la caverne, équipe de 5 héros et créatures, ordre selon la vitesse, énergie, recharges, avantages élémentaires, critiques, boucliers, états (brûlure, gel, poison, paralysie, étourdissement, affaiblissement, régénération, provocation), synergie élémentaire d'équipe. Mode manuel (choix de la compétence et de la cible) ou automatique, vitesse ×1 à ×3, caméra cinématique pour les ultimes, chiffres de dégâts. IA ennemie à stratégies (équilibrée, agressive, achever les blessés). 10 défis des profondeurs dont 2 boss, avec récompenses ; la Caserne entraîne l'équipe.
 - **Progression** : équipements forgés (arme, armure, amulette ; 12 objets) et talents à choisir aux niveaux 10, 20 et 30 ; boss à phases (purification, bouclier, rage à 66 % et 33 %).
 - **Exploration** : carte des 5 zones des profondeurs et des 3 régions de la surface (ouvertes au Temple niveau 5), chacune avec 3 combats dont un gardien, ambiance d'arène propre (cristaux, forges, plein jour et forêts à la surface) et butin ; expéditions de héros (1, 4 ou 8 h) depuis la Tour des explorateurs.
+- **Infirmerie** : les héros mis K.O. sont blessés et se reposent (10 min, −8 % par niveau d'Infirmerie) avant de pouvoir recombattre ; soin immédiat en Essence vitale.
+- **Recherches** : la Bibliothèque (production, durée des chantiers, stockage, bien-être) et l'Académie (coût d'entraînement des héros, attaque et PV en combat, places de créatures) développent 8 technologies, plafonnées par le niveau du bâtiment.
 - **Missions et événements** : 4 missions du jour et 3 de la semaine suivies automatiquement, récompenses de connexion sur 7 jours, passe saisonnier de 20 paliers, événement hebdomadaire tournant (+50 % de récompenses de combat, boss d'événement quotidien).
 - **Boutique** : 6 offres du jour renouvelées (ingrédients, fragments, équipements), packs de ressources, coffres d'alchimiste et du héros ; le Marché l'ouvre aussi. Tout s'achète avec les monnaies du jeu : aucun paiement réel n'est intégré.
 - **Son** : bande-son originale synthétisée (thème de la cité, thème de combat, jingles) et 13 effets sonores ; volumes réglables.

@@ -10,7 +10,7 @@ static func lines(d: BuildingData, level: int) -> Array:
 		return out
 	if not d.produces.is_empty():
 		var rt := DataRegistry.resource_type(d.produces)
-		out.append(["Production", "+%s / h" % Fmt.amount(d.production_per_hour(level)), rt.icon])
+		out.append(["Production", "+%s / h" % Fmt.amount(d.production_per_hour(level) * GameState.city.production_mult()), rt.icon])
 		out.append(["Réserve interne", Fmt.amount(d.internal_capacity(level)), rt.icon])
 	var st := d.storage_for_level(level)
 	for id in st:

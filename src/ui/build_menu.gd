@@ -188,7 +188,7 @@ func _card(d: BuildingData) -> Control:
 		time_row.alignment = BoxContainer.ALIGNMENT_CENTER
 		time_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		time_row.add_child(UiTheme.icon_rect(ICON_CLOCK, 20))
-		time_row.add_child(UiTheme.label(Fmt.duration(d.build_seconds_for_level(1)), "DimLabel", 16))
+		time_row.add_child(UiTheme.label(Fmt.duration(GameState.city.build_seconds(d, 1)), "DimLabel", 16))
 		col.add_child(time_row)
 		if reason != "":
 			card.modulate = Color(0.75, 0.75, 0.8)

@@ -42,6 +42,8 @@ const WOUND_BASE_SECONDS := 600.0
 const HEAL_ESSENCE_PER_MINUTE := 2
 const TEAM_SIZE := 5
 var _next_monster_uid := 1
+## Réduction du coût d'amélioration des héros (recherche « Entraînement »), fixée par GameState.
+var level_cost_discount := 0.0
 
 
 # --- Héros -------------------------------------------------------------------
@@ -89,7 +91,7 @@ func add_fragments(id: String, count: int) -> bool:
 func hero_level_cost(id: String) -> Dictionary:
 	var d := DataRegistry.hero(id)
 	var lvl := hero_level(id)
-	var mult := 1.0 + d.rarity * 0.35
+	var mult := (1.0 + d.rarity * 0.35) * (1.0 - level_cost_discount)
 	var cost := {"gold": BuildingData.nice_round(80.0 * pow(1.17, lvl - 1) * mult)}
 	if lvl >= 10:
 		cost["abyssal_crystal"] = BuildingData.nice_round(4.0 * pow(1.12, lvl - 10) * mult)
@@ -165,7 +167,7 @@ func hero_power(id: String) -> int:
 # --- Monstres ----------------------------------------------------------------
 
 func monster_capacity(city: CityState) -> int:
-	var n := BASE_MONSTER_CAPACITY
+	var n := BASE_MONSTER_CAPACITY + int(city.research.value("bestiary"))
 	for b in city.buildings.values():
 		n += b.data().monster_capacity_for_level(b.level)
 	return n

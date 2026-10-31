@@ -12,9 +12,12 @@ static func apply_city_bonus(team: Array, city: CityState) -> float:
 	for b in city.buildings.values():
 		if b.data_id == "barracks":
 			lvl = maxi(lvl, b.level)
-	var mult := 1.0 + 0.03 * lvl
+	var mult := (1.0 + 0.03 * lvl) * (1.0 + city.research.value("tactics"))
+	var hp_mult := 1.0 + city.research.value("vitality")
 	for c: Combatant in team:
 		c.attack = int(c.attack * mult)
+		c.max_hp = int(c.max_hp * hp_mult)
+		c.hp = c.max_hp
 	return mult
 
 

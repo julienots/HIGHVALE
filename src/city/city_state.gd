@@ -29,6 +29,8 @@ var next_wild_at := 0.0
 var wild_spawn_seconds := 240.0
 var max_wilds := 6
 var buildings := {}  # uid -> BuildingState
+## Recherches de la Bibliothèque et de l'Académie (effets sur la cité et les héros).
+var research := ResearchState.new()
 var _occupancy := {}  # Vector2i -> uid
 var _next_uid := 1
 
@@ -67,6 +69,25 @@ func count_of(data_id: String) -> int:
 		if b.data_id == data_id:
 			n += 1
 	return n
+
+
+## Durée d'un chantier, réduite par la recherche « Architecture ».
+func build_seconds(data: BuildingData, level: int) -> float:
+	return data.build_seconds_for_level(level) * (1.0 - research.value("architecture"))
+
+
+## Multiplicateur de production apporté par la recherche « Extraction profonde ».
+func production_mult() -> float:
+	return 1.0 + research.value("extraction")
+
+
+## Applique les effets de recherche à tous les bâtiments (après avoir figé leur production).
+func apply_research(now: float) -> void:
+	var mult := production_mult()
+	for b: BuildingState in buildings.values():
+		if not is_equal_approx(b.prod_mult, mult):
+			b.flush(now)
+			b.prod_mult = mult
 
 
 ## Niveau le plus élevé parmi les bâtiments d'un type (0 si aucun).
@@ -127,7 +148,7 @@ func storage_capacity(resource_id: String) -> int:
 	var cap := rt.base_capacity
 	for b in buildings.values():
 		cap += int(b.data().storage_for_level(b.level).get(resource_id, 0))
-	return cap
+	return int(cap * (1.0 + research.value("warehouses")))
 
 
 ## Vérifie qu'un nouveau bâtiment peut être construit (hors emplacement). "" = OK.
@@ -170,7 +191,7 @@ func place_new(data: BuildingData, cell: Vector2i, wallet: Wallet, now: float) -
 	var cost := data.cost_for_level(1)
 	wallet.spend(cost)
 	var b := _create(data.id, cell, 0)
-	_start_task(b, BuildingState.Task.CONSTRUCTING, data.build_seconds_for_level(1), cost, now)
+	_start_task(b, BuildingState.Task.CONSTRUCTING, build_seconds(data, 1), cost, now)
 	building_added.emit(b)
 	update(now)
 	return b
@@ -204,7 +225,7 @@ func start_upgrade(b: BuildingState, wallet: Wallet, now: float) -> String:
 	var cost := b.data().cost_for_level(b.level + 1)
 	wallet.spend(cost)
 	b.prod_carry = b.stored_production(now)
-	_start_task(b, BuildingState.Task.UPGRADING, b.data().build_seconds_for_level(b.level + 1), cost, now)
+	_start_task(b, BuildingState.Task.UPGRADING, build_seconds(b.data(), b.level + 1), cost, now)
 	building_changed.emit(b)
 	update(now)
 	return ""
@@ -279,6 +300,8 @@ func update(now: float) -> Array[BuildingState]:
 	done.sort_custom(func(a, c): return a.task_end < c.task_end)
 	for b in done:
 		_finish_task(b, b.task_end)
+	if not research.update(now).is_empty():
+		apply_research(now)
 	update_population(now)
 	update_wilds(now)
 	return done
@@ -319,7 +342,7 @@ func feast_active(now: float) -> bool:
 
 ## Bien-être de 0 à 100 : base + confort des bâtiments + festin éventuel.
 func happiness(now: float, feast_bonus := 25) -> int:
-	return clampi(base_happiness + comfort() + (feast_bonus if feast_active(now) else 0), 0, 100)
+	return clampi(base_happiness + comfort() + int(research.value("festivities")) + (feast_bonus if feast_active(now) else 0), 0, 100)
 
 
 ## Intervalle entre deux arrivées : deux fois plus long à 0 %, deux fois plus court à 100 %.
@@ -482,6 +505,7 @@ func _create(data_id: String, cell: Vector2i, level: int) -> BuildingState:
 	b.data_id = data_id
 	b.cell = cell
 	b.level = level
+	b.prod_mult = production_mult()
 	buildings[b.uid] = b
 	_set_occupancy(b, true)
 	return b
@@ -524,7 +548,7 @@ func to_dict() -> Dictionary:
 	for c in wilds:
 		wild_list.append({"x": c.x, "y": c.y, "id": wilds[c]})
 	return {"next_uid": _next_uid, "buildings": list, "inhabitants": inhabitants, "growth_since": growth_since,
-		"feast_until": feast_until, "wilds": wild_list, "next_wild_at": next_wild_at}
+		"feast_until": feast_until, "wilds": wild_list, "next_wild_at": next_wild_at, "research": research.to_dict()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -535,6 +559,7 @@ func from_dict(d: Dictionary) -> void:
 	growth_since = float(d.get("growth_since", 0.0))
 	feast_until = float(d.get("feast_until", 0.0))
 	next_wild_at = float(d.get("next_wild_at", 0.0))
+	research.from_dict(d.get("research", {}))
 	wilds.clear()
 	for bd in d.get("buildings", []):
 		var b := BuildingState.from_dict(bd)
@@ -544,6 +569,7 @@ func from_dict(d: Dictionary) -> void:
 		if not is_area_free(b.cell, b.footprint()):
 			push_warning("CityState : chevauchement ignoré pour « %s »" % b.data_id)
 			continue
+		b.prod_mult = production_mult()
 		buildings[b.uid] = b
 		_set_occupancy(b, true)
 		_next_uid = maxi(_next_uid, b.uid + 1)

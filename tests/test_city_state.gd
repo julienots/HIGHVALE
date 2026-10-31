@@ -41,7 +41,7 @@ func test_max_count_and_temple_lock() -> void:
 	check(c.can_build_reason(DataRegistry.building("primordial_temple"), w).begins_with("Nombre maximal"), "un seul Temple")
 	check(c.can_build_reason(DataRegistry.building("infirmary"), w).begins_with("Temple"), "Infirmerie verrouillée au Temple 1")
 	for b in DataRegistry.all_buildings():
-		check(b.feature in ["", "research"] or FeatureFlags.is_enabled(b.feature), "module livré : %s" % b.id)
+		check(b.feature == "" or FeatureFlags.is_enabled(b.feature), "module livré : %s" % b.id)
 
 
 func test_construction_completes_in_order() -> void:
@@ -235,3 +235,31 @@ func test_wilds_spawn_block_and_harvest() -> void:
 	var c2 := new_city()
 	c2.from_dict(data)
 	eq(c2.wilds.size(), c.wilds.size(), "ressources sauvages sauvegardées")
+
+
+func test_research_effects() -> void:
+	var c := _city_with_temple()
+	var w := new_wallet(c, {"gold": 50000, "stone": 50000, "fungal_wood": 50000})
+	var r := c.research
+	check(r.reason("extraction", c, w).begins_with("Construisez"), "Bibliothèque requise")
+	c.add_built("library", Vector2i(5, 28), 2, T0)
+	var mine := c.add_built("stone_mine", Vector2i(10, 28), 1, T0)
+	var base_rate := mine.stored_production(T0 + 3600)
+	var base_cap := c.storage_capacity("stone")
+	var base_time := c.build_seconds(DataRegistry.building("stone_mine"), 2)
+	eq(r.start("extraction", c, w, T0), "", "recherche lancée")
+	eq(r.reason("warehouses", c, w), "Une recherche est déjà en cours", "une seule recherche par bâtiment")
+	c.update(T0 + r.seconds("extraction") + 1)
+	eq(r.level("extraction"), 1, "recherche terminée")
+	check(is_equal_approx(mine.prod_mult, 1.05), "production +5 %")
+	r.levels["warehouses"] = 2
+	r.levels["architecture"] = 2
+	check(c.storage_capacity("stone") > base_cap, "stockage augmenté")
+	check(c.build_seconds(DataRegistry.building("stone_mine"), 2) < base_time, "chantiers plus courts")
+	check(base_rate > 0.0, "la mine produit")
+	r.levels["extraction"] = 2
+	eq(r.reason("extraction", c, w), "Améliorez le bâtiment (niveau 3 requis)", "plafond lié au niveau du bâtiment")
+	var c2 := CityState.new()
+	c2.configure(DataRegistry.config)
+	c2.from_dict(c.to_dict())
+	eq(c2.research.level("warehouses"), 2, "recherches sauvegardées")
