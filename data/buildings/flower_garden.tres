@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/buildings/flower_garden.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_script")
+id = "flower_garden"
+display_name = "Jardin des lueurs"
+description = "Massifs de fleurs et de champignons lumineux où les habitants aiment flâner. Améliore le bien-être."
+category = 10
+sort_order = 310
+feature = ""
+footprint = Vector2i(2, 2)
+max_level = 5
+unlock_temple_level = 1
+max_count_by_temple = PackedInt32Array(2, 2, 3, 3, 4, 4, 5, 5, 6, 6)
+level_cap_base = 2
+level_cap_per_temple = 2
+base_cost = {"gold": 150, "fungal_wood": 150}
+cost_growth = 1.8
+base_build_seconds = 10.0
+build_time_growth = 2.0
+produces = ""
+base_production_per_hour = 0.0
+production_growth = 1.3
+internal_storage_hours = 1.0
+base_workers = 0
+storage = {}
+storage_growth = 1.6
+population_base = 0
+population_growth = 1.35
+builders_provided = 0
+comfort_base = 4
+comfort_per_level = 1
+model_scene = ExtResource("2_model")
+model_recipe = "flower_garden"
+primary_color = Color(0.310, 0.541, 0.227, 1)
+accent_color = Color(1.000, 0.416, 0.835, 1)

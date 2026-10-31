@@ -280,7 +280,9 @@ func _show_population() -> void:
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 30)
-	for row in [["Habitants", "%d / %d" % [city.inhabitants, city.population_capacity()]],
+	var cfg := GameState.config()
+	for row in [["Bien-être", "%d %%" % city.happiness(now, cfg.feast_bonus)],
+			["Habitants", "%d / %d" % [city.inhabitants, city.population_capacity()]],
 			["Au travail", str(city.workers_total())], ["Libres", str(city.idle_inhabitants())],
 			["Prochaine arrivée", "Logements pleins" if city.next_arrival_in(now) < 0 else Fmt.duration(city.next_arrival_in(now))]]:
 		grid.add_child(UiTheme.label(row[0], "", 22))
@@ -294,10 +296,20 @@ func _show_population() -> void:
 			body.add_child(UiTheme.label("%s (niv. %d) : %d / %d ouvriers — %d %%" % [b.data().display_name, b.level, b.workers, b.worker_slots(), roundi(b.efficiency() * 100)], "", 20))
 	if not any:
 		body.add_child(UiTheme.label("Aucun bâtiment de production.", "DimLabel", 18))
-	var hint := UiTheme.label("Les habitants arrivent tant qu'il reste des logements (Hôtel des habitants, Temple). Ils sont affectés aux postes libres ; un bâtiment sans ouvrier produit à 25 %.", "DimLabel", 17)
+	var hint := UiTheme.label("Les habitants arrivent tant qu'il reste des logements. Le bien-être (décorations, Temple, festins) accélère leur arrivée. Un bâtiment sans ouvrier produit à 25 %.", "DimLabel", 17)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(hint)
-	DialogBox.open(root, "Population", body, [], 680)
+	var buttons := []
+	if city.feast_active(now):
+		body.add_child(UiTheme.label("Festin en cours : encore %s" % Fmt.duration(city.feast_until - now), "HudLabel", 22, UiTheme.GOLD))
+	else:
+		var cost_text := ""
+		for id in cfg.feast_cost:
+			cost_text += "%d %s" % [cfg.feast_cost[id], DataRegistry.resource_type(id).display_name.to_lower()]
+		buttons.append({"text": "Festin (%s)" % cost_text, "variation": "PrimaryButton", "icon": preload("res://assets/icons/ui/heart.svg"),
+			"disabled": not GameState.wallet.can_afford(cfg.feast_cost), "action": func(): controller.start_feast()})
+	buttons.append({"text": "Fermer", "variation": "SecondaryButton"})
+	DialogBox.open(root, "Population", body, buttons, 720)
 
 
 func _show_builders_info() -> void:

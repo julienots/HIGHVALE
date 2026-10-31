@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WildResourceData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/economy/wild_resource_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props/wild_shrooms.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_script")
+id = "shrooms"
+display_name = "Champignons sauvages"
+weight = 3.0
+rewards = {"fungal_wood": Vector2i(100, 200), "underground_nectar": Vector2i(15, 35)}
+premium_chance = 0.0
+premium_amount = Vector2i(1, 3)
+model_scene = ExtResource("2_model")

@@ -3,9 +3,9 @@ extends Resource
 ## Définition d'un type de bâtiment. Les valeurs par niveau sont calculées par
 ## formules de croissance afin qu'un bâtiment complet tienne dans un seul fichier.
 
-enum Category { CORE, RESOURCE, STORAGE, POPULATION, CREATURES, HEROES, MILITARY, KNOWLEDGE, TRADE, EXPLORATION }
+enum Category { CORE, RESOURCE, STORAGE, POPULATION, CREATURES, HEROES, MILITARY, KNOWLEDGE, TRADE, EXPLORATION, DECORATION }
 
-const CATEGORY_NAMES := ["Cœur", "Ressources", "Stockage", "Population", "Créatures", "Héros", "Militaire", "Savoir", "Commerce", "Exploration"]
+const CATEGORY_NAMES := ["Cœur", "Ressources", "Stockage", "Population", "Créatures", "Héros", "Militaire", "Savoir", "Commerce", "Exploration", "Décoration"]
 
 @export var id := ""
 @export var display_name := ""
@@ -53,6 +53,9 @@ const CATEGORY_NAMES := ["Cœur", "Ressources", "Stockage", "Population", "Créa
 @export var population_growth := 1.35
 ## Bâtisseurs fournis (chantiers simultanés).
 @export var builders_provided := 0
+## Points de bien-être apportés (décorations, Temple…).
+@export var comfort_base := 0
+@export var comfort_per_level := 0
 
 @export_group("Visuel")
 ## Modèle 3D définitif (glTF importé). Si absent, le modèle procédural « model_recipe » est utilisé.
@@ -104,6 +107,12 @@ func population_for_level(level: int) -> int:
 	if level < 1 or population_base <= 0:
 		return 0
 	return int(round(population_base * pow(population_growth, level - 1)))
+
+
+func comfort_for_level(level: int) -> int:
+	if level < 1 or comfort_base <= 0:
+		return 0
+	return comfort_base + (level - 1) * comfort_per_level
 
 
 func max_count(temple_level: int) -> int:

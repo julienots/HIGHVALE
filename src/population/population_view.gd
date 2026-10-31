@@ -24,6 +24,7 @@ func _ready() -> void:
 	Events.building_removed.connect(func(_u): rebuild_nav())
 	Events.building_changed.connect(_on_building_changed)
 	Events.population_changed.connect(refresh_roster)
+	Events.wilds_changed.connect(rebuild_nav)
 	Events.game_loaded.connect(func():
 		for v in villagers.values():
 			v.queue_free()

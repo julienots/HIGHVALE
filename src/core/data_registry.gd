@@ -7,11 +7,13 @@ const CONFIG_PATH := "res://data/config/game_config.tres"
 const RESOURCE_TYPES_DIR := "res://data/resources"
 const BUILDINGS_DIR := "res://data/buildings"
 const STORY_DIR := "res://data/story"
+const WILDS_DIR := "res://data/wilds"
 
 var config: GameConfig
 var _resource_types := {}  # id -> ResourceTypeData
 var _buildings := {}  # id -> BuildingData
 var _story: Array[StoryChapterData] = []
+var _wilds := {}  # id -> WildResourceData
 
 
 func _ready() -> void:
@@ -22,6 +24,7 @@ func reload() -> void:
 	config = load(CONFIG_PATH)
 	_resource_types = _index_by_id(load_dir(RESOURCE_TYPES_DIR))
 	_buildings = _index_by_id(load_dir(BUILDINGS_DIR))
+	_wilds = _index_by_id(load_dir(WILDS_DIR))
 	_story.clear()
 	for r in load_dir(STORY_DIR):
 		if r is StoryChapterData:
@@ -80,6 +83,17 @@ func all_buildings() -> Array[BuildingData]:
 	var list: Array[BuildingData] = []
 	list.assign(_buildings.values())
 	list.sort_custom(func(a, b): return a.sort_order < b.sort_order)
+	return list
+
+
+func wild(id: String) -> WildResourceData:
+	return _wilds.get(id)
+
+
+func all_wilds() -> Array[WildResourceData]:
+	var list: Array[WildResourceData] = []
+	list.assign(_wilds.values())
+	list.sort_custom(func(a, b): return a.id < b.id)
 	return list
 
 

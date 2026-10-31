@@ -4,7 +4,7 @@ extends TestCase
 
 func test_every_building_builds_a_model() -> void:
 	for d in DataRegistry.all_buildings():
-		check(BuildingModels._has_recipe("_" + d.model_recipe), "recette manquante : " + d.model_recipe)
+		check(d.model_scene != null or BuildingModels._has_recipe("_" + d.model_recipe), "modèle manquant : " + d.id)
 		for level in [1, 3, 5, 7, d.max_level]:
 			var m := BuildingModels.build(d, level)
 			check(_count_meshes(m) > 4, "%s niv. %d : modèle vide" % [d.id, level])

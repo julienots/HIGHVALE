@@ -11,6 +11,7 @@ signal building_changed(uid: int)
 signal building_task_finished(uid: int)
 signal temple_level_changed(level: int)
 signal population_changed
+signal wilds_changed
 signal toast_requested(text: String, kind: String)
 signal story_chapter_requested(chapter: StoryChapterData)
 signal settings_changed

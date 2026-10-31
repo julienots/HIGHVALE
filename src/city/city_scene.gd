@@ -10,6 +10,7 @@ var cam: CityCamera
 var hud: CityHud
 var env: CaveEnvironment
 var population: PopulationView
+var wild_view: WildView
 var nodes := {}  # uid -> BuildingNode
 var selected_uid := 0
 
@@ -37,6 +38,9 @@ func _ready() -> void:
 	_buildings_root.name = "Buildings"
 	add_child(_buildings_root)
 	_build_grid_overlay(cfg.buildable_rect)
+	wild_view = WildView.new()
+	wild_view.name = "Wilds"
+	add_child(wild_view)
 	population = PopulationView.new()
 	population.name = "Population"
 	add_child(population)
@@ -202,6 +206,9 @@ func _handle_tap(pos: Vector2) -> void:
 		return
 	var b := GameState.city.building_at(cell)
 	if b == null:
+		if GameState.city.wild_at(cell) != "":
+			harvest(cell)
+			return
 		deselect()
 		return
 	var n: BuildingNode = nodes.get(b.uid)
@@ -355,6 +362,53 @@ func collect(uid: int) -> void:
 			n.play_pop(1.05)
 	elif b.stored_production(GameClock.now()) >= 1.0:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
+
+
+## Récolte manuelle d'une ressource sauvage.
+func harvest(cell: Vector2i) -> void:
+	deselect()
+	var node := wild_view.node_at(cell)
+	var origin := node.global_position if node else Vector3(cell.x + 0.5, 0, cell.y + 0.5)
+	var got := GameState.city.harvest_wild(cell, GameState.wallet, GameState.config().premium_resource, GameClock.now())
+	if got.is_empty():
+		Events.toast_requested.emit("Réserves pleines : rien n'a pu être récolté", "error")
+		return
+	var i := 0
+	for id in got:
+		var rt := DataRegistry.resource_type(id)
+		_float_at(origin + Vector3(0, 0.8 + i * 0.45, 0), "+%s %s" % [Fmt.amount(got[id]), rt.display_name], rt.color.lightened(0.25))
+		i += 1
+	GameState.save()
+
+
+func _float_at(pos: Vector3, text: String, color: Color) -> void:
+	var l := Label3D.new()
+	l.font = BuildingNode.TITLE_FONT
+	l.font_size = 52
+	l.outline_size = 14
+	l.outline_modulate = Color("1b1430")
+	l.modulate = color
+	l.pixel_size = 0.008
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.render_priority = 12
+	l.outline_render_priority = 11
+	l.text = text
+	l.position = pos
+	add_child(l)
+	var t := l.create_tween().set_parallel()
+	t.tween_property(l, "position:y", pos.y + 1.4, 1.3).set_ease(Tween.EASE_OUT)
+	t.tween_property(l, "modulate:a", 0.0, 0.5).set_delay(0.8)
+	t.chain().tween_callback(l.queue_free)
+
+
+func start_feast() -> void:
+	var reason := GameState.city.start_feast(GameState.wallet, GameClock.now(), GameState.config())
+	if reason != "":
+		Events.toast_requested.emit(reason, "error")
+		return
+	Events.toast_requested.emit("Festin ! Le bien-être de la cité augmente", "reward")
+	GameState.save()
 
 
 func change_workers(uid: int, delta: int) -> void:

@@ -151,7 +151,7 @@ func test_population_grows_to_capacity() -> void:
 	c.inhabitants = 2
 	c.growth_since = T0
 	var cap := c.population_capacity()
-	c.update_population(T0 + c.growth_seconds * 3 + 1.0)
+	c.update_population(T0 + c.growth_interval(T0) * 3 + 1.0)
 	eq(c.inhabitants, 5, "trois arrivées en trois intervalles")
 	c.update_population(T0 + 100000.0)
 	eq(c.inhabitants, cap, "plafonné par les logements (y compris hors ligne)")
@@ -199,3 +199,37 @@ func test_desired_workers_and_capacity_drop() -> void:
 	c.remove(c.building_at(Vector2i(13, 18)))
 	check(c.inhabitants <= c.population_capacity(), "habitants réduits si des logements disparaissent")
 	check(c.workers_total() <= c.inhabitants, "jamais plus d'ouvriers que d'habitants")
+
+
+func test_happiness_and_feast() -> void:
+	var c := _city_with_temple()
+	var cfg := DataRegistry.config
+	var h0 := c.happiness(T0)
+	eq(h0, cfg.base_happiness + 5, "base + confort du Temple")
+	c.add_built("fountain", Vector2i(5, 5), 1, T0)
+	eq(c.happiness(T0), h0 + 6, "la fontaine ajoute du bien-être")
+	var slow := c.growth_interval(T0)
+	var w := new_wallet(c, {"underground_nectar": 200})
+	eq(c.start_feast(w, T0, cfg), "", "festin lancé")
+	check(c.growth_interval(T0) < slow, "le festin accélère les arrivées")
+	eq(c.start_feast(w, T0, cfg), "Un festin est déjà en cours", "pas de cumul")
+	check(not c.feast_active(T0 + cfg.feast_seconds + 1.0), "le festin se termine")
+
+
+func test_wilds_spawn_block_and_harvest() -> void:
+	var c := _city_with_temple()
+	c.next_wild_at = T0
+	c.update_wilds(T0 + c.wild_spawn_seconds * 20)
+	eq(c.wilds.size(), c.max_wilds, "apparitions hors ligne plafonnées")
+	for cell in c.wilds:
+		check(c.building_at(cell) == null, "jamais sur un bâtiment")
+		check(not c.is_area_free(cell, Vector2i.ONE), "bloque la construction")
+	var cell: Vector2i = c.wilds.keys()[0]
+	var w := new_wallet(c)
+	var got := c.harvest_wild(cell, w, "prisms", T0)
+	check(not got.is_empty(), "récolte non vide")
+	check(c.wild_at(cell) == "", "ressource retirée")
+	var data: Dictionary = JSON.parse_string(JSON.stringify(c.to_dict()))
+	var c2 := new_city()
+	c2.from_dict(data)
+	eq(c2.wilds.size(), c.wilds.size(), "ressources sauvages sauvegardées")

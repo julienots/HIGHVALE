@@ -18,7 +18,7 @@ func rebuild(city: CityState) -> void:
 	for x in city.grid_size.x:
 		for y in city.grid_size.y:
 			var c := Vector2i(x, y)
-			astar.set_point_solid(c, not buildable.has_point(c) or city.building_at(c) != null)
+			astar.set_point_solid(c, not buildable.has_point(c) or city.building_at(c) != null or city.wilds.has(c))
 
 
 func is_walkable(c: Vector2i) -> bool:

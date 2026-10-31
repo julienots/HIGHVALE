@@ -19,6 +19,11 @@ static func lines(d: BuildingData, level: int) -> Array:
 	var pop := d.population_for_level(level)
 	if pop > 0:
 		out.append(["Habitants", "+%d" % pop, preload("res://assets/icons/ui/population.svg")])
+	var comfort := d.comfort_for_level(level)
+	if comfort > 0:
+		out.append(["Bien-être", "+%d" % comfort, preload("res://assets/icons/ui/heart.svg")])
+	if d.worker_slots(level) > 0:
+		out.append(["Postes d'ouvriers", str(d.worker_slots(level)), preload("res://assets/icons/ui/population.svg")])
 	if d.builders_provided > 0:
 		out.append(["Bâtisseurs", "+%d" % d.builders_provided, preload("res://assets/icons/ui/builder.svg")])
 	return out

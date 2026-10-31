@@ -8,6 +8,7 @@ signal building_removed(b: BuildingState)
 signal building_changed(b: BuildingState)
 signal task_finished(b: BuildingState)
 signal population_changed
+signal wilds_changed
 
 const TEMPLE_ID := "primordial_temple"
 const CANCEL_REFUND_RATIO := 0.5
@@ -19,6 +20,14 @@ var growth_seconds := 20.0
 ## Habitants présents et horodatage de référence de la croissance.
 var inhabitants := 0
 var growth_since := 0.0
+## Bien-être : base de configuration, fin du festin en cours.
+var base_happiness := 40
+var feast_until := 0.0
+## Ressources sauvages : case -> identifiant de WildResourceData.
+var wilds := {}
+var next_wild_at := 0.0
+var wild_spawn_seconds := 240.0
+var max_wilds := 6
 var buildings := {}  # uid -> BuildingState
 var _occupancy := {}  # Vector2i -> uid
 var _next_uid := 1
@@ -29,6 +38,9 @@ func configure(config: GameConfig) -> void:
 	buildable_rect = config.buildable_rect
 	base_builders = config.base_builders
 	growth_seconds = config.population_growth_seconds
+	base_happiness = config.base_happiness
+	wild_spawn_seconds = config.wild_spawn_seconds
+	max_wilds = config.max_wilds
 
 
 # --- Requêtes -------------------------------------------------------------
@@ -62,8 +74,9 @@ func is_area_free(cell: Vector2i, size: Vector2i, ignore_uid := 0) -> bool:
 		return false
 	for x in size.x:
 		for y in size.y:
-			var owner: int = _occupancy.get(cell + Vector2i(x, y), 0)
-			if owner != 0 and owner != ignore_uid:
+			var c := cell + Vector2i(x, y)
+			var owner: int = _occupancy.get(c, 0)
+			if (owner != 0 and owner != ignore_uid) or wilds.has(c):
 				return false
 	return true
 
@@ -258,6 +271,7 @@ func update(now: float) -> Array[BuildingState]:
 	for b in done:
 		_finish_task(b, b.task_end)
 	update_population(now)
+	update_wilds(now)
 	return done
 
 
@@ -278,7 +292,109 @@ func idle_inhabitants() -> int:
 func next_arrival_in(now: float) -> float:
 	if inhabitants >= population_capacity():
 		return -1.0
-	return maxf(growth_seconds - (now - growth_since), 0.0)
+	return maxf(growth_interval(now) - (now - growth_since), 0.0)
+
+
+# --- Bien-être -----------------------------------------------------------------
+
+func comfort() -> int:
+	var n := 0
+	for b in buildings.values():
+		n += b.data().comfort_for_level(b.level)
+	return n
+
+
+func feast_active(now: float) -> bool:
+	return now < feast_until
+
+
+## Bien-être de 0 à 100 : base + confort des bâtiments + festin éventuel.
+func happiness(now: float, feast_bonus := 25) -> int:
+	return clampi(base_happiness + comfort() + (feast_bonus if feast_active(now) else 0), 0, 100)
+
+
+## Intervalle entre deux arrivées : deux fois plus long à 0 %, deux fois plus court à 100 %.
+func growth_interval(now: float) -> float:
+	return growth_seconds * lerpf(2.0, 0.5, happiness(now) / 100.0)
+
+
+func start_feast(wallet: Wallet, now: float, config: GameConfig) -> String:
+	if feast_active(now):
+		return "Un festin est déjà en cours"
+	if not wallet.spend(config.feast_cost):
+		return "Pas assez de nectar"
+	update_population(now)
+	feast_until = now + config.feast_seconds
+	population_changed.emit()
+	return ""
+
+
+# --- Ressources sauvages ------------------------------------------------------
+
+func wild_at(cell: Vector2i) -> String:
+	return wilds.get(cell, "")
+
+
+## Fait apparaître les ressources sauvages échues (aussi hors ligne), sans dépasser le maximum.
+func update_wilds(now: float) -> void:
+	if next_wild_at <= 0.0:
+		next_wild_at = now + wild_spawn_seconds
+	var spawned := false
+	while now >= next_wild_at:
+		if wilds.size() < max_wilds:
+			spawned = spawn_wild(int(next_wild_at)) or spawned
+		next_wild_at += wild_spawn_seconds
+	if spawned:
+		wilds_changed.emit()
+
+
+## Place une ressource sauvage sur une case libre, à l'écart des bâtiments.
+func spawn_wild(seed: int) -> bool:
+	var kinds := DataRegistry.all_wilds()
+	if kinds.is_empty():
+		return false
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var total := 0.0
+	for k in kinds:
+		total += k.weight
+	var roll := rng.randf() * total
+	var kind: WildResourceData = kinds[0]
+	for k in kinds:
+		roll -= k.weight
+		if roll <= 0.0:
+			kind = k
+			break
+	for attempt in 60:
+		var c := Vector2i(rng.randi_range(buildable_rect.position.x + 1, buildable_rect.end.x - 2),
+			rng.randi_range(buildable_rect.position.y + 1, buildable_rect.end.y - 2))
+		if is_area_free(c - Vector2i.ONE, Vector2i(3, 3)):
+			wilds[c] = kind.id
+			return true
+	return false
+
+
+## Récolte une ressource sauvage. Retourne les quantités réellement obtenues.
+func harvest_wild(cell: Vector2i, wallet: Wallet, premium_id: String, now: float) -> Dictionary:
+	var kind := DataRegistry.wild(wilds.get(cell, ""))
+	if kind == null:
+		return {}
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([cell, int(now)])
+	var got := {}
+	for id in kind.rewards:
+		var r: Vector2i = kind.rewards[id]
+		var added := wallet.add(id, rng.randi_range(r.x, r.y))
+		if added > 0:
+			got[id] = added
+	if kind.premium_chance > 0.0 and rng.randf() < kind.premium_chance:
+		got[premium_id] = wallet.add(premium_id, rng.randi_range(kind.premium_amount.x, kind.premium_amount.y))
+	wilds.erase(cell)
+	if wilds.size() == max_wilds - 1:
+		# Le minuteur repart à la récolte quand la cité était pleine.
+		next_wild_at = maxf(next_wild_at, now + wild_spawn_seconds)
+	wilds_changed.emit()
+	return got
 
 
 ## Croissance de la population (aussi hors ligne) puis affectation aux postes libres.
@@ -291,10 +407,11 @@ func update_population(now: float) -> void:
 	if inhabitants >= cap:
 		growth_since = now
 	elif growth_seconds > 0.0 and now > growth_since:
-		var arrivals := int((now - growth_since) / growth_seconds)
+		var interval := growth_interval(now)
+		var arrivals := int((now - growth_since) / interval)
 		if arrivals > 0:
 			inhabitants = mini(inhabitants + arrivals, cap)
-			growth_since = now if inhabitants >= cap else growth_since + arrivals * growth_seconds
+			growth_since = now if inhabitants >= cap else growth_since + arrivals * interval
 	if inhabitants != before:
 		population_changed.emit()
 	auto_assign(now)
@@ -394,7 +511,11 @@ func to_dict() -> Dictionary:
 	var list := []
 	for b in buildings.values():
 		list.append(b.to_dict())
-	return {"next_uid": _next_uid, "buildings": list, "inhabitants": inhabitants, "growth_since": growth_since}
+	var wild_list := []
+	for c in wilds:
+		wild_list.append({"x": c.x, "y": c.y, "id": wilds[c]})
+	return {"next_uid": _next_uid, "buildings": list, "inhabitants": inhabitants, "growth_since": growth_since,
+		"feast_until": feast_until, "wilds": wild_list, "next_wild_at": next_wild_at}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -403,6 +524,9 @@ func from_dict(d: Dictionary) -> void:
 	_next_uid = int(d.get("next_uid", 1))
 	inhabitants = int(d.get("inhabitants", 0))
 	growth_since = float(d.get("growth_since", 0.0))
+	feast_until = float(d.get("feast_until", 0.0))
+	next_wild_at = float(d.get("next_wild_at", 0.0))
+	wilds.clear()
 	for bd in d.get("buildings", []):
 		var b := BuildingState.from_dict(bd)
 		if b.data() == null:
@@ -414,3 +538,7 @@ func from_dict(d: Dictionary) -> void:
 		buildings[b.uid] = b
 		_set_occupancy(b, true)
 		_next_uid = maxi(_next_uid, b.uid + 1)
+	for w in d.get("wilds", []):
+		var c := Vector2i(int(w.get("x", 0)), int(w.get("y", 0)))
+		if DataRegistry.wild(str(w.get("id", ""))) and building_at(c) == null:
+			wilds[c] = str(w.get("id", ""))

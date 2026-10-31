@@ -5,14 +5,14 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.5.0)
+## État actuel (v0.6.0)
 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Architecture du projet Godot | ✅ terminée |
 | 2 | Cité isométrique jouable | ✅ terminée |
 | 3 | Bâtiments et économie | 🟡 base jouable (voir [la feuille de route](docs/FEUILLE_DE_ROUTE.md)) |
-| 4 | Population et vie de la cité | 🟡 base jouable |
+| 4 | Population et vie de la cité | ✅ terminée |
 | 5 → 12 | Collections, laboratoire, invocation, combat… | ⏳ à venir |
 
 **Ce qui est jouable et testé :**
