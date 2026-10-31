@@ -8,6 +8,9 @@ func _ready() -> void:
 	add_child(env)
 	env.build(Vector2i(40, 40), Rect2i(3, 3, 34, 34))
 	var all := DataRegistry.all_buildings()
+	var only := OS.get_cmdline_user_args().slice(1)
+	if not only.is_empty():
+		all = all.filter(func(d): return d.id in only)
 	for i in all.size():
 		var d: BuildingData = all[i]
 		var m := BuildingModels.build(d, 8)
@@ -22,7 +25,7 @@ func _ready() -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(out.path_join("showcase.png"))
 	cam.camera.size = 7.0
-	cam.position = Vector3(12, 0, 12)
+	cam.position = Vector3(12, 0, 12) if only.is_empty() else Vector3(10, 0, 9)
 	for i in 5:
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw

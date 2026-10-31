@@ -67,6 +67,8 @@ PALETTE = {
     "straw": ("e0c070", 0.95, 0.0, None, 0),
     "water": ("2a8fd0", 0.05, 0.0, "1a6fb0", 0.6),
     "glass": ("bff6ff", 0.05, 0.0, None, 0),
+    "sunbeam": ("fff4c8", 0.5, 0.0, "ffe9a0", 0.5),
+    "ore_vein": ("3a2a4a", 0.6, 0.2, None, 0),
     "brew_violet": ("b464ff", 0.3, 0.0, "a050ff", 3.0),
     "brew_green": ("5bff8a", 0.3, 0.0, "3ae070", 3.0),
     "glow_gold": ("fff1a8", 0.4, 0.0, "ffd84a", 4.0),
@@ -138,8 +140,8 @@ def _material(name):
     if emit:
         bsdf.inputs["Emission Color"].default_value = (*lin(emit), 1.0)
         bsdf.inputs["Emission Strength"].default_value = strength
-    if name == "glass":
-        bsdf.inputs["Alpha"].default_value = 0.35
+    if name in ("glass", "sunbeam"):
+        bsdf.inputs["Alpha"].default_value = 0.35 if name == "glass" else 0.1
         m.surface_render_method = "BLENDED"
     # La couleur de sommet module la couleur de base (exportée en COLOR_0).
     attr = m.node_tree.nodes.new("ShaderNodeVertexColor")

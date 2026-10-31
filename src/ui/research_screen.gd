@@ -103,6 +103,10 @@ func _card(id: String) -> Control:
 	if done:
 		v.add_child(UiTheme.label("Recherche complète", "HudLabel", 18, UiTheme.GOLD))
 		return card
+	var a: Dictionary = r.active.get(_building, {})
+	if a.get("id", "") == id:
+		v.add_child(UiTheme.label("Recherche du niveau %d en cours…" % (lvl + 1), "HudLabel", 18, UiTheme.GOLD))
+		return card
 	var cost := r.cost(id)
 	var info := HBoxContainer.new()
 	info.add_theme_constant_override("separation", 12)

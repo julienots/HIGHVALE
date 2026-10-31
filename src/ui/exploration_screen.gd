@@ -151,7 +151,7 @@ func _fill_expeditions() -> void:
 			row.add_child(UiTheme.label("Aucun héros disponible", "DimLabel", 16))
 		else:
 			for hours in ExplorationState.EXPEDITION_HOURS:
-				var b := UiTheme.button("%d h" % hours, "SecondaryButton", null, 17)
+				var b := UiTheme.button(Fmt.duration(ExplorationState.duration(hours, city)), "SecondaryButton", null, 17)
 				b.tooltip_text = "Butin estimé : %s" % str(ExplorationState.expected_loot(z, hours, GameState.collection.hero_power(hero_id)))
 				b.pressed.connect(func():
 					var r := ex.start(z, hero_id, hours, city, GameState.collection, GameClock.now())

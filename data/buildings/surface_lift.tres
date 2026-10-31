@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/buildings/surface_lift.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_script")
+id = "surface_lift"
+display_name = "Ascenseur de surface"
+description = "Une cabine hissée jusqu'à la voûte relie la cité à la surface. Ajoute une équipe d'exploration et raccourcit les expéditions de 6 % par niveau."
+category = 9
+sort_order = 195
+feature = ""
+footprint = Vector2i(2, 2)
+max_level = 10
+unlock_temple_level = 5
+max_count_by_temple = PackedInt32Array(0, 0, 0, 0, 1, 1, 1, 1, 1, 1)
+level_cap_base = 2
+level_cap_per_temple = 2
+base_cost = {"gold": 3000, "fungal_wood": 1500, "stone": 1000}
+cost_growth = 1.7
+base_build_seconds = 420.0
+build_time_growth = 2.0
+produces = ""
+base_production_per_hour = 0.0
+production_growth = 1.3
+base_workers = 0
+internal_storage_hours = 2.0
+storage = {}
+storage_growth = 1.6
+population_base = 0
+population_growth = 1.35
+builders_provided = 0
+comfort_base = 0
+comfort_per_level = 0
+model_scene = ExtResource("2_model")
+model_recipe = "surface_lift"
+primary_color = Color(0.545, 0.369, 0.235, 1)
+accent_color = Color(0.169, 0.616, 0.561, 1)

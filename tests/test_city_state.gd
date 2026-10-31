@@ -263,3 +263,24 @@ func test_research_effects() -> void:
 	c2.configure(DataRegistry.config)
 	c2.from_dict(c.to_dict())
 	eq(c2.research.level("warehouses"), 2, "recherches sauvegardées")
+
+
+func test_surface_buildings() -> void:
+	var c := _city_with_temple(5)
+	var w := new_wallet(c, {"gold": 50000, "stone": 50000, "fungal_wood": 50000, "abyssal_crystal": 1000})
+	for id in ["dark_ore_pit", "light_well", "surface_lift"]:
+		var d := DataRegistry.building(id)
+		check(d != null and d.model_scene != null, "bâtiment et modèle : " + id)
+	eq(DataRegistry.building("dark_ore_pit").produces, "dark_ore", "la fosse produit du minerai sombre")
+	var pit := c.add_built("dark_ore_pit", Vector2i(5, 28), 1, T0)
+	check(pit.stored_production(T0 + 3600) > 0.0, "minerai sombre produit")
+	check(c.storage_capacity("dark_ore") > DataRegistry.resource_type("dark_ore").base_capacity, "la fosse stocke le minerai")
+	var before := c.happiness(T0)
+	c.add_built("light_well", Vector2i(10, 28), 1, T0)
+	check(c.happiness(T0) > before, "le Puits de lumière réjouit la cité")
+	c.add_built("explorer_tower", Vector2i(28, 5), 1, T0)
+	var slots := ExplorationState.slots(c)
+	var long := ExplorationState.duration(8, c)
+	c.add_built("surface_lift", Vector2i(31, 5), 3, T0)
+	eq(ExplorationState.slots(c), slots + 1, "une équipe d'exploration de plus")
+	check(ExplorationState.duration(8, c) < long, "expéditions raccourcies")

@@ -54,7 +54,7 @@ func grant(zone: ZoneData, stage: int, collection: CollectionState, wallet: Wall
 			got[id] = int(got.get(id, 0)) + wallet.add(id, enc.first_clear_rewards[id])
 		progress[zone.id] = stage + 1
 	var frag := {}
-	var pool := DataRegistry.all_heroes().filter(func(h): return not h.is_god)
+	var pool := DataRegistry.all_heroes().filter(func(h): return not h.is_god and (h.requires_temple == 0 or zone.is_surface))
 	var h: HeroData = pool[rng.randi() % pool.size()]
 	collection.add_fragments(h.id, enc.fragment_reward)
 	frag[h.id] = enc.fragment_reward
@@ -69,7 +69,14 @@ static func slots(city: CityState) -> int:
 	for b in city.buildings.values():
 		if b.data_id == "explorer_tower":
 			lvl = maxi(lvl, b.level)
-	return 0 if lvl < 1 else 1 + (lvl - 1) / 3
+	if lvl < 1:
+		return 0
+	return 1 + (lvl - 1) / 3 + (1 if city.best_level("surface_lift") > 0 else 0)
+
+
+## Durée d'une expédition, raccourcie par l'Ascenseur de surface (−6 % par niveau).
+static func duration(hours: int, city: CityState) -> float:
+	return hours * 3600.0 * (1.0 - 0.06 * city.best_level("surface_lift"))
 
 
 func hero_busy(hero_id: String) -> bool:
@@ -92,7 +99,7 @@ func start(zone: ZoneData, hero_id: String, hours: int, city: CityState, collect
 	var reason := start_reason(zone, hero_id, city, collection)
 	if reason != "":
 		return reason
-	expeditions.append({"zone": zone.id, "hero": hero_id, "start": now, "end": now + hours * 3600.0, "hours": hours})
+	expeditions.append({"zone": zone.id, "hero": hero_id, "start": now, "end": now + duration(hours, city), "hours": hours})
 	changed.emit()
 	return ""
 

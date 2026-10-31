@@ -371,7 +371,7 @@ func collect(uid: int) -> void:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
 
 
-const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal", "market", "infirmary", "library", "academy"]
+const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal", "market", "infirmary", "library", "academy", "surface_lift"]
 
 
 func has_screen(data_id: String) -> bool:
@@ -404,7 +404,7 @@ func open_building_screen(uid: int) -> void:
 			hud.infirmary_screen.open_screen()
 		"library", "academy":
 			hud.research_screen.open_for(b.data_id)
-		"explorer_tower", "ancient_portal":
+		"explorer_tower", "ancient_portal", "surface_lift":
 			hud.exploration_screen.open_screen()
 
 

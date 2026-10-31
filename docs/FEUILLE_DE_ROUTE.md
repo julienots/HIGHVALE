@@ -118,6 +118,14 @@ Reste au studio : essais sur plusieurs téléphones, clé de publication et fich
 - Recherches (`src/research/research_state.gd`) : 4 technologies de cité à la Bibliothèque, 4 technologies de héros à l'Académie. Tous les bâtiments ont désormais un module livré.
 - 60 tests automatisés.
 
+## ✅ v0.14.0 — Bâtiments de la surface et du minerai
+
+- Fosse de minerai sombre (Temple 3) : cratère en gradins, filons luisants, grue à benne animée, fonderie ; seule source régulière de minerai sombre.
+- Puits de lumière (Temple 5) : colonne de soleil translucide, miroirs dorés orientables ; produit l'Essence vitale et apporte du bien-être.
+- Ascenseur de surface (Temple 5) : tour de charpente, cabine et contrepoids animés ; +1 équipe d'exploration, expéditions −6 % par niveau.
+- Fragments de héros de surface réservés aux zones de surface ; carte « recherche en cours » corrigée dans la Bibliothèque.
+- 61 tests automatisés.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |
