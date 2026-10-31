@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_frost_bear.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/frost_bear_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/frost_bear_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/frost_bear_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 692
+attack = 62
+defense = 42
+speed = 109
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "frost_bear"
+display_name = "Ours de givre"
+lore = "Des stalactites de glace poussent sur son dos ; il les secoue comme des javelots."
+rarity = 2
+element = 2
+category = 0
+family = "Bêtes"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 2
+genetic_tags = PackedStringArray("terrestre", "bete", "cristal")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/monster_frost_bear.glb"
+portrait = ExtResource("4_portrait")

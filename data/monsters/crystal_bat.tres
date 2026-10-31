@@ -30,6 +30,7 @@ food_per_hour = {"underground_nectar": 3}
 habitat_element = 6
 genetic_tags = PackedStringArray("volant", "cristal")
 lab_weight = 1.0
+requires_temple = 0
 stats = SubResource("stats")
 skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
 model_path = "res://assets/models/characters/monster_crystal_bat.glb"

@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_pink_jelly.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/pink_jelly_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/pink_jelly_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 541
+attack = 45
+defense = 35
+speed = 93
+crit_chance = 0.05
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "pink_jelly"
+display_name = "Gelée rose"
+lore = "Une gelée douce et collante qui adore les câlins. Ses câlins collent pendant des heures."
+rarity = 0
+element = 2
+category = 2
+family = "Gelées"
+max_level = 50
+food_per_hour = {"underground_nectar": 4}
+habitat_element = 2
+genetic_tags = PackedStringArray("aquatique", "gelee")
+lab_weight = 1.0
+requires_temple = 0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_pink_jelly.glb"
+portrait = ExtResource("4_portrait")

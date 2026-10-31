@@ -413,6 +413,88 @@ for (mid,name,rar,el,cat,fam,(hp,atk,df,spd),food,tags,lore,skills) in MONSTERS:
         "category": MC[cat], "family": q(fam), "max_level": 50,
         "food_per_hour": "{" + ", ".join(f'"{k}": {v}' for k,v in food.items()) + "}",
         "habitat_element": EL[el], "genetic_tags": "PackedStringArray(" + ", ".join(q(t) for t in tags) + ")",
-        "lab_weight": 0.0 if mid in ("magma_slime", "crystal_chimera", "plains_wolf", "storm_eagle", "wind_sylph", "dawn_golem", "phoenix") else (0.6 if mid == "void_serpent" else 1.0)}, stats_block(hp,atk,df,spd, crit=0.05 + 0.02*RA[rar], growth=1.07),
+        "lab_weight": 0.0 if mid in ("magma_slime", "crystal_chimera") else (0.6 if mid == "void_serpent" else 1.0),
+        "requires_temple": 5 if mid in ("plains_wolf", "storm_eagle", "wind_sylph", "dawn_golem", "phoenix") else 0}, stats_block(hp,atk,df,spd, crit=0.05 + 0.02*RA[rar], growth=1.07),
         sids, "monster_"+mid, "monster_"+mid)
-print(len(HEROES) + len(ACTIVE), "héros,", len(MONSTERS), "créatures,", len(os.listdir(ROOT + "/skills")), "compétences")
+
+# --- Roster étendu des créatures (tools/data/monster_roster.py) ----------------
+from monster_roster import ACTIVE as MON_ACTIVE
+
+CAT_BASE = dict(TERRESTRIAL=(560, 48, 32, 96), FLYING=(480, 56, 22, 118), AQUATIC=(540, 44, 34, 92), MAGICAL=(460, 58, 22, 108),
+                PLANT=(580, 42, 36, 84), ELEMENTAL=(500, 56, 26, 102), ANCIENT=(760, 54, 48, 78))
+FOOD = dict(COMMON=4, RARE=6, EPIC=10, LEGENDARY=14)
+BASIC_BY_PLAN = dict(blob=("Rebond", "Bondit sur un ennemi."), quad=("Morsure", "Morsure vive."), drake=("Griffes", "Coup de griffes."),
+                     bird=("Coup de bec", "Pique un ennemi."), serpent=("Morsure venimeuse", "Morsure qui peut empoisonner."),
+                     insect=("Mandibules", "Pince un ennemi."), golem=("Poing de pierre", "Coup lourd."), spirit=("Lueur", "Rayon d'énergie."),
+                     plant=("Fouet de liane", "Fouette un ennemi."), fish=("Charge aquatique", "Fonce sur un ennemi."),
+                     crab=("Pince", "Pincement douloureux."), frog=("Langue fouet", "Frappe à distance."), jelly=("Piqûre", "Filaments urticants."),
+                     brute=("Coup de poing", "Frappe brutale."))
+ULT_BY_CAT = dict(TERRESTRIAL="Ruée", FLYING="Tempête d'ailes", AQUATIC="Raz-de-marée", MAGICAL="Sortilège", PLANT="Floraison",
+                  ELEMENTAL="Déchaînement", ANCIENT="Colère")
+
+
+def monster_kit(m):
+    n, st = EL_WORD[m["el"]]
+    stv = STATUS_FR[st]
+    b_name, b_desc = BASIC_BY_PLAN[m["plan"]]
+    basic = dict(power=1.0)
+    if m["plan"] == "serpent":
+        basic.update(status="POISON", chance=0.3)
+    elif st != "NONE":
+        basic.update(status=st, chance=0.12)
+    cat = m["cat"]
+    if cat == "PLANT":
+        special = ("Spores apaisantes", "Soigne et régénère l'équipe.", "ALL_ALLIES", dict(power=0.0, heal=0.35, cost=60, cd=3, status="REGEN", chance=1.0))
+    elif cat == "ANCIENT" or m["plan"] in ("crab", "golem"):
+        special = ("Carapace " + de(n), "Se protège et provoque l'ennemi.", "SELF", dict(power=0.0, shield=0.6, cost=40, cd=2, status="TAUNT", chance=1.0))
+    elif cat == "FLYING":
+        special = ("Rafale " + de(n), "Frappe tous les ennemis.", "ALL_ENEMIES", dict(power=0.6, cost=60, cd=2))
+    elif cat == "MAGICAL":
+        special = ("Maléfice " + de(n), "Frappe trois fois au hasard" + ((" et peut " + stv) if stv else "") + ".", "RANDOM_ENEMIES",
+                   dict(power=0.55, hits=3, cost=60, cd=2, status=st, chance=0.25))
+    elif cat == "ELEMENTAL":
+        special = ("Souffle " + de(n), "Souffle sur tous les ennemis" + ((", peut " + stv) if stv else "") + ".", "ALL_ENEMIES",
+                   dict(power=0.65, cost=60, cd=3, status=st, chance=0.35))
+    elif cat == "AQUATIC":
+        special = ("Vague " + de(n), "Frappe la rangée ennemie.", "ROW_ENEMIES", dict(power=0.85, cost=50, cd=2, status=st, chance=0.25))
+    else:
+        special = ("Charge " + de(n), "Fonce sur la rangée ennemie.", "ROW_ENEMIES", dict(power=0.9, cost=50, cd=2))
+    ult = (ULT_BY_CAT[cat] + " " + de(n), "Attaque dévastatrice sur tous les ennemis.", "ALL_ENEMIES",
+           dict(power=1.5 if m["rar"] == "EPIC" else 1.8, cost=100, cd=4, cine=True))
+    kit = [("BASIC", b_name, b_desc, "SINGLE_ENEMY", basic), ("SPECIAL",) + special]
+    if m["rar"] in ("EPIC", "LEGENDARY"):
+        kit.append(("ULTIMATE",) + ult)
+    out = []
+    for kind, name, desc, target, kw in kit:
+        kw = dict(kw)
+        if kw.get("status", "NONE") == "NONE":
+            kw.pop("status", None)
+            kw.pop("chance", None)
+        out.append((kind, name, desc, target, kw))
+    return out
+
+
+for mm in MON_ACTIVE:
+    rng = random.Random(mm["id"])
+    bh, ba, bd, bs = CAT_BASE[mm["cat"]]
+    mult, spd_bonus = RAR_MULT[mm["rar"]]
+    j = lambda v: int(round(v * mult * rng.uniform(0.94, 1.06)))
+    sids = [skill("%s_%s" % (mm["id"], SUFFIX[i]), name, desc, kind, mm["el"], target, **kw)
+            for i, (kind, name, desc, target, kw) in enumerate(monster_kit(mm))]
+    write_char("monsters", mm["id"], "res://src/monsters/monster_data.gd", "MonsterData", {
+        "id": q(mm["id"]), "display_name": q(mm["name"]), "lore": q(mm["lore"]), "rarity": RA[mm["rar"]], "element": EL[mm["el"]],
+        "category": MC[mm["cat"]], "family": q(mm["fam"]), "max_level": 50,
+        "food_per_hour": '{"underground_nectar": %d}' % FOOD[mm["rar"]],
+        "habitat_element": EL[mm["el"]], "genetic_tags": "PackedStringArray(" + ", ".join(q(t) for t in mm["tags"]) + ")",
+        "lab_weight": 1.0, "requires_temple": 5 if mm["surface"] else 0},
+        stats_block(j(bh), j(ba), j(bd), bs + spd_bonus + rng.randint(-5, 5), crit=0.05 + 0.02 * RA[mm["rar"]], growth=1.07),
+        sids, "monster_" + mm["id"], "monster_" + mm["id"])
+    opts = dict(mm["opts"])
+    args = [q(mm["plan"]), q(mm["colors"][0]), q(mm["colors"][1]), q(mm["colors"][2]), "eyes=" + q(mm["eyes"]),
+            "deco=" + repr(mm["deco"])] + ["%s=%r" % (k, v) for k, v in opts.items()]
+    src = ('"""Créature : %s. Généré par tools/data/gen_collection.py."""\n'
+           "from characters._beast import creature, EXTENTS\n\nFLAT_PALETTE = True\nEXTENT = EXTENTS[%s]\n\n\n"
+           "def build(m):\n    creature(m, %s)\n") % (mm["name"], q(mm["plan"]), ", ".join(args))
+    open(os.path.join(CHAR_DIR, "monster_%s.py" % mm["id"]), "w").write(src)
+
+print(len(HEROES) + len(ACTIVE), "héros,", len(MONSTERS) + len(MON_ACTIVE), "créatures,", len(os.listdir(ROOT + "/skills")), "compétences")

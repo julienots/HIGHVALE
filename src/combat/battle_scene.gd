@@ -599,7 +599,7 @@ func _finish() -> void:
 			_end_dialog(body, won)
 			return
 		var mult := EventCalendar.REWARD_BONUS
-		var got := GameState.exploration.grant(zone, GameState.pending_stage, GameState.collection, GameState.wallet, rng) if zone \
+		var got := GameState.exploration.grant(zone, GameState.pending_stage, GameState.collection, GameState.wallet, rng, GameState.city) if zone \
 			else BattleSetup.grant_victory(encounter, GameState.collection, GameState.wallet, rng)
 		# Bonus de l'événement de la semaine (+50 % des ressources gagnées).
 		for id in got.resources:
@@ -610,6 +610,8 @@ func _finish() -> void:
 		body.add_child(UiTheme.cost_row(got.resources, null, 24))
 		for id in got.fragments:
 			body.add_child(UiTheme.label("+%d fragments : %s" % [got.fragments[id], DataRegistry.hero(id).display_name], "HudLabel", 20, Color("d8b4ff")))
+		if got.get("recruit", "") != "":
+			body.add_child(UiTheme.label("%s rejoint votre cité !" % DataRegistry.monster(got.recruit).display_name, "HudLabel", 20, UiTheme.GREEN))
 	else:
 		body.add_child(UiTheme.label("Votre équipe a été repoussée. Améliorez vos héros, nourrissez vos créatures ou changez de composition.", "", 20))
 		body.get_child(0).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

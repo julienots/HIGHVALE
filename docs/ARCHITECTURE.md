@@ -16,6 +16,8 @@ tools/blender/hv_kit.py        Boîte à outils : pierres biseautées, murs maç
 tools/blender/models/<id>.py   Un script par bâtiment : build(m)
 tools/data/gen_collection.py   Données des héros, créatures et compétences (+ scripts Blender du roster)
 tools/data/hero_roster.py      Roster des héros : identité, histoire, apparence (126 actifs, 34 en réserve)
+tools/data/monster_roster.py   Roster des créatures : plan de corps, couleurs, ornements, tags (100 actives, 17 en réserve)
+tools/blender/characters/_beast.py  Créatures paramétriques (14 plans de corps, ornements)
 tools/blender/build_models.py  Export → assets/models/buildings/<id>.glb (+ aperçus Cycles)
 src/city/model_rig.gd          Lecture des conventions à l'import dans Godot
 ```

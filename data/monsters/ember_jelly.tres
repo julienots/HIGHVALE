@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_ember_jelly.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/ember_jelly_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/ember_jelly_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 576
+attack = 65
+defense = 31
+speed = 109
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "ember_jelly"
+display_name = "Gelée de braise"
+lore = "Elle grésille en permanence et laisse des traces fumantes sur son passage."
+rarity = 1
+element = 1
+category = 5
+family = "Gelées"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 1
+genetic_tags = PackedStringArray("gelee", "igne")
+lab_weight = 1.0
+requires_temple = 0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_ember_jelly.glb"
+portrait = ExtResource("4_portrait")

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_queen_bee.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/queen_bee_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/queen_bee_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/queen_bee_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 645
+attack = 73
+defense = 29
+speed = 127
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "queen_bee"
+display_name = "Reine des abeilles"
+lore = "Elle produit un nectar si pur qu'il guérit les blessures."
+rarity = 2
+element = 5
+category = 1
+family = "Insectes"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 5
+genetic_tags = PackedStringArray("volant", "vegetal")
+lab_weight = 1.0
+requires_temple = 0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/monster_queen_bee.glb"
+portrait = ExtResource("4_portrait")

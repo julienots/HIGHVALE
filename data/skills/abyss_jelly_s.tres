@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "abyss_jelly_s"
+display_name = "Vague de Néant"
+description = "Frappe la rangée ennemie."
+kind = 1
+element = 9
+target = 2
+hits = 1
+power = 0.85
+heal_power = 0.0
+shield_power = 0.0
+energy_cost = 50
+energy_gain = 25
+cooldown_turns = 2
+status_effect = 5
+status_chance = 0.25
+status_turns = 2
+cinematic = false

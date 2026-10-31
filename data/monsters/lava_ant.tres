@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_lava_ant.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/lava_ant_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/lava_ant_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 544
+attack = 50
+defense = 32
+speed = 91
+crit_chance = 0.05
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "lava_ant"
+display_name = "Fourmi de lave"
+lore = "Une colonie de fourmis de lave peut creuser une galerie en une nuit."
+rarity = 0
+element = 1
+category = 0
+family = "Insectes"
+max_level = 50
+food_per_hour = {"underground_nectar": 4}
+habitat_element = 1
+genetic_tags = PackedStringArray("terrestre", "igne", "carapace")
+lab_weight = 1.0
+requires_temple = 0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_lava_ant.glb"
+portrait = ExtResource("4_portrait")

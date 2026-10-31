@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_sky_heron.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/sky_heron_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/sky_heron_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 537
+attack = 66
+defense = 24
+speed = 119
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "sky_heron"
+display_name = "Héron céleste"
+lore = "Il pêche dans les nuages des Pics avec son long bec."
+rarity = 1
+element = 4
+category = 1
+family = "Échassiers"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 4
+genetic_tags = PackedStringArray("volant", "tempete")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_sky_heron.glb"
+portrait = ExtResource("4_portrait")

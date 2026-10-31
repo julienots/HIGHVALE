@@ -117,3 +117,30 @@ func test_divine_awakening() -> void:
 		if h.is_god and coll.owns_hero(h.id):
 			gods += 1
 	check(gods >= 1, "un dieu finit par s'éveiller")
+
+
+func test_lab_rarity_odds_and_surface_gate() -> void:
+	# Les chances par rareté ne dépendent pas du nombre d'espèces.
+	var dist := LabRules.rarity_distribution(LabRules.probabilities([], 1))
+	var expected := LabRules.RARITY_BASE[0] / (LabRules.RARITY_BASE[0] + LabRules.RARITY_BASE[1] + LabRules.RARITY_BASE[2] + LabRules.RARITY_BASE[3])
+	check(absf(dist[GameEnums.Rarity.COMMON] - expected) < 0.01, "chance des Communs fixée par la rareté (%.3f)" % dist[0])
+	var low := LabRules.probabilities([], 1)
+	var high := LabRules.probabilities([], 5)
+	check(not low.has("plains_wolf") and not low.has("sun_lion"), "créatures de surface absentes avant le Temple 5")
+	check(high.has("plains_wolf") and high.has("sun_lion"), "créatures de surface au Temple 5")
+
+
+func test_zone_recruits_creatures() -> void:
+	var coll := CollectionState.new()
+	var w := Wallet.new()
+	var ex := ExplorationState.new()
+	var zone := DataRegistry.zone("renewal_plains")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var got := 0
+	for i in 40:
+		var r := ex.grant(zone, 2, coll, w, rng)
+		if r.recruit != "":
+			got += 1
+			check(r.recruit in zone.monster_ids, "recrue issue de la zone")
+	check(got > 5 and got < 35, "recrutement possible mais pas systématique (%d / 40)" % got)

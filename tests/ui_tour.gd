@@ -36,6 +36,12 @@ func _ready() -> void:
 	await _frames(20)
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(out.path_join("ui_collection.png"))
+	for id in ["gold_dragon", "unicorn", "pegasus", "behemoth", "shadow_wyrm", "sea_dragon", "frost_drake", "king_shroom", "cobra_king", "griffin", "banshee", "royal_jelly"]:
+		GameState.collection.add_monster(id)
+	city.hud.collection_screen.show_screen(1)
+	await _frames(20)
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(out.path_join("ui_creatures.png"))
 	SaveSystem.delete_save()
 	print("UI_TOUR_OK")
 	get_tree().quit()

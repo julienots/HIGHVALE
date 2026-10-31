@@ -16,7 +16,13 @@ func test_content_is_complete() -> void:
 		rarities[h.rarity] = int(rarities.get(h.rarity, 0)) + 1
 	for r in range(4):
 		check(int(rarities.get(r, 0)) >= 20, "au moins 20 héros de rareté %d" % r)
-	check(monsters.size() >= 10, "au moins 10 monstres")
+	eq(monsters.size(), 120, "120 créatures (objectif du document de conception)")
+	var mnames := {}
+	for m in monsters:
+		check(not mnames.has(m.display_name), "nom de créature en double : " + m.display_name)
+		mnames[m.display_name] = true
+		check(m.model_path.ends_with("monster_%s.glb" % m.id), "modèle chargé à la demande : " + m.id)
+		check(m.lab_weight > 0.0 or m.id in ["magma_slime", "crystal_chimera"], "créature obtenable : " + m.id)
 	var classes := {}
 	var categories := {}
 	for h in heroes:
@@ -29,7 +35,7 @@ func test_content_is_complete() -> void:
 		check(m.model_scene != null and m.portrait != null, "visuels manquants : " + m.id)
 		check(m.skills.size() >= 2 and not m.food_per_hour.is_empty(), "données manquantes : " + m.id)
 	eq(classes.size(), 10, "les 10 classes sont représentées")
-	eq(categories.size(), 7, "7 catégories de créatures (la divine viendra avec l'Autel)")
+	eq(categories.size(), 7, "7 catégories de créatures")
 
 
 func test_fragments_unlock_and_star_up() -> void:

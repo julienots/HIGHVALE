@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_moss_deer.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/moss_deer_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/moss_deer_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 649
+attack = 55
+defense = 35
+speed = 98
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "moss_deer"
+display_name = "Cerf moussu"
+lore = "Des fleurs poussent dans ses bois ; il les offre aux enfants de la cité."
+rarity = 1
+element = 5
+category = 0
+family = "Cervidés"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 5
+genetic_tags = PackedStringArray("terrestre", "vegetal")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_moss_deer.glb"
+portrait = ExtResource("4_portrait")

@@ -5,7 +5,7 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.15.0)
+## État actuel (v0.16.0)
 
 | Étape | Contenu | État |
 |---|---|---|
@@ -13,7 +13,7 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 | 2 | Cité isométrique jouable | ✅ terminée |
 | 3 | Bâtiments et économie | ✅ les 28 bâtiments sont fonctionnels |
 | 4 | Population et vie de la cité | ✅ terminée |
-| 5 | Collection des héros et des monstres | 🟡 150 héros (objectif atteint), 20 créatures sur 120 |
+| 5 | Collection des héros et des monstres | ✅ 150 héros et 120 créatures |
 | 6 | Laboratoire et Fusionnerie | ✅ terminée |
 | 7 | Invocation et dieux | ✅ terminée |
 | 8 | Combat au tour par tour | ✅ terminée |
@@ -29,7 +29,7 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Habitants** : la population augmente tant qu'il reste des logements, y compris jeu fermé. Les habitants sont affectés aux postes de production ; un bâtiment produit à 25 % sans ouvrier et à 100 % avec tous ses postes pourvus. Le joueur règle le nombre d'ouvriers avec − / +.
 - **Bien-être** : décorations (Fontaine de cristal, Jardin des lueurs, Statue du Fondateur), niveau du Temple et festins payés en Nectar souterrain (produit par la Nectarerie) accélèrent l'arrivée des habitants.
 - **Récolte manuelle** : filons de pierre, champignons sauvages et cristaux affleurants apparaissent sur les cases libres (y compris jeu fermé) et se récoltent d'un toucher ; les cristaux peuvent contenir des Prismes.
-- **Collection** : 150 héros (les 10 classes et les 10 éléments, de Commun à Divin ; 24 héros de la surface ne s'invoquent qu'à partir du Temple 5) et 20 créatures, chacun avec son modèle 3D, son portrait, ses statistiques, 2 à 3 compétences et son histoire. Écran de collection avec cartes par rareté, filtres et fiche détaillée (vitrine 3D orientable, statistiques, compétences). Les héros montent de niveau (or, puis cristaux) et évoluent avec des fragments (étoiles), qui relèvent leur niveau maximal ; les créatures se nourrissent de nectar pour grandir. Fragments trouvés dans les cristaux affleurants, œufs parfois cachés dans les champignons sauvages ; l'Habitat des monstres augmente le nombre de créatures hébergées.
+- **Collection** : 150 héros (les 10 classes et les 10 éléments, de Commun à Divin ; 24 héros de la surface ne s'invoquent qu'à partir du Temple 5) et 120 créatures (14 plans de corps : gelées, bêtes, drakes, oiseaux, serpents, insectes, golems, esprits, plantes, poissons, crustacés, batraciens, méduses, brutes ; celles de la surface n'apparaissent qu'au Temple 5). Une victoire en exploration peut faire rejoindre une créature de la zone, chacun avec son modèle 3D, son portrait, ses statistiques, 2 à 3 compétences et son histoire. Écran de collection avec cartes par rareté, filtres et fiche détaillée (vitrine 3D orientable, statistiques, compétences). Les héros montent de niveau (or, puis cristaux) et évoluent avec des fragments (étoiles), qui relèvent leur niveau maximal ; les créatures se nourrissent de nectar pour grandir. Fragments trouvés dans les cristaux affleurants, œufs parfois cachés dans les champignons sauvages ; l'Habitat des monstres augmente le nombre de créatures hébergées.
 - **Laboratoire** : 12 ingrédients aux affinités génétiques ; jusqu'à 4 emplacements selon le niveau ; probabilités affichées (par rareté et par espèce) ; résultat tiré au lancement, révélé à la fin du compte à rebours ; machine animée (liquides, bulles, arcs électriques) ; synthèse d'ingrédients à partir des ressources.
 - **Fusionnerie** : deux créatures fusionnées en une espèce apparentée de rareté égale ou supérieure ; recettes secrètes (dont deux créatures exclusives : Gelée de magma, Chimère de cristal) ; mutations rares en variantes dorée, d'ombre ou de cristal.
 - **Sanctuaire des héros** : invocations classique, avancée, élémentaire (élément du jour) et légendaire, avec taux affichés, garantie Épique et doublons convertis en fragments. **Autel divin** : éveil des dieux Kryos, Vitalia et Pyros (fragments divins, éveil complet exceptionnel).

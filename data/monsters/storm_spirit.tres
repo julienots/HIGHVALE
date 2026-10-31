@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_storm_spirit.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/storm_spirit_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/storm_spirit_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/storm_spirit_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 632
+attack = 73
+defense = 33
+speed = 113
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "storm_spirit"
+display_name = "Esprit d'orage"
+lore = "Un nuage vivant chargé d'électricité."
+rarity = 2
+element = 4
+category = 5
+family = "Esprits"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 4
+genetic_tags = PackedStringArray("magique", "tempete")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/monster_storm_spirit.glb"
+portrait = ExtResource("4_portrait")

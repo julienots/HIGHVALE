@@ -459,7 +459,7 @@ func roll_wild_bonus(kind_id: String, rng: RandomNumberGenerator, city: CityStat
 			var unlocked := add_fragments(id, n)
 			return {"fragments": {id: n}, "unlocked": id if unlocked else ""}
 	elif kind_id == "shrooms" and rng.randf() < 0.08 and monsters.size() < monster_capacity(city):
-		var candidates := DataRegistry.all_monsters().filter(func(m): return m.rarity <= GameEnums.Rarity.RARE and m.lab_weight > 0.0)
+		var candidates := DataRegistry.all_monsters().filter(func(m): return m.rarity <= GameEnums.Rarity.RARE and m.lab_weight > 0.0 and m.requires_temple <= city.temple_level())
 		var id := _weighted_pick(candidates, rng)
 		if id != "":
 			add_monster(id)

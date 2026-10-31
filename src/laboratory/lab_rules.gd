@@ -8,15 +8,25 @@ const RARITY_BASE := [100.0, 30.0, 8.0, 2.0, 0.3]
 const ELEMENT_BONUS := 1.5
 
 
-static func weights(ingredients: Array) -> Dictionary:
+## Espèces disponibles : poids positif et niveau du Temple suffisant.
+static func eligible(temple_level := -1) -> Array:
+	var tl := temple_level if temple_level >= 0 else GameState.city.temple_level()
+	return DataRegistry.all_monsters().filter(func(m): return m.lab_weight > 0.0 and m.requires_temple <= tl)
+
+
+static func weights(ingredients: Array, temple_level := -1) -> Dictionary:
 	var boost := 0.0
 	for ing: IngredientData in ingredients:
 		boost += ing.rarity_boost
+	var pool := eligible(temple_level)
+	# Les chances par rareté ne dépendent pas du nombre d'espèces : le poids de
+	# base d'une rareté est partagé entre ses espèces.
+	var per_rarity := [0.0, 0.0, 0.0, 0.0, 0.0]
+	for m in pool:
+		per_rarity[m.rarity] += m.lab_weight
 	var out := {}
-	for m in DataRegistry.all_monsters():
-		if m.lab_weight <= 0.0:
-			continue
-		var w: float = RARITY_BASE[m.rarity] * m.lab_weight
+	for m in pool:
+		var w: float = RARITY_BASE[m.rarity] * m.lab_weight / per_rarity[m.rarity]
 		for ing: IngredientData in ingredients:
 			for tag in ing.genetic_affinities:
 				if tag in m.genetic_tags:
@@ -28,8 +38,8 @@ static func weights(ingredients: Array) -> Dictionary:
 	return out
 
 
-static func probabilities(ingredients: Array) -> Dictionary:
-	var w := weights(ingredients)
+static func probabilities(ingredients: Array, temple_level := -1) -> Dictionary:
+	var w := weights(ingredients, temple_level)
 	var total := 0.0
 	for v in w.values():
 		total += v

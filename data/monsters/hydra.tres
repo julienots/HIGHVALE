@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_hydra.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/hydra_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/hydra_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/hydra_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 757
+attack = 61
+defense = 52
+speed = 102
+crit_chance = 0.11
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "hydra"
+display_name = "Hydre des marais"
+lore = "Coupez une tête, deux repoussent. Mieux vaut l'avoir dans son camp."
+rarity = 3
+element = 5
+category = 2
+family = "Serpents"
+max_level = 50
+food_per_hour = {"underground_nectar": 14}
+habitat_element = 5
+genetic_tags = PackedStringArray("aquatique", "reptile", "antique")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/monster_hydra.glb"
+portrait = ExtResource("4_portrait")

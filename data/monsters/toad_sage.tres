@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_toad_sage.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/toad_sage_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/toad_sage_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 521
+attack = 67
+defense = 26
+speed = 110
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "toad_sage"
+display_name = "Crapaud sage"
+lore = "Un vieux crapaud qui connaît tous les secrets des marais."
+rarity = 1
+element = 5
+category = 3
+family = "Batraciens"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 5
+genetic_tags = PackedStringArray("magique", "vegetal")
+lab_weight = 1.0
+requires_temple = 0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_toad_sage.glb"
+portrait = ExtResource("4_portrait")

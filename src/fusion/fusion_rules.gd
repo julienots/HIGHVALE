@@ -40,7 +40,7 @@ static func candidates(a: MonsterData, b: MonsterData, rarity: int) -> Array:
 		tags[t] = true
 	var out := []
 	for m in DataRegistry.all_monsters():
-		if m.rarity != rarity or m.lab_weight <= 0.0:
+		if m.rarity != rarity or m.lab_weight <= 0.0 or m.requires_temple > GameState.city.temple_level():
 			continue
 		for t in m.genetic_tags:
 			if tags.has(t):

@@ -30,6 +30,7 @@ food_per_hour = {"underground_nectar": 6}
 habitat_element = 1
 genetic_tags = PackedStringArray("igne", "reptile")
 lab_weight = 1.0
+requires_temple = 0
 stats = SubResource("stats")
 skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
 model_path = "res://assets/models/characters/monster_fire_salamander.glb"

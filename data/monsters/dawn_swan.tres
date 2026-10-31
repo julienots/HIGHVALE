@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_dawn_swan.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/dawn_swan_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/dawn_swan_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/dawn_swan_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 647
+attack = 69
+defense = 27
+speed = 125
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "dawn_swan"
+display_name = "Cygne d'aurore"
+lore = "Son plumage reflète la lumière du soleil levant ; il guérit d'un battement d'ailes."
+rarity = 2
+element = 7
+category = 1
+family = "Cygnes"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 7
+genetic_tags = PackedStringArray("volant", "lumineux")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/monster_dawn_swan.glb"
+portrait = ExtResource("4_portrait")

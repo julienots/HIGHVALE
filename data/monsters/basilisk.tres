@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_basilisk.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/basilisk_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/basilisk_s.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/basilisk_u.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 1004
+attack = 71
+defense = 64
+speed = 88
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "basilisk"
+display_name = "Basilic"
+lore = "Son regard pétrifie ; les mineurs portent des lunettes noires en le croisant."
+rarity = 2
+element = 3
+category = 6
+family = "Lézards"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 3
+genetic_tags = PackedStringArray("reptile", "antique", "roche")
+lab_weight = 1.0
+requires_temple = 0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_path = "res://assets/models/characters/monster_basilisk.glb"
+portrait = ExtResource("4_portrait")

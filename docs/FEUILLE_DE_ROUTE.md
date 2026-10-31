@@ -134,6 +134,15 @@ Reste au studio : essais sur plusieurs téléphones, clé de publication et fich
 - Modèles 3D chargés à la demande (`model_path`) et portraits compressés pour la mémoire des téléphones.
 - Les fragments des héros de surface ne sortent plus des défis, de la boutique ni des zones souterraines.
 
+## ✅ v0.16.0 — Les 120 créatures
+
+- 100 nouvelles créatures (25 Communes, 34 Rares, 26 Épiques, 15 Légendaires) dans les 7 catégories, dont 27 de la surface (Temple 5) ; 17 de plus écrites et gardées en réserve.
+- Kit Blender `_beast.py` : 14 plans de corps (gelée, quadrupède, drake, oiseau, serpent, insecte, golem, esprit, plante, poisson, crustacé, batracien, méduse, brute) et 15 ornements (cristaux, piquants, flammes, mousse, champignons, cornes, bois, couronne, auréole, carapace, runes, feuilles…).
+- Compétences dérivées du plan de corps, de la catégorie et de l'élément.
+- Laboratoire : chances par rareté indépendantes du nombre d'espèces ; créatures de surface disponibles au Temple 5 (aussi pour les fusions et les œufs sauvages).
+- Les créatures de surface, jusque-là impossibles à obtenir, sortent maintenant du Laboratoire et des zones.
+- Exploration : chaque zone compte 7 à 10 espèces ; une victoire peut faire rejoindre une créature de la zone (25 à 50 % selon l'étape, s'il reste de la place).
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |

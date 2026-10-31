@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_sun_flower.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/sun_flower_b.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/sun_flower_s.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 651
+attack = 48
+defense = 40
+speed = 89
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "sun_flower"
+display_name = "Tournesol vivant"
+lore = "Il concentre la lumière du soleil en rayons brûlants."
+rarity = 1
+element = 7
+category = 4
+family = "Fleurs"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 7
+genetic_tags = PackedStringArray("vegetal", "lumineux")
+lab_weight = 1.0
+requires_temple = 5
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_path = "res://assets/models/characters/monster_sun_flower.glb"
+portrait = ExtResource("4_portrait")

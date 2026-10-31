@@ -23,6 +23,8 @@ extends Resource
 ## Familles génétiques utilisées par le calcul de probabilités du laboratoire.
 @export var genetic_tags: PackedStringArray = []
 @export var lab_weight := 1.0
+## Niveau du Temple requis pour l'obtenir au Laboratoire (créatures de la surface).
+@export var requires_temple := 0
 @export_group("Visuel")
 @export var portrait: Texture2D
 ## Modèle 3D chargé à la demande (évite de charger toute la collection au démarrage).

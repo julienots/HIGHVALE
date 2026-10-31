@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "unicorn_s"
+display_name = "Maléfice d'Aurore"
+description = "Frappe trois fois au hasard et peut affaiblir."
+kind = 1
+element = 7
+target = 6
+hits = 3
+power = 0.55
+heal_power = 0.0
+shield_power = 0.0
+energy_cost = 60
+energy_gain = 25
+cooldown_turns = 2
+status_effect = 5
+status_chance = 0.25
+status_turns = 2
+cinematic = false

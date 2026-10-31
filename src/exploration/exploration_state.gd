@@ -43,7 +43,10 @@ func stage_unlocked(zone: ZoneData, stage: int) -> bool:
 
 
 ## Récompenses d'une victoire en zone ; retourne le détail obtenu.
-func grant(zone: ZoneData, stage: int, collection: CollectionState, wallet: Wallet, rng: RandomNumberGenerator) -> Dictionary:
+const RECRUIT_CHANCE := [0.25, 0.3, 0.5]
+
+
+func grant(zone: ZoneData, stage: int, collection: CollectionState, wallet: Wallet, rng: RandomNumberGenerator, city: CityState = null) -> Dictionary:
 	var enc := zone.encounter(stage)
 	var got := {}
 	for id in enc.rewards:
@@ -58,8 +61,15 @@ func grant(zone: ZoneData, stage: int, collection: CollectionState, wallet: Wall
 	var h: HeroData = pool[rng.randi() % pool.size()]
 	collection.add_fragments(h.id, enc.fragment_reward)
 	frag[h.id] = enc.fragment_reward
+	# Une créature de la zone peut rejoindre la cité (s'il reste de la place).
+	var recruit := ""
+	var wild := Array(zone.monster_ids).filter(func(id): return DataRegistry.monster(id) != null and DataRegistry.monster(id).lab_weight > 0.0)
+	if not wild.is_empty() and rng.randf() < RECRUIT_CHANCE[clampi(stage, 0, 2)] \
+			and (city == null or collection.monsters.size() < collection.monster_capacity(city)):
+		recruit = wild[rng.randi() % wild.size()]
+		collection.add_monster(recruit, maxi(1, zone.base_level / 2))
 	changed.emit()
-	return {"resources": got, "fragments": frag, "first": first}
+	return {"resources": got, "fragments": frag, "first": first, "recruit": recruit}
 
 
 # --- Expéditions ----------------------------------------------------------------

@@ -72,6 +72,13 @@ def render_preview(path, extent):
 def render_portrait(path, extent):
     """Portrait de carte : vue de trois quarts face, fond transparent."""
     scene = bpy.context.scene
+    # Les émissions fortes (feu, lave) virent au pastel dans Cycles : on les
+    # atténue pour le portrait seulement (le jeu garde les valeurs du modèle).
+    for mat in bpy.data.materials:
+        if mat.node_tree:
+            for node in mat.node_tree.nodes:
+                if node.type == "BSDF_PRINCIPLED" and node.inputs["Emission Strength"].default_value > 2.0:
+                    node.inputs["Emission Strength"].default_value = 0.9
     scene.render.engine = "CYCLES"
     scene.cycles.samples = 32
     scene.cycles.use_denoising = True

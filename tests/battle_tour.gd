@@ -35,8 +35,8 @@ func _ready() -> void:
 	# Arène de la surface
 	scene.queue_free()
 	await _frames(2)
-	GameState.pending_zone = "renewal_plains"
-	GameState.pending_stage = 2
+	GameState.pending_zone = "sunken_forges"
+	GameState.pending_stage = 1
 	GameState.collection.team.clear()
 	for id in ["aegis", "magnus", "seren", "malakar", "leo"]:
 		GameState.collection.unlock_hero(id)
