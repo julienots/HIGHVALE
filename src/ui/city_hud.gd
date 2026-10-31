@@ -25,6 +25,7 @@ var exploration_screen: ExplorationScreen
 var missions_screen: MissionsScreen
 var shop_screen: ShopScreen
 var _missions_btn: Button
+var _left_buttons: Array[Control] = []
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
 var _builders_label: Label
@@ -101,6 +102,8 @@ func _process(delta: float) -> void:
 	if building_panel.visible:
 		building_panel.refresh()
 	_build_button.visible = not building_panel.visible and not _placement_bar.visible
+	for b in _left_buttons:
+		b.visible = _build_button.visible
 	_refresh_counters()
 	_missions_btn.text = "Missions !" if _claimable() else "Missions"
 	_fps.visible = Settings.show_fps
@@ -190,6 +193,7 @@ func _build_bottom() -> void:
 		controller.deselect()
 		collection_screen.show_screen())
 	root.add_child(coll)
+	_left_buttons.append(coll)
 	var fight := UiTheme.button("Combats", "DangerButton", preload("res://assets/icons/elements/fire.svg"), 24)
 	fight.add_theme_constant_override("icon_max_width", 40)
 	fight.custom_minimum_size = Vector2(0, 72)
@@ -200,6 +204,7 @@ func _build_bottom() -> void:
 		controller.deselect()
 		stages_screen.open_screen())
 	root.add_child(fight)
+	_left_buttons.append(fight)
 	var explore := UiTheme.button("Carte", "SuccessButton", preload("res://assets/icons/elements/earth.svg"), 24)
 	explore.add_theme_constant_override("icon_max_width", 40)
 	explore.custom_minimum_size = Vector2(0, 72)
@@ -210,6 +215,7 @@ func _build_bottom() -> void:
 		controller.deselect()
 		exploration_screen.open_screen())
 	root.add_child(explore)
+	_left_buttons.append(explore)
 	var side := VBoxContainer.new()
 	side.add_theme_constant_override("separation", 10)
 	side.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 14)

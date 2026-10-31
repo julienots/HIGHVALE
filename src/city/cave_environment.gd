@@ -104,9 +104,10 @@ func _cliffs() -> void:
 		# Première rangée, contre la cité
 		_props.add(cliffs[_rng.randi() % 3], Vector3(t + _rng.randf_range(-0.6, 0.6), 0, -3.2 - _rng.randf_range(0, 1.5)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
 		_props.add(cliffs[_rng.randi() % 3], Vector3(-3.2 - _rng.randf_range(0, 1.5), 0, t + _rng.randf_range(-0.6, 0.6)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
-		# Arrière-plan, plus massif
-		_props.add(cliffs[_rng.randi() % 3], Vector3(t, 0, -8.5 - _rng.randf_range(0, 2.5)), _rng.randf_range(1.5, 2.1), _rng.randf() * TAU)
-		_props.add(cliffs[_rng.randi() % 3], Vector3(-8.5 - _rng.randf_range(0, 2.5), 0, t), _rng.randf_range(1.5, 2.1), _rng.randf() * TAU)
+		# Arrière-plan, plus massif (une falaise sur deux suffit, plus grande)
+		if i % 6 == 2:
+			_props.add(cliffs[_rng.randi() % 3], Vector3(t, 0, -9.0 - _rng.randf_range(0, 2.5)), _rng.randf_range(2.0, 2.6), _rng.randf() * TAU)
+			_props.add(cliffs[_rng.randi() % 3], Vector3(-9.0 - _rng.randf_range(0, 2.5), 0, t), _rng.randf_range(2.0, 2.6), _rng.randf() * TAU)
 	# Bordure avant basse : rochers moussus
 	for i in range(0, n + 3, 3):
 		var t := float(i)

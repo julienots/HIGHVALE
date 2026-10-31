@@ -5,7 +5,7 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.11.0)
+## État actuel (v0.12.0)
 
 | Étape | Contenu | État |
 |---|---|---|
@@ -19,7 +19,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 | 8 | Combat au tour par tour | ✅ terminée |
 | 9 | Progression, exploration et surface | ✅ base complète |
 | 10 | Boutique et événements | ✅ terminée (sans paiement réel) |
-| 11 → 12 | Finitions graphiques, optimisation et tests sur appareils | ⏳ à venir |
+| 11 | Graphismes, animations, effets, son | ✅ terminée |
+| 12 | Optimisation, tests, export APK | ✅ terminée (tests sur téléphone à faire par le studio) |
 
 **Ce qui est jouable et testé :**
 
@@ -38,6 +39,9 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Exploration** : carte des 5 zones des profondeurs et des 3 régions de la surface (ouvertes au Temple niveau 5), chacune avec 3 combats dont un gardien, ambiance d'arène propre (cristaux, forges, plein jour et forêts à la surface) et butin ; expéditions de héros (1, 4 ou 8 h) depuis la Tour des explorateurs.
 - **Missions et événements** : 4 missions du jour et 3 de la semaine suivies automatiquement, récompenses de connexion sur 7 jours, passe saisonnier de 20 paliers, événement hebdomadaire tournant (+50 % de récompenses de combat, boss d'événement quotidien).
 - **Boutique** : 6 offres du jour renouvelées (ingrédients, fragments, équipements), packs de ressources, coffres d'alchimiste et du héros ; le Marché l'ouvre aussi. Tout s'achète avec les monnaies du jeu : aucun paiement réel n'est intégré.
+- **Son** : bande-son originale synthétisée (thème de la cité, thème de combat, jingles) et 13 effets sonores ; volumes réglables.
+- **Effets** : gerbes de particules (collecte, niveau atteint, récolte, coups, soins), poussière de chantier, révélations lumineuses.
+- **Performances** : décors instanciés par zones avec niveaux de détail, ombres réservées aux objets proches, qualité graphique réglable (résolution 3D, ombres, lueur, particules). Mesures : environ 130 000 triangles et 370 appels de rendu dans la cité, 137 000 triangles en combat (`tests/perf_probe.tscn`).
 - **Cité vivante** : mineurs, cultivatrices, porteurs, bâtisseurs et flâneurs modélisés en 3D se déplacent sur la grille (A*). Ils travaillent avec leur outil, rapportent leur récolte à l'Entrepôt ou au Temple, et les bâtisseurs martèlent sur les chantiers.
 - Caméra isométrique : glisser avec inertie, pincer ou molette pour zoomer.
 - **25 bâtiments modélisés en 3D** (fichiers glTF `assets/models/buildings/`, 2 500 à 15 000 faces chacun) : maçonnerie pierre par pierre, toits à tuiles, colombages, fenêtres éclairées, bannières, cristaux taillés, champignons géants. Chaque modèle s'enrichit aux niveaux 3, 5 et 7 et possède des pièces animées (roues, foreuse, cristal flottant, portails) et ses propres lumières.
@@ -51,7 +55,7 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 
 ## Modèles 3D
 
-Les modèles sont produits par des scripts Blender versionnés (`tools/blender/`), ce qui permet de les régénérer, de les retoucher dans Blender et de garantir un style cohérent :
+La bande-son est générée par `python3 tools/audio/make_audio.py` (numpy et ffmpeg). Les modèles sont produits par des scripts Blender versionnés (`tools/blender/`), ce qui permet de les régénérer, de les retoucher dans Blender et de garantir un style cohérent :
 
 Catégories : `models/` (bâtiments), `props/` (décors de la caverne), `characters/` (habitants).
 

@@ -71,11 +71,15 @@ def hero(m, outfit, outfit2="leather", skin="skin", hair="hair_brown", hair_styl
         hz = HEAD_Z
         m.sphere(0.092, (0, 0, hz), skin, seg=16, rings=10)
         for sx in (-1, 1):
-            m.sphere(0.014, (sx * 0.033, -0.083, hz + 0.008), eyes, seg=6, rings=4, scale=(1, 0.7, 1.25))
-            m.box((0.03, 0.008, 0.008), (sx * 0.034, -0.086, hz + 0.034), "hair_black" if hair != "hair_white" else "hair_white", rot=(0, sx * 10, 0), bevel=0)
+            # Œil : blanc, iris coloré, reflet ; sourcil ; joue rosée ; oreille.
+            m.sphere(0.02, (sx * 0.034, -0.079, hz + 0.008), "cloth_white", seg=10, rings=6, scale=(1, 0.5, 1.2))
+            m.sphere(0.0135, (sx * 0.034, -0.088, hz + 0.006), eyes, seg=8, rings=5, scale=(1, 0.6, 1.2))
+            m.sphere(0.0048, (sx * 0.034 + 0.005, -0.094, hz + 0.014), "cloth_white", seg=6, rings=4)
+            m.box((0.03, 0.008, 0.008), (sx * 0.034, -0.086, hz + 0.036), "hair_black" if hair != "hair_white" else "hair_white", rot=(0, sx * 10, 0), bevel=0)
+            m.sphere(0.014, (sx * 0.056, -0.079, hz - 0.02), "mushroom_pink", seg=8, rings=5, scale=(1.2, 0.35, 0.7))
             m.sphere(0.014, (sx * 0.092, 0, hz), skin, seg=6, rings=4)
         m.sphere(0.012, (0, -0.094, hz - 0.012), skin, seg=6, rings=4)
-        m.box((0.032, 0.006, 0.006), (0, -0.087, hz - 0.038), "skin_dark", bevel=0)
+        m.torus(0.015, 0.0042, (0, -0.087, hz - 0.034), "skin_dark", rot=(-90, 0, 0), seg=10, rseg=3, arc=180)
         if beard:
             m.sphere(0.06, (0, -0.05, hz - 0.055), hair, seg=10, rings=6, scale=(1.15, 0.85, 1.0))
         if hood:

@@ -225,6 +225,7 @@ class Model:
             mat = "palette"
         bm, col = self._target(mat)
         src.normal_update()
+        rot3 = matrix.to_3x3()
         vmap = {v: bm.verts.new(matrix @ v.co) for v in src.verts}
         for f in src.faces:
             try:
@@ -235,8 +236,11 @@ class Model:
                 nf.smooth = abs(f.normal.z) < 0.7
             else:
                 nf.smooth = bool(smooth)
+            # Éclairage peint : dessus éclairé, dessous assombri (relief lisible sur mobile).
+            nz = (rot3 @ f.normal).normalized().z
+            k = 1.0 + 0.1 * nz if nz > 0 else 1.0 + 0.16 * nz
             for loop in nf.loops:
-                loop[col] = (tint[0], tint[1], tint[2], 1.0)
+                loop[col] = (tint[0] * k, tint[1] * k, tint[2] * k, 1.0)
         src.free()
 
     # --- Primitives -------------------------------------------------------
@@ -244,7 +248,9 @@ class Model:
         bm = bmesh.new()
         bmesh.ops.create_cube(bm, size=1.0)
         bmesh.ops.scale(bm, vec=Vector(size), verts=bm.verts)
-        _bevel(bm, min(bevel, min(size) * 0.45))
+        b = min(bevel, min(size) * 0.45)
+        # Arêtes arrondies sur deux segments pour les pièces visibles.
+        _bevel(bm, b, 2 if b >= 0.02 else 1)
         self.add(bm, mat, _mat4(loc, rot), tint)
 
     def cyl(self, r, h, loc, mat, r2=None, seg=12, rot=(0, 0, 0), bevel=0.0, tint=None, smooth="sides", scale=(1, 1, 1)):
@@ -366,6 +372,17 @@ class Model:
                 else:
                     p, s = (-w / 2 + 0.06, t, h * 0.75), (0.14, seg - 0.03, 0.12)
                 self.box(s, p, curb, bevel=0.025, tint=self.jitter(0.12))
+        # Herbes folles et cailloux au pied du socle.
+        for i in range(10):
+            side = self.rng.randrange(4)
+            u = self.rng.uniform(-0.45, 0.45)
+            x, y = [(u * w, -d / 2 - 0.04), (w / 2 + 0.04, u * d), (u * w, d / 2 + 0.04), (-w / 2 - 0.04, u * d)][side]
+            if i % 3 == 0:
+                self.rock((x, y, 0), (0.05, 0.045, 0.035), "rock_light")
+            else:
+                for k in range(3):
+                    self.cyl(0.018, self.rng.uniform(0.07, 0.13), (x + self.rng.uniform(-0.03, 0.03), y + self.rng.uniform(-0.03, 0.03), 0),
+                             "moss", r2=0.0, seg=4, rot=(self.rng.uniform(-20, 20), self.rng.uniform(-20, 20), 0), tint=self.jitter(0.2), smooth=False)
         return h * 0.7 + 0.055
 
     def brick_wall(self, p0, p1, z0, height, thick=0.22, mat="stone", course=0.18, brick=0.36, bevel=0.025):

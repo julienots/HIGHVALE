@@ -95,6 +95,20 @@ Reste à faire : créatures et héros propres à la surface, bâtiments spécifi
 - Écrans Missions et Boutique ; indicateur de récompense disponible.
 - Non intégré : achats en argent réel (Google Play Billing, nécessite le compte développeur du studio), classements en ligne (serveur requis).
 
+## ✅ Étape 11 — Graphismes, animations, effets et son
+
+- Passe de détail sur les 76 modèles : arêtes arrondies, éclairage peint dans les couleurs de sommets, herbes et cailloux au pied des socles, visages expressifs (yeux, reflets, joues, sourire).
+- Bande-son originale (`tools/audio/make_audio.py`) et `AudioManager` ; effets de particules `Fx`.
+
+## ✅ Étape 12 — Optimisation, tests et export
+
+- Décors : maillages importés conservés (niveaux de détail), MultiMesh par zones de 16 cases, pas d'ombre pour les falaises, rochers et arbres ; falaises d'arrière-plan allégées. Cité : 1,6 million → 130 000 triangles.
+- Qualité graphique réglable (Économie, Équilibrée, Élevée).
+- 57 tests automatisés, visites visuelles (cité, combat, interface), sonde de performances.
+- APK Android signé (clé de débogage) via `tools/build_apk.sh`.
+
+Reste au studio : essais sur plusieurs téléphones, clé de publication et fiche Play Store, achats intégrés (Google Play Billing), contenu jusqu'à 150 héros et 120 créatures, créatures et bâtiments propres à la surface.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |

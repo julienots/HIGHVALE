@@ -32,10 +32,13 @@ def villager(m, cloth, trousers="cloth_brown", skin="skin", hair="hair_brown", h
         hz = 0.36
         m.sphere(0.085, (0, 0, hz), skin, seg=14, rings=10)
         for sx in (-1, 1):
-            m.sphere(0.012, (sx * 0.03, -0.077, hz + 0.008), "dark", seg=6, rings=4)
+            m.sphere(0.017, (sx * 0.03, -0.074, hz + 0.008), "cloth_white", seg=8, rings=5, scale=(1, 0.5, 1.2))
+            m.sphere(0.011, (sx * 0.03, -0.082, hz + 0.006), "dark", seg=6, rings=4, scale=(1, 0.6, 1.2))
+            m.sphere(0.004, (sx * 0.03 + 0.004, -0.087, hz + 0.012), "cloth_white", seg=6, rings=4)
+            m.sphere(0.012, (sx * 0.05, -0.073, hz - 0.018), "mushroom_pink", seg=8, rings=5, scale=(1.2, 0.35, 0.7))
             m.sphere(0.013, (sx * 0.085, 0, hz), skin, seg=6, rings=4)
         m.sphere(0.012, (0, -0.088, hz - 0.012), skin, seg=6, rings=4)
-        m.box((0.03, 0.006, 0.006), (0, -0.081, hz - 0.035), "skin_dark", bevel=0)
+        m.torus(0.013, 0.004, (0, -0.081, hz - 0.032), "skin_dark", rot=(-90, 0, 0), seg=10, rseg=3, arc=180)
         if beard:
             m.sphere(0.055, (0, -0.045, hz - 0.05), hair, seg=10, rings=6, scale=(1.1, 0.8, 0.9))
         if hat == "helmet":
