@@ -59,6 +59,7 @@ func _ready() -> void:
 	Events.story_chapter_requested.connect(_show_story)
 	Events.game_loaded.connect(_rebuild_city)
 	_rebuild_city()
+	AudioManager.play_music("music_city")
 
 
 func _process(delta: float) -> void:
@@ -310,6 +311,8 @@ func confirm_placement() -> void:
 		Events.toast_requested.emit(city.can_build_reason(d, GameState.wallet), "error")
 		return
 	_end_placement()
+	AudioManager.sfx("build")
+	Fx.dust(self, Vector3(b.cell.x + d.footprint.x / 2.0, 0, b.cell.y + d.footprint.y / 2.0), d.footprint.x / 2.0)
 	Events.action_done.emit("build", 1)
 	Events.toast_requested.emit("Construction lancée : %s" % d.display_name, "success")
 	GameState.save()
@@ -359,9 +362,11 @@ func collect(uid: int) -> void:
 	if got > 0:
 		Events.action_done.emit("collect", got)
 		var rt := DataRegistry.resource_type(res)
+		AudioManager.sfx("collect")
 		if n:
 			n.float_text("+%s" % Fmt.amount(got), rt.color.lightened(0.2))
 			n.play_pop(1.05)
+			Fx.burst(self, n.global_position + Vector3(0, 1.2, 0), rt.color.lightened(0.3), 20, 2.2)
 	elif b.stored_production(GameClock.now()) >= 1.0:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
 
@@ -406,6 +411,8 @@ func harvest(cell: Vector2i) -> void:
 	var origin := node.global_position if node else Vector3(cell.x + 0.5, 0, cell.y + 0.5)
 	var kind_id := GameState.city.wild_at(cell)
 	Events.action_done.emit("harvest", 1)
+	AudioManager.sfx("harvest")
+	Fx.burst(self, origin + Vector3(0, 0.3, 0), Color("ffe6a0"), 22, 2.0)
 	var got := GameState.city.harvest_wild(cell, GameState.wallet, GameState.config().premium_resource, GameClock.now())
 	if got.is_empty():
 		Events.toast_requested.emit("Réserves pleines : rien n'a pu être récolté", "error")
@@ -605,6 +612,9 @@ func _on_task_finished(uid: int) -> void:
 		return
 	n.refresh(GameClock.now())
 	n.play_pop(1.15)
+	AudioManager.sfx("levelup", 0.0)
+	Fx.burst(self, n.global_position + Vector3(0, 1.0, 0), UiTheme.GOLD, 50, 4.0, 0.08, 1.0, 1.2)
+	Fx.burst(self, n.global_position + Vector3(0, 0.3, 0), Color("7fdcff"), 30, 2.5)
 	n.float_text("Niveau %d !" % b.level, UiTheme.GOLD)
 	Events.toast_requested.emit("%s : niveau %d terminé !" % [b.data().display_name, b.level], "reward")
 

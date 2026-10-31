@@ -75,6 +75,7 @@ func _setup(scene: PackedScene, rarity: int, title: String, name_text: String, l
 	_sparks.color = _secondary
 	_sparks.emitting = false
 	add_child(_sparks)
+	AudioManager.sfx("charge", 0.0)
 	_flash = ColorRect.new()
 	_flash.color = Color(1, 1, 1, 0)
 	_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -92,6 +93,7 @@ func _process(delta: float) -> void:
 
 func _reveal() -> void:
 	_phase = 1
+	AudioManager.sfx("reveal", 0.0)
 	_sparks.emitting = true
 	var t := create_tween().set_parallel()
 	_flash.color.a = 0.9 if _rarity >= GameEnums.Rarity.EPIC else 0.6

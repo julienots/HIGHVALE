@@ -14,6 +14,7 @@ var buildable := Rect2i(3, 3, 34, 34)
 var _rng := RandomNumberGenerator.new()
 var _sun: DirectionalLight3D
 var _props: PropScatter
+var _env: Environment
 
 
 func build(p_grid: Vector2i, p_buildable: Rect2i) -> void:
@@ -38,7 +39,9 @@ func build(p_grid: Vector2i, p_buildable: Rect2i) -> void:
 
 
 func _apply_settings() -> void:
-	_sun.shadow_enabled = Settings.shadows_enabled
+	_sun.shadow_enabled = Settings.shadows_enabled and Settings.quality > 0
+	if _env:
+		_env.glow_enabled = Settings.glow_enabled()
 
 
 func _environment() -> void:
@@ -63,6 +66,7 @@ func _environment() -> void:
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
+	_env = env
 
 	# Lumière principale : lueur froide tombant des cristaux du plafond.
 	_sun = DirectionalLight3D.new()
@@ -228,7 +232,7 @@ func _static_meshes(n: Node) -> Array[MeshInstance3D]:
 
 func _spores() -> void:
 	var p := GPUParticles3D.new()
-	p.amount = 140
+	p.amount = int(140 * Settings.particle_factor())
 	p.lifetime = 9.0
 	p.preprocess = 9.0
 	p.visibility_aabb = AABB(Vector3(-25, -2, -25), Vector3(50, 14, 50))

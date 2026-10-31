@@ -13,6 +13,8 @@ func _ready() -> void:
 
 
 func show_message(text: String, kind := "info") -> void:
+	if kind == "error":
+		AudioManager.sfx("error", 0.0, -6.0)
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var sb := UiTheme.box(COLORS.get(kind, COLORS.info), UiTheme.INK, 14, 3)

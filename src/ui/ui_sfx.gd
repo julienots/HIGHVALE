@@ -6,6 +6,7 @@ extends RefCounted
 static func click(c: Control) -> void:
 	if not c.is_inside_tree():
 		return
+	AudioManager.sfx("click", 0.08, -4.0)
 	c.pivot_offset = c.size / 2.0
 	var t := c.create_tween()
 	t.tween_property(c, "scale", Vector2(0.92, 0.92), 0.05)

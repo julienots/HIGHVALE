@@ -30,6 +30,7 @@ func _ready() -> void:
 	cam.look_at(_pivot.global_position + Vector3(0, 1.5, 0))
 	cam.make_current()
 	_build_ui()
+	AudioManager.play_music("music_city")
 
 
 func _process(delta: float) -> void:

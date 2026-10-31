@@ -6,7 +6,31 @@ extends RefCounted
 static func open(parent: Node, in_city: bool) -> DialogBox:
 	var body := VBoxContainer.new()
 	body.add_theme_constant_override("separation", 12)
+	body.add_child(UiTheme.label("Son", "HeaderLabel"))
+	for entry in [["Musique", "music_volume"], ["Effets sonores", "sfx_volume"]]:
+		var row := HBoxContainer.new()
+		var l := UiTheme.label(entry[0], "", 22)
+		l.custom_minimum_size = Vector2(200, 0)
+		row.add_child(l)
+		var slider := HSlider.new()
+		slider.min_value = 0.0
+		slider.max_value = 1.0
+		slider.step = 0.05
+		slider.value = Settings.get(entry[1])
+		slider.custom_minimum_size = Vector2(260, 36)
+		slider.value_changed.connect(func(v): Settings.set_value(entry[1], v))
+		row.add_child(slider)
+		body.add_child(row)
 	body.add_child(UiTheme.label("Graphismes", "HeaderLabel"))
+	var qrow := HBoxContainer.new()
+	qrow.add_child(UiTheme.label("Qualité", "", 22))
+	var q := OptionButton.new()
+	for name in ["Économie (batterie)", "Équilibrée", "Élevée"]:
+		q.add_item(name)
+	q.select(Settings.quality)
+	q.item_selected.connect(func(i): Settings.set_value("quality", i))
+	qrow.add_child(q)
+	body.add_child(qrow)
 	var shadows := CheckButton.new()
 	shadows.text = "Ombres dynamiques"
 	shadows.button_pressed = Settings.shadows_enabled

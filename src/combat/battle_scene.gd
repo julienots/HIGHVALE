@@ -47,6 +47,7 @@ func _ready() -> void:
 	battle.setup(team, BattleSetup.enemies_for(encounter))
 	_build_ui()
 	_spawn_units()
+	AudioManager.play_music("music_battle")
 	_run.call_deferred()
 
 
@@ -65,7 +66,7 @@ func _build_arena() -> void:
 	env.ambient_light_color = Color("c8d8ff") if surface else Color("5060a0")
 	env.ambient_light_energy = 0.55 if surface else 0.6
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.glow_enabled = true
+	env.glow_enabled = Settings.glow_enabled()
 	env.glow_intensity = 0.8
 	env.fog_enabled = true
 	env.fog_light_color = zone.sky_color if zone else Color("0c1430")
@@ -77,7 +78,7 @@ func _build_arena() -> void:
 	sun.rotation_degrees = Vector3(-55, -30, 0)
 	sun.light_energy = 1.15 if surface else 1.0
 	sun.light_color = zone.light_color if zone else Color.WHITE
-	sun.shadow_enabled = Settings.shadows_enabled
+	sun.shadow_enabled = Settings.shadows_enabled and Settings.quality > 0
 	add_child(sun)
 	var ground := PlaneMesh.new()
 	ground.size = Vector2(60, 60)
@@ -271,6 +272,8 @@ func _play(events: Array) -> void:
 				_flash(e.target)
 				await get_tree().create_timer(0.35).timeout
 			"heal":
+				AudioManager.sfx("heal")
+				Fx.burst(self, _rigs[e.target.uid].global_position + Vector3(0, 0.3, 0), Color("7aff8a"), 16, 1.5, 0.07, 1.0, 1.1)
 				_float(e.target, "+%d" % e.amount, Color("7aff8a"), 1.1)
 				_glow(e.target, Color("5bd36b"))
 				await get_tree().create_timer(0.15).timeout
@@ -316,6 +319,7 @@ func _animate_cast(actor: Combatant, skill: SkillData, target: Combatant) -> voi
 	var aoe := skill.target in [SkillData.Target.ALL_ENEMIES, SkillData.Target.ROW_ENEMIES]
 	var t_rig: CharacterRig = _rigs[target.uid] if target and _rigs.has(target.uid) else null
 	if _is_melee(actor) and t_rig and not aoe:
+		AudioManager.sfx("whoosh")
 		var dest := t_rig.position + (home - t_rig.position).normalized() * 0.9
 		var tw := create_tween()
 		tw.tween_property(rig, "position", dest, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -326,6 +330,7 @@ func _animate_cast(actor: Combatant, skill: SkillData, target: Combatant) -> voi
 	else:
 		var from := rig.global_position + Vector3(0, 0.7, 0)
 		var dest := (t_rig.global_position if t_rig and not aoe else _side_center(1 - actor.side)) + Vector3(0, 0.6, 0)
+		AudioManager.sfx("magic")
 		var orb := MeshKit.part(self, MeshKit.sphere(0.18 if not aoe else 0.32, false, 12), MeshKit.glow_mat(color, 4.0), from)
 		var light := OmniLight3D.new()
 		light.light_color = color
@@ -372,6 +377,8 @@ func _side_center(side: int) -> Vector3:
 
 func _hit(t: Combatant, amount: int, crit: bool, adv: int) -> void:
 	_flash(t)
+	AudioManager.sfx("crit" if crit else "hit")
+	Fx.burst(self, _rigs[t.uid].global_position + Vector3(0, 0.6, 0), Color("fff1c0") if crit else Color("ffd0a0"), 26 if crit else 14, 3.0)
 	var text := "%s%d" % ["CRITIQUE ! " if crit else "-", amount]
 	_float(t, text, Color("ffe04a") if crit else Color.WHITE, 1.4 if crit else 1.1)
 	if adv > 0:
@@ -564,6 +571,8 @@ func _finish() -> void:
 	Engine.time_scale = 1.0
 	_skill_bar.visible = false
 	var won := battle.winner == 0
+	AudioManager.stop_music(0.3)
+	AudioManager.sfx("jingle_victory" if won else "jingle_defeat", 0.0)
 	var body := VBoxContainer.new()
 	body.add_theme_constant_override("separation", 8)
 	if won:
