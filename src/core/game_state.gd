@@ -11,6 +11,11 @@ var wallet := Wallet.new()
 var collection := CollectionState.new()
 var inventory := Inventory.new()
 var lab := LaboratoryState.new()
+var exploration := ExplorationState.new()
+## Combat préparé hors des défis (zone d'exploration).
+var pending_battle: EncounterData
+var pending_zone := ""
+var pending_stage := 0
 
 const STARTER_INGREDIENTS := {"ember_stone": 3, "vital_drop": 3, "tide_scale": 2, "resonant_shard": 2}
 ## Récompense de chaque nouveau niveau du Temple Primordial.
@@ -31,6 +36,7 @@ func _ready() -> void:
 	collection.changed.connect(func(): Events.collection_changed.emit())
 	inventory.changed.connect(func(): Events.inventory_changed.emit())
 	lab.changed.connect(func(): Events.inventory_changed.emit())
+	exploration.changed.connect(func(): Events.inventory_changed.emit())
 	_new_city()
 
 
@@ -67,6 +73,7 @@ func new_game() -> void:
 	collection.from_dict({})
 	inventory.from_dict({})
 	lab.from_dict({})
+	exploration.from_dict({})
 	_give_starters()
 	profile = {"player_name": "Fondateur", "created_at": now, "story_seen": []}
 	is_loaded = true
@@ -88,7 +95,7 @@ func save() -> void:
 
 func to_dict() -> Dictionary:
 	return {"profile": profile, "wallet": wallet.to_dict(), "city": city.to_dict(), "collection": collection.to_dict(),
-		"inventory": inventory.to_dict(), "lab": lab.to_dict()}
+		"inventory": inventory.to_dict(), "lab": lab.to_dict(), "exploration": exploration.to_dict()}
 
 
 func _apply(data: Dictionary) -> void:
@@ -99,6 +106,7 @@ func _apply(data: Dictionary) -> void:
 	collection.from_dict(data.get("collection", {}))
 	inventory.from_dict(data.get("inventory", {}))
 	lab.from_dict(data.get("lab", {}))
+	exploration.from_dict(data.get("exploration", {}))
 	if not data.has("inventory"):
 		for id in STARTER_INGREDIENTS:
 			inventory.add(id, STARTER_INGREDIENTS[id])

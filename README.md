@@ -5,7 +5,7 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.9.0)
+## État actuel (v0.10.0)
 
 | Étape | Contenu | État |
 |---|---|---|
@@ -17,7 +17,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 | 6 | Laboratoire et Fusionnerie | ✅ terminée |
 | 7 | Invocation et dieux | ✅ terminée |
 | 8 | Combat au tour par tour | ✅ terminée |
-| 9 → 12 | Progression, exploration et surface, boutique… | ⏳ à venir |
+| 9 | Progression, exploration et surface | ✅ base complète |
+| 10 → 12 | Boutique et événements, finitions, optimisation | ⏳ à venir |
 
 **Ce qui est jouable et testé :**
 
@@ -32,6 +33,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Sanctuaire des héros** : invocations classique, avancée, élémentaire (élément du jour) et légendaire, avec taux affichés, garantie Épique et doublons convertis en fragments. **Autel divin** : éveil des dieux Kryos, Vitalia et Pyros (fragments divins, éveil complet exceptionnel).
 - **Révélations** : charge lumineuse, rayons, éclair et présentation 3D, d'autant plus spectaculaires que la rareté est haute.
 - **Combat au tour par tour** : arène 3D dans la caverne, équipe de 5 héros et créatures, ordre selon la vitesse, énergie, recharges, avantages élémentaires, critiques, boucliers, états (brûlure, gel, poison, paralysie, étourdissement, affaiblissement, régénération, provocation), synergie élémentaire d'équipe. Mode manuel (choix de la compétence et de la cible) ou automatique, vitesse ×1 à ×3, caméra cinématique pour les ultimes, chiffres de dégâts. IA ennemie à stratégies (équilibrée, agressive, achever les blessés). 10 défis des profondeurs dont 2 boss, avec récompenses ; la Caserne entraîne l'équipe.
+- **Progression** : équipements forgés (arme, armure, amulette ; 12 objets) et talents à choisir aux niveaux 10, 20 et 30 ; boss à phases (purification, bouclier, rage à 66 % et 33 %).
+- **Exploration** : carte des 5 zones des profondeurs et des 3 régions de la surface (ouvertes au Temple niveau 5), chacune avec 3 combats dont un gardien, ambiance d'arène propre (cristaux, forges, plein jour et forêts à la surface) et butin ; expéditions de héros (1, 4 ou 8 h) depuis la Tour des explorateurs.
 - **Cité vivante** : mineurs, cultivatrices, porteurs, bâtisseurs et flâneurs modélisés en 3D se déplacent sur la grille (A*). Ils travaillent avec leur outil, rapportent leur récolte à l'Entrepôt ou au Temple, et les bâtisseurs martèlent sur les chantiers.
 - Caméra isométrique : glisser avec inertie, pincer ou molette pour zoomer.
 - **25 bâtiments modélisés en 3D** (fichiers glTF `assets/models/buildings/`, 2 500 à 15 000 faces chacun) : maçonnerie pierre par pierre, toits à tuiles, colombages, fenêtres éclairées, bannières, cristaux taillés, champignons géants. Chaque modèle s'enrichit aux niveaux 3, 5 et 7 et possède des pièces animées (roues, foreuse, cristal flottant, portails) et ses propres lumières.

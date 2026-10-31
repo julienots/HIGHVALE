@@ -60,7 +60,8 @@ src/
   laboratory/  LabRules, LaboratoryState, LabMachine
   fusion/      FusionRules, recettes
   summoning/   Bannières, SummonRules
-  inventory/   Inventory (ingrédients)
+  inventory/   Inventory, ItemData, ForgeRules
+  exploration/ ZoneData, ExplorationState (zones, expéditions)
   inventory/   ItemData (schéma)
   exploration/ ZoneData (schéma, étape 9)
   quests/      StoryChapterData

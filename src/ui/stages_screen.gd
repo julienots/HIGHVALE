@@ -87,6 +87,7 @@ func _fill_stages() -> void:
 		go.disabled = not unlocked
 		go.pressed.connect(func():
 			GameState.pending_encounter = enc.id
+			GameState.pending_zone = ""
 			GameState.save()
 			SceneRouter.go_to(SceneRouter.BATTLE))
 		row.add_child(go)

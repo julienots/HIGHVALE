@@ -16,6 +16,7 @@ const ENABLED := {
 	"divine": true,
 	"combat": true,
 	"equipment": true,
+	"exploration": true,
 }
 
 const MODULE_NAMES := {

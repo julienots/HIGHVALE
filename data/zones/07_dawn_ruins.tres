@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ZoneData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/exploration/zone_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "dawn_ruins"
+display_name = "Ruines d'Aurore"
+description = "Les vestiges dorés d'une cité d'avant la Fracture."
+order = 7
+is_surface = true
+unlock_temple_level = 6
+base_level = 22
+resource_drops = {"gold": 1000, "ancient_shards": 15}
+monster_ids = PackedStringArray("crystal_golem", "rock_beetle", "wisp")
+boss_id = "crystal_chimera"
+ground_color = Color(0.722, 0.627, 0.439, 1)
+sky_color = Color(1.000, 0.847, 0.627, 1)
+light_color = Color(1.000, 0.878, 0.627, 1)

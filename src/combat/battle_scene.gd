@@ -10,6 +10,7 @@ const PLAYER_SLOTS := [Vector3(-2.4, 0, 0), Vector3(-2.9, 0, -1.4), Vector3(-2.9
 
 var battle := BattleState.new()
 var encounter: EncounterData
+var zone: ZoneData
 var auto := false
 var speed := 1
 var _rigs := {}  # uid -> CharacterRig
@@ -31,9 +32,13 @@ var _waiting_input := false
 
 func _ready() -> void:
 	encounter = DataRegistry.encounters()[0]
-	for e in DataRegistry.encounters():
-		if e.id == GameState.pending_encounter:
-			encounter = e
+	if GameState.pending_zone != "":
+		zone = DataRegistry.zone(GameState.pending_zone)
+		encounter = zone.encounter(GameState.pending_stage)
+	else:
+		for e in DataRegistry.encounters():
+			if e.id == GameState.pending_encounter:
+				encounter = e
 	_build_arena()
 	var team := GameState.collection.build_team_combatants()
 	BattleSetup.apply_city_bonus(team, GameState.city)
@@ -50,24 +55,26 @@ func _exit_tree() -> void:
 # --- Arène ---------------------------------------------------------------------
 
 func _build_arena() -> void:
+	var surface := zone != null and zone.is_surface
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("070a16")
+	env.background_color = zone.sky_color if zone else Color("070a16")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("5060a0")
-	env.ambient_light_energy = 0.6
+	env.ambient_light_color = Color("c8d8ff") if surface else Color("5060a0")
+	env.ambient_light_energy = 0.55 if surface else 0.6
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.glow_enabled = true
 	env.glow_intensity = 0.8
 	env.fog_enabled = true
-	env.fog_light_color = Color("0c1430")
-	env.fog_density = 0.02
+	env.fog_light_color = zone.sky_color if zone else Color("0c1430")
+	env.fog_density = 0.003 if surface else 0.02
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-55, -30, 0)
-	sun.light_energy = 1.0
+	sun.light_energy = 1.15 if surface else 1.0
+	sun.light_color = zone.light_color if zone else Color.WHITE
 	sun.shadow_enabled = Settings.shadows_enabled
 	add_child(sun)
 	var ground := PlaneMesh.new()
@@ -75,6 +82,12 @@ func _build_arena() -> void:
 	var gm := ShaderMaterial.new()
 	gm.shader = preload("res://assets/shaders/cave_ground.gdshader")
 	gm.set_shader_parameter("buildable", Vector4(-5.5, -3.5, 5.5, 3.5))
+	if zone:
+		gm.set_shader_parameter("rock_light", zone.ground_color)
+		gm.set_shader_parameter("rock_dark", zone.ground_color.darkened(0.5))
+		if surface:
+			gm.set_shader_parameter("moss_color", Color("5aa040"))
+			gm.set_shader_parameter("floor_color", Color("8a7a5a"))
 	MeshKit.part(self, ground, gm)
 	var props := PropScatter.new()
 	add_child(props)
@@ -86,14 +99,16 @@ func _build_arena() -> void:
 		var p := Vector3(cos(a) * r * 1.3, 0, sin(a) * r)
 		if p.z > 4.0 and absf(p.x) < 6.0:
 			continue  # dégage la vue de la caméra
-		props.add(["cliff_a", "cliff_b", "cliff_c"][i % 3], p, rng.randf_range(0.8, 1.3), rng.randf() * TAU)
+		var kinds := ["tree_pine", "tree_round", "boulder"] if surface else ["cliff_a", "cliff_b", "cliff_c"]
+		props.add(kinds[i % 3], p, rng.randf_range(0.8, 1.3) * (1.6 if surface else 1.0), rng.randf() * TAU)
 	for i in 8:
 		var a := rng.randf() * TAU
 		var p := Vector3(cos(a) * 7.5, 0, sin(a) * 5.2 - 1.0)
 		if p.z > 1.5:
 			p.z = -p.z  # rien entre la caméra et l'arène
-		props.add(["crystals_blue", "crystals_violet", "mushrooms_teal", "stalagmite"][i % 4], p, rng.randf_range(0.6, 1.0), rng.randf() * TAU)
-		if i % 2 == 0:
+		var inner := ["tree_round", "boulder", "tree_pine", "ruin_pillar"] if surface else ["crystals_blue", "crystals_violet", "mushrooms_teal", "stalagmite"]
+		props.add(inner[i % 4], p, rng.randf_range(0.6, 1.0), rng.randf() * TAU)
+		if i % 2 == 0 and not surface:
 			var l := OmniLight3D.new()
 			l.light_color = Color("7fdcff") if i % 4 == 0 else Color("c2b4ff")
 			l.light_energy = 1.4
@@ -552,7 +567,8 @@ func _finish() -> void:
 	if won:
 		var rng := RandomNumberGenerator.new()
 		rng.randomize()
-		var got := BattleSetup.grant_victory(encounter, GameState.collection, GameState.wallet, rng)
+		var got := GameState.exploration.grant(zone, GameState.pending_stage, GameState.collection, GameState.wallet, rng) if zone \
+			else BattleSetup.grant_victory(encounter, GameState.collection, GameState.wallet, rng)
 		GameState.save()
 		body.add_child(UiTheme.label("Récompenses" + (" (première victoire !)" if got.first else ""), "HeaderLabel", 24))
 		body.add_child(UiTheme.cost_row(got.resources, null, 24))

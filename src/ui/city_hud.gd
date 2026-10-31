@@ -21,6 +21,7 @@ var fusion_screen: FusionScreen
 var summon_screen: SummonScreen
 var stages_screen: StagesScreen
 var forge_screen: ForgeScreen
+var exploration_screen: ExplorationScreen
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
 var _builders_label: Label
@@ -73,6 +74,8 @@ func _ready() -> void:
 	root.add_child(stages_screen)
 	forge_screen = ForgeScreen.new()
 	root.add_child(forge_screen)
+	exploration_screen = ExplorationScreen.new()
+	root.add_child(exploration_screen)
 	_fps = UiTheme.label("", "DimLabel", 16)
 	_fps.position = Vector2(12, 92)
 	root.add_child(_fps)
@@ -189,6 +192,16 @@ func _build_bottom() -> void:
 		controller.deselect()
 		stages_screen.open_screen())
 	root.add_child(fight)
+	var explore := UiTheme.button("Carte", "SuccessButton", preload("res://assets/icons/elements/earth.svg"), 24)
+	explore.add_theme_constant_override("icon_max_width", 40)
+	explore.custom_minimum_size = Vector2(0, 72)
+	explore.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 16)
+	explore.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	explore.position.x += 478
+	explore.pressed.connect(func():
+		controller.deselect()
+		exploration_screen.open_screen())
+	root.add_child(explore)
 	_build_button = UiTheme.button("Construire", "PrimaryButton", ICON_BUILD, 30)
 	_build_button.add_theme_constant_override("icon_max_width", 48)
 	_build_button.custom_minimum_size = Vector2(230, 84)

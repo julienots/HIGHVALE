@@ -79,11 +79,19 @@ Reste à faire :
 - `BattleScene` : arène 3D, déplacements de mêlée, projectiles élémentaires, ondes de choc, boucliers, chiffres flottants, caméra cinématique des ultimes, tremblements, ordre des tours, synergies, modes manuel/auto, vitesse ×1-×3, fin de combat.
 - Écran « Défis des profondeurs » : défis, puissance comparée, récompenses, composition de l'équipe.
 
+## ✅ Étape 9 — Progression et exploration (base complète)
+
+- Équipements (`ItemData`, 12 objets, `ForgeRules`, écran Forge), talents (3 paliers × 2 choix), bonus appliqués en combat.
+- Boss à phases dans `BattleState`.
+- `ZoneData` (8 zones : 5 profondeurs, 3 surface), `ExplorationState` (progression, déblocage, récompenses, expéditions), arène thématique (couleurs, décors de surface : sapins et feuillus modélisés).
+- Écran Exploration (profondeurs, surface, expéditions) ; Tour des explorateurs et Portail antique l'ouvrent.
+
+Reste à faire : créatures et héros propres à la surface, bâtiments spécifiques de la surface, événements de zone, variantes visuelles des personnages, Infirmerie (blessures).
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |
 |---|---|---|
-| 9 | Progression et exploration, surface | `ZoneData.is_surface`, Portail antique, Tour des explorateurs |
 | 10 | Boutique et événements | monnaie premium Prismes, bâtiment Marché |
 | 11 | Graphismes définitifs | `model_scene` sur chaque donnée pour brancher les modèles glTF |
 | 12 | Optimisation, tests appareils, export APK | préréglage Android prêt |

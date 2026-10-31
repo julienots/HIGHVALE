@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ZoneData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/exploration/zone_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "sunken_forges"
+display_name = "Forges englouties"
+description = "Les forges d'une civilisation disparue, encore brûlantes."
+order = 4
+is_surface = false
+unlock_temple_level = 4
+base_level = 15
+resource_drops = {"gold": 500, "dark_ore": 8}
+monster_ids = PackedStringArray("fire_salamander", "magma_slime", "rock_beetle")
+boss_id = "dragonling"
+ground_color = Color(0.416, 0.290, 0.227, 1)
+sky_color = Color(0.165, 0.047, 0.031, 1)
+light_color = Color(1.000, 0.541, 0.227, 1)

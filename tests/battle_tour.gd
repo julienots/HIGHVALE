@@ -32,6 +32,16 @@ func _ready() -> void:
 			await _shot("b3_mid_%d" % guard)
 	await _frames(40)
 	await _shot("b4_end")
+	# Arène de la surface
+	scene.queue_free()
+	await _frames(2)
+	GameState.pending_zone = "renewal_plains"
+	GameState.pending_stage = 2
+	var surf: BattleScene = load("res://scenes/combat/battle.tscn").instantiate()
+	get_tree().root.add_child(surf)
+	surf.auto = true
+	await _frames(120)
+	await _shot("b5_surface")
 	print("BATTLE_DONE winner=", scene.battle.winner, " rounds=", scene.battle.round)
 	SaveSystem.delete_save()
 	get_tree().quit()

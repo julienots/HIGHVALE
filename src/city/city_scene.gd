@@ -364,7 +364,7 @@ func collect(uid: int) -> void:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
 
 
-const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge"]
+const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal"]
 
 
 func has_screen(data_id: String) -> bool:
@@ -391,6 +391,8 @@ func open_building_screen(uid: int) -> void:
 			hud.stages_screen.open_screen()
 		"forge":
 			hud.forge_screen.open_screen()
+		"explorer_tower", "ancient_portal":
+			hud.exploration_screen.open_screen()
 
 
 ## Récolte manuelle d'une ressource sauvage.
@@ -629,7 +631,7 @@ func _handle_back() -> void:
 		if c is DialogBox:
 			c.close()
 			return
-	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen]:
+	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen, hud.exploration_screen]:
 		if s.visible:
 			s.close_screen()
 			return
