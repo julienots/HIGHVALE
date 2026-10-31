@@ -95,6 +95,7 @@ func refresh() -> void:
 				if s < ex.zone_progress(z):
 					b.text += "  ✓"
 				b.pressed.connect(func():
+					GameState.pending_battle = null
 					GameState.pending_zone = z.id
 					GameState.pending_stage = s
 					GameState.save()

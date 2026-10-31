@@ -310,6 +310,7 @@ func confirm_placement() -> void:
 		Events.toast_requested.emit(city.can_build_reason(d, GameState.wallet), "error")
 		return
 	_end_placement()
+	Events.action_done.emit("build", 1)
 	Events.toast_requested.emit("Construction lancée : %s" % d.display_name, "success")
 	GameState.save()
 
@@ -356,6 +357,7 @@ func collect(uid: int) -> void:
 	var got := GameState.city.collect(b, GameState.wallet, GameClock.now())
 	var n: BuildingNode = nodes.get(uid)
 	if got > 0:
+		Events.action_done.emit("collect", got)
 		var rt := DataRegistry.resource_type(res)
 		if n:
 			n.float_text("+%s" % Fmt.amount(got), rt.color.lightened(0.2))
@@ -364,7 +366,7 @@ func collect(uid: int) -> void:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
 
 
-const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal"]
+const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat", "arena", "barracks", "forge", "explorer_tower", "ancient_portal", "market"]
 
 
 func has_screen(data_id: String) -> bool:
@@ -391,6 +393,8 @@ func open_building_screen(uid: int) -> void:
 			hud.stages_screen.open_screen()
 		"forge":
 			hud.forge_screen.open_screen()
+		"market":
+			hud.shop_screen.open_screen()
 		"explorer_tower", "ancient_portal":
 			hud.exploration_screen.open_screen()
 
@@ -401,6 +405,7 @@ func harvest(cell: Vector2i) -> void:
 	var node := wild_view.node_at(cell)
 	var origin := node.global_position if node else Vector3(cell.x + 0.5, 0, cell.y + 0.5)
 	var kind_id := GameState.city.wild_at(cell)
+	Events.action_done.emit("harvest", 1)
 	var got := GameState.city.harvest_wild(cell, GameState.wallet, GameState.config().premium_resource, GameClock.now())
 	if got.is_empty():
 		Events.toast_requested.emit("Réserves pleines : rien n'a pu être récolté", "error")
@@ -523,6 +528,7 @@ func _do_upgrade(uid: int) -> void:
 	if reason != "":
 		Events.toast_requested.emit(reason, "error")
 		return
+	Events.action_done.emit("build", 1)
 	Events.toast_requested.emit("Amélioration lancée", "success")
 	GameState.save()
 
@@ -631,7 +637,7 @@ func _handle_back() -> void:
 		if c is DialogBox:
 			c.close()
 			return
-	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen, hud.exploration_screen]:
+	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen, hud.exploration_screen, hud.missions_screen, hud.shop_screen]:
 		if s.visible:
 			s.close_screen()
 			return

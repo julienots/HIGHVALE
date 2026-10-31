@@ -17,6 +17,7 @@ const ENABLED := {
 	"combat": true,
 	"equipment": true,
 	"exploration": true,
+	"shop": true,
 }
 
 const MODULE_NAMES := {

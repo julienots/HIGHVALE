@@ -88,11 +88,17 @@ Reste à faire :
 
 Reste à faire : créatures et héros propres à la surface, bâtiments spécifiques de la surface, événements de zone, variantes visuelles des personnages, Infirmerie (blessures).
 
+## ✅ Étape 10 — Boutique et événements
+
+- `QuestState` : missions quotidiennes (tirage stable par jour) et hebdomadaires, suivi par `Events.action_done`, connexion sur 7 jours, passe saisonnier (XP des missions, 20 paliers).
+- `ShopState` : offres du jour, packs de ressources, coffres ; `EventCalendar` : 4 événements hebdomadaires (bonus de récompenses, boss quotidien).
+- Écrans Missions et Boutique ; indicateur de récompense disponible.
+- Non intégré : achats en argent réel (Google Play Billing, nécessite le compte développeur du studio), classements en ligne (serveur requis).
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |
 |---|---|---|
-| 10 | Boutique et événements | monnaie premium Prismes, bâtiment Marché |
 | 11 | Graphismes définitifs | `model_scene` sur chaque donnée pour brancher les modèles glTF |
 | 12 | Optimisation, tests appareils, export APK | préréglage Android prêt |
 

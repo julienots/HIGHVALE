@@ -22,6 +22,9 @@ var summon_screen: SummonScreen
 var stages_screen: StagesScreen
 var forge_screen: ForgeScreen
 var exploration_screen: ExplorationScreen
+var missions_screen: MissionsScreen
+var shop_screen: ShopScreen
+var _missions_btn: Button
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
 var _builders_label: Label
@@ -76,6 +79,10 @@ func _ready() -> void:
 	root.add_child(forge_screen)
 	exploration_screen = ExplorationScreen.new()
 	root.add_child(exploration_screen)
+	missions_screen = MissionsScreen.new()
+	root.add_child(missions_screen)
+	shop_screen = ShopScreen.new()
+	root.add_child(shop_screen)
 	_fps = UiTheme.label("", "DimLabel", 16)
 	_fps.position = Vector2(12, 92)
 	root.add_child(_fps)
@@ -95,6 +102,7 @@ func _process(delta: float) -> void:
 		building_panel.refresh()
 	_build_button.visible = not building_panel.visible and not _placement_bar.visible
 	_refresh_counters()
+	_missions_btn.text = "Missions !" if _claimable() else "Missions"
 	_fps.visible = Settings.show_fps
 	if _fps.visible:
 		_fps.text = "%d FPS" % Engine.get_frames_per_second()
@@ -202,6 +210,24 @@ func _build_bottom() -> void:
 		controller.deselect()
 		exploration_screen.open_screen())
 	root.add_child(explore)
+	var side := VBoxContainer.new()
+	side.add_theme_constant_override("separation", 10)
+	side.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 14)
+	side.position.y += 78
+	side.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	root.add_child(side)
+	_missions_btn = UiTheme.button("Missions", "SecondaryButton", preload("res://assets/icons/ui/star.svg"), 20)
+	_missions_btn.custom_minimum_size = Vector2(170, 58)
+	_missions_btn.pressed.connect(func():
+		controller.deselect()
+		missions_screen.open_screen())
+	side.add_child(_missions_btn)
+	var shop_btn := UiTheme.button("Boutique", "PremiumButton", DataRegistry.resource_type("prisms").icon, 20)
+	shop_btn.custom_minimum_size = Vector2(170, 58)
+	shop_btn.pressed.connect(func():
+		controller.deselect()
+		shop_screen.open_screen())
+	side.add_child(shop_btn)
 	_build_button = UiTheme.button("Construire", "PrimaryButton", ICON_BUILD, 30)
 	_build_button.add_theme_constant_override("icon_max_width", 48)
 	_build_button.custom_minimum_size = Vector2(230, 84)
@@ -321,6 +347,17 @@ func _show_all_resources() -> void:
 		row.custom_minimum_size = Vector2(300, 0)
 		grid.add_child(row)
 	DialogBox.open(root, "Ressources", grid, [], 760)
+
+
+## Une récompense attend-elle le joueur (mission, connexion, passe) ?
+func _claimable() -> bool:
+	var q := GameState.quests
+	if q.login_available(GameClock.now()) or q.pass_claimed < q.pass_tier():
+		return true
+	for id in q.daily_ids() + QuestState.WEEKLY.keys():
+		if q.can_claim(id):
+			return true
+	return false
 
 
 func _show_population() -> void:

@@ -88,6 +88,7 @@ func _fill_stages() -> void:
 		go.pressed.connect(func():
 			GameState.pending_encounter = enc.id
 			GameState.pending_zone = ""
+			GameState.pending_battle = null
 			GameState.save()
 			SceneRouter.go_to(SceneRouter.BATTLE))
 		row.add_child(go)

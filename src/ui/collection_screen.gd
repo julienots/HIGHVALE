@@ -574,6 +574,10 @@ func _do(reason: String, success: String) -> void:
 		Events.toast_requested.emit(reason, "error")
 		return
 	Events.toast_requested.emit(success, "success")
+	if success.begins_with("Améliorer"):
+		Events.action_done.emit("hero_level", 1)
+	elif success.begins_with("Nourrir"):
+		Events.action_done.emit("feed", 1)
 	GameState.save()
 	_fill_detail()
 

@@ -32,7 +32,9 @@ var _waiting_input := false
 
 func _ready() -> void:
 	encounter = DataRegistry.encounters()[0]
-	if GameState.pending_zone != "":
+	if GameState.pending_battle != null:
+		encounter = GameState.pending_battle
+	elif GameState.pending_zone != "":
 		zone = DataRegistry.zone(GameState.pending_zone)
 		encounter = zone.encounter(GameState.pending_stage)
 	else:
@@ -565,10 +567,25 @@ func _finish() -> void:
 	var body := VBoxContainer.new()
 	body.add_theme_constant_override("separation", 8)
 	if won:
+		Events.action_done.emit("battle_win", 1)
 		var rng := RandomNumberGenerator.new()
 		rng.randomize()
+		if GameState.pending_zone == "" and encounter.id.begins_with("event_"):
+			GameState.profile["event_day"] = QuestState.day_index(GameClock.now())
+			for id in encounter.rewards:
+				GameState.wallet.add(id, encounter.rewards[id])
+			GameState.save()
+			body.add_child(UiTheme.label("Récompenses de l'événement", "HeaderLabel", 24))
+			body.add_child(UiTheme.cost_row(encounter.rewards, null, 24))
+			_end_dialog(body, won)
+			return
+		var mult := EventCalendar.REWARD_BONUS
 		var got := GameState.exploration.grant(zone, GameState.pending_stage, GameState.collection, GameState.wallet, rng) if zone \
 			else BattleSetup.grant_victory(encounter, GameState.collection, GameState.wallet, rng)
+		# Bonus de l'événement de la semaine (+50 % des ressources gagnées).
+		for id in got.resources:
+			var extra := int(got.resources[id] * (mult - 1.0))
+			got.resources[id] += GameState.wallet.add(id, extra)
 		GameState.save()
 		body.add_child(UiTheme.label("Récompenses" + (" (première victoire !)" if got.first else ""), "HeaderLabel", 24))
 		body.add_child(UiTheme.cost_row(got.resources, null, 24))
@@ -577,6 +594,10 @@ func _finish() -> void:
 	else:
 		body.add_child(UiTheme.label("Votre équipe a été repoussée. Améliorez vos héros, nourrissez vos créatures ou changez de composition.", "", 20))
 		body.get_child(0).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_end_dialog(body, won)
+
+
+func _end_dialog(body: Control, won: bool) -> void:
 	DialogBox.open(_ui, "Victoire !" if won else ("Défaite…" if battle.winner == 1 else "Match nul"), body, [
 		{"text": "Rejouer", "variation": "SecondaryButton", "action": func(): SceneRouter.go_to(SceneRouter.BATTLE)},
 		{"text": "Retour à la cité", "variation": "PrimaryButton", "action": func(): SceneRouter.go_to(SceneRouter.CITY)}], 620)

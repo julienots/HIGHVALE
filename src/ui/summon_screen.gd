@@ -118,6 +118,7 @@ func _summon() -> void:
 	if r.has("error"):
 		Events.toast_requested.emit(r.error, "error")
 		return
+	Events.action_done.emit("summon", 1)
 	GameState.save()
 	var h := DataRegistry.hero(r.hero)
 	var lines := ["%s • %s" % [GameEnums.HERO_CLASS_NAMES[h.hero_class], GameEnums.element_name(h.element)]]

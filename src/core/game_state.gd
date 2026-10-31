@@ -12,6 +12,8 @@ var collection := CollectionState.new()
 var inventory := Inventory.new()
 var lab := LaboratoryState.new()
 var exploration := ExplorationState.new()
+var quests := QuestState.new()
+var shop := ShopState.new()
 ## Combat préparé hors des défis (zone d'exploration).
 var pending_battle: EncounterData
 var pending_zone := ""
@@ -37,6 +39,9 @@ func _ready() -> void:
 	inventory.changed.connect(func(): Events.inventory_changed.emit())
 	lab.changed.connect(func(): Events.inventory_changed.emit())
 	exploration.changed.connect(func(): Events.inventory_changed.emit())
+	quests.changed.connect(func(): Events.quests_changed.emit())
+	shop.changed.connect(func(): Events.inventory_changed.emit())
+	Events.action_done.connect(func(kind, n): quests.track(kind, n))
 	_new_city()
 
 
@@ -53,6 +58,8 @@ func start_or_load() -> void:
 	is_loaded = true
 	# Progression hors ligne : terminer les chantiers échus pendant l'absence.
 	city.update(GameClock.now())
+	quests.roll(GameClock.now())
+	shop.roll(GameClock.now())
 	Events.game_loaded.emit()
 
 
@@ -74,6 +81,8 @@ func new_game() -> void:
 	inventory.from_dict({})
 	lab.from_dict({})
 	exploration.from_dict({})
+	quests.from_dict({})
+	shop.from_dict({})
 	_give_starters()
 	profile = {"player_name": "Fondateur", "created_at": now, "story_seen": []}
 	is_loaded = true
@@ -95,7 +104,8 @@ func save() -> void:
 
 func to_dict() -> Dictionary:
 	return {"profile": profile, "wallet": wallet.to_dict(), "city": city.to_dict(), "collection": collection.to_dict(),
-		"inventory": inventory.to_dict(), "lab": lab.to_dict(), "exploration": exploration.to_dict()}
+		"inventory": inventory.to_dict(), "lab": lab.to_dict(), "exploration": exploration.to_dict(),
+		"quests": quests.to_dict(), "shop": shop.to_dict()}
 
 
 func _apply(data: Dictionary) -> void:
@@ -107,6 +117,8 @@ func _apply(data: Dictionary) -> void:
 	inventory.from_dict(data.get("inventory", {}))
 	lab.from_dict(data.get("lab", {}))
 	exploration.from_dict(data.get("exploration", {}))
+	quests.from_dict(data.get("quests", {}))
+	shop.from_dict(data.get("shop", {}))
 	if not data.has("inventory"):
 		for id in STARTER_INGREDIENTS:
 			inventory.add(id, STARTER_INGREDIENTS[id])
@@ -147,7 +159,10 @@ func _process(delta: float) -> void:
 	_tick_accum += delta
 	if _tick_accum >= TICK_SECONDS:
 		_tick_accum = 0.0
-		city.update(GameClock.now())
+		var now := GameClock.now()
+		city.update(now)
+		quests.roll(now)
+		shop.roll(now)
 	_autosave_accum += delta
 	if _autosave_accum >= config().autosave_seconds:
 		save()

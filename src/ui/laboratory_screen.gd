@@ -233,6 +233,7 @@ func _start() -> void:
 		Events.toast_requested.emit(r, "error")
 		return
 	_slots.clear()
+	Events.action_done.emit("lab", 1)
 	GameState.save()
 	refresh()
 
