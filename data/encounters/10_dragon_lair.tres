@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "dragon_lair"
+display_name = "Repaire du Dragonnet"
+description = "Le dernier dragon primordial défend son nid. (Boss)"
+order = 10
+enemies = Array[Dictionary]([{"id": "dragonling", "level": 15, "boss": true}, {"id": "fire_salamander", "level": 14, "boss": false}, {"id": "fire_salamander", "level": 14, "boss": false}])
+strategy = "aggressive"
+rewards = {"gold": 3000, "divine_dust": 5}
+first_clear_rewards = {"prisms": 100}
+fragment_reward = 12

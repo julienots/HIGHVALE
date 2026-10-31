@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "shadow_aviary"
+display_name = "Volière de l'ombre"
+description = "Le Hibou des abysses et sa garde ailée."
+order = 7
+enemies = Array[Dictionary]([{"id": "abyss_owl", "level": 8, "boss": false}, {"id": "crystal_bat", "level": 8, "boss": false}, {"id": "crystal_bat", "level": 8, "boss": false}])
+strategy = "focus_weak"
+rewards = {"gold": 900, "ancient_shards": 10}
+first_clear_rewards = {"prisms": 30}
+fragment_reward = 6

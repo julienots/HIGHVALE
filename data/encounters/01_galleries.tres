@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "galleries"
+display_name = "Galeries humides"
+description = "Des gelées curieuses bloquent les premières galeries."
+order = 1
+enemies = Array[Dictionary]([{"id": "gloubi", "level": 1, "boss": false}, {"id": "gloubi", "level": 1, "boss": false}])
+strategy = "balanced"
+rewards = {"gold": 200}
+first_clear_rewards = {"prisms": 20}
+fragment_reward = 0

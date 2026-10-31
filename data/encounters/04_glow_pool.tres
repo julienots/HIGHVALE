@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "glow_pool"
+display_name = "Bassin lumineux"
+description = "Un lac souterrain où rôde une anguille électrique."
+order = 4
+enemies = Array[Dictionary]([{"id": "glow_eel", "level": 4, "boss": false}, {"id": "gloubi", "level": 4, "boss": false}, {"id": "gloubi", "level": 4, "boss": false}])
+strategy = "aggressive"
+rewards = {"gold": 500, "vital_essence": 20}
+first_clear_rewards = {"prisms": 25}
+fragment_reward = 4

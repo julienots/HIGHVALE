@@ -13,6 +13,7 @@ const MONSTERS_DIR := "res://data/monsters"
 const INGREDIENTS_DIR := "res://data/ingredients"
 const BANNERS_DIR := "res://data/banners"
 const FUSION_DIR := "res://data/fusion"
+const ENCOUNTERS_DIR := "res://data/encounters"
 
 var config: GameConfig
 var _resource_types := {}  # id -> ResourceTypeData
@@ -24,6 +25,7 @@ var _monsters := {}  # id -> MonsterData
 var _ingredients := {}  # id -> IngredientData
 var _banners: Array[SummonBannerData] = []
 var _fusion: Array[FusionRecipeData] = []
+var _encounters: Array[EncounterData] = []
 
 
 func _ready() -> void:
@@ -41,6 +43,8 @@ func reload() -> void:
 	_banners.assign(load_dir(BANNERS_DIR))
 	_banners.sort_custom(func(a, b): return a.sort_order < b.sort_order)
 	_fusion.assign(load_dir(FUSION_DIR))
+	_encounters.assign(load_dir(ENCOUNTERS_DIR))
+	_encounters.sort_custom(func(a, b): return a.order < b.order)
 	_story.clear()
 	for r in load_dir(STORY_DIR):
 		if r is StoryChapterData:
@@ -156,6 +160,10 @@ func banner(id: String) -> SummonBannerData:
 		if b.id == id:
 			return b
 	return null
+
+
+func encounters() -> Array[EncounterData]:
+	return _encounters
 
 
 func fusion_recipes() -> Array[FusionRecipeData]:

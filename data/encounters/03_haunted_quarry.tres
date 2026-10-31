@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "haunted_quarry"
+display_name = "Carrière hantée"
+description = "Scarabées et champignards ont envahi une vieille carrière."
+order = 3
+enemies = Array[Dictionary]([{"id": "rock_beetle", "level": 3, "boss": false}, {"id": "rock_beetle", "level": 3, "boss": false}, {"id": "shroomling", "level": 3, "boss": false}])
+strategy = "balanced"
+rewards = {"gold": 400, "stone": 200}
+first_clear_rewards = {"prisms": 25}
+fragment_reward = 3

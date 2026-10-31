@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "forgotten_forge"
+display_name = "Forge oubliée"
+description = "Une salamandre géante garde les braises d'une forge disparue. (Boss)"
+order = 5
+enemies = Array[Dictionary]([{"id": "fire_salamander", "level": 6, "boss": true}, {"id": "magma_slime", "level": 5, "boss": false}])
+strategy = "aggressive"
+rewards = {"gold": 800, "ancient_shards": 8}
+first_clear_rewards = {"prisms": 50}
+fragment_reward = 6

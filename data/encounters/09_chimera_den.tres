@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "chimera_den"
+display_name = "Antre des chimères"
+description = "Des créatures de cristal impossibles rôdent ici."
+order = 9
+enemies = Array[Dictionary]([{"id": "crystal_chimera", "level": 12, "boss": false}, {"id": "crystal_chimera", "level": 12, "boss": false}, {"id": "wisp", "level": 12, "boss": false}])
+strategy = "aggressive"
+rewards = {"gold": 1500, "ancient_shards": 15}
+first_clear_rewards = {"prisms": 40}
+fragment_reward = 8

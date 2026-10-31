@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ancient_sentinels"
+display_name = "Sentinelles antiques"
+description = "Un golem de cristal réveillé par la lumière du Temple."
+order = 8
+enemies = Array[Dictionary]([{"id": "crystal_golem", "level": 10, "boss": false}, {"id": "rock_beetle", "level": 10, "boss": false}, {"id": "rock_beetle", "level": 10, "boss": false}])
+strategy = "balanced"
+rewards = {"gold": 1200, "abyssal_crystal": 30}
+first_clear_rewards = {"prisms": 40}
+fragment_reward = 8

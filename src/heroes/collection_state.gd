@@ -20,6 +20,11 @@ var monsters := {}
 ## Invocations sans Épique par bannière (garantie) et recettes de fusion découvertes.
 var pity := {}
 var discovered_recipes: Array = []
+## Équipe de combat : [{ "kind": "h", "id": … } ou { "kind": "m", "uid": … }], 5 au maximum.
+var team: Array = []
+## Nombre de défis des profondeurs remportés (débloque le suivant).
+var stages_cleared := 0
+const TEAM_SIZE := 5
 var _next_monster_uid := 1
 
 
@@ -208,8 +213,75 @@ func release_monster(uid: int) -> bool:
 	if not monsters.has(uid) or monsters.size() <= 1:
 		return false
 	monsters.erase(uid)
+	_clean_team()
 	changed.emit()
 	return true
+
+
+# --- Équipe -------------------------------------------------------------------
+
+func in_team(kind: String, key: Variant) -> bool:
+	for e in team:
+		if e.kind == kind and (e.id == key if kind == "h" else e.uid == key):
+			return true
+	return false
+
+
+func toggle_team(kind: String, key: Variant) -> String:
+	for i in team.size():
+		var e: Dictionary = team[i]
+		if e.kind == kind and (e.id == key if kind == "h" else e.uid == key):
+			if team.size() <= 1:
+				return "L'équipe ne peut pas être vide"
+			team.remove_at(i)
+			changed.emit()
+			return ""
+	if team.size() >= TEAM_SIZE:
+		return "Équipe complète (%d membres)" % TEAM_SIZE
+	team.append({"kind": kind, "id": key if kind == "h" else "", "uid": key if kind == "m" else 0})
+	changed.emit()
+	return ""
+
+
+## Équipe par défaut : meilleurs héros puis meilleures créatures.
+func default_team() -> void:
+	team.clear()
+	var hs: Array = heroes.keys()
+	hs.sort_custom(func(a, b): return hero_power(a) > hero_power(b))
+	for id in hs.slice(0, 3):
+		team.append({"kind": "h", "id": id, "uid": 0})
+	var ms: Array = monsters.keys()
+	ms.sort_custom(func(a, b): return monster_power(a) > monster_power(b))
+	for uid in ms:
+		if team.size() >= TEAM_SIZE:
+			break
+		team.append({"kind": "m", "id": "", "uid": uid})
+
+
+func _clean_team() -> void:
+	team = team.filter(func(e): return (e.kind == "h" and heroes.has(e.id)) or (e.kind == "m" and monsters.has(e.uid)))
+	if team.is_empty() and not (heroes.is_empty() and monsters.is_empty()):
+		default_team()
+
+
+## Combattants du joueur pour une bataille.
+func build_team_combatants() -> Array:
+	_clean_team()
+	var out := []
+	for e in team:
+		if e.kind == "h":
+			out.append(Combatant.from_hero(DataRegistry.hero(e.id), hero_level(e.id), hero_stars(e.id)))
+		else:
+			var m: Dictionary = monsters[e.uid]
+			out.append(Combatant.from_monster(DataRegistry.monster(m.id), m.level, 2 if m.get("variant", "") != "" else 1))
+	return out
+
+
+func team_power() -> int:
+	var p := 0
+	for c in build_team_combatants():
+		p += c.power_rating()
+	return p
 
 
 # --- Trouvailles ---------------------------------------------------------------
@@ -254,7 +326,7 @@ func to_dict() -> Dictionary:
 	for uid in monsters:
 		mons.append({"uid": uid, "id": monsters[uid].id, "level": monsters[uid].level, "variant": monsters[uid].get("variant", "")})
 	return {"heroes": heroes.duplicate(true), "fragments": fragments.duplicate(), "monsters": mons, "next_monster_uid": _next_monster_uid,
-		"pity": pity.duplicate(), "recipes": discovered_recipes.duplicate()}
+		"pity": pity.duplicate(), "recipes": discovered_recipes.duplicate(), "team": team.duplicate(true), "stages": stages_cleared}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -270,6 +342,11 @@ func from_dict(d: Dictionary) -> void:
 	_next_monster_uid = int(d.get("next_monster_uid", 1))
 	pity = d.get("pity", {}).duplicate()
 	discovered_recipes = d.get("recipes", []).duplicate()
+	stages_cleared = int(d.get("stages", 0))
+	team.clear()
+	for e in d.get("team", []):
+		team.append({"kind": str(e.get("kind", "h")), "id": str(e.get("id", "")), "uid": int(e.get("uid", 0))})
+	_clean_team()
 	for m in d.get("monsters", []):
 		if DataRegistry.monster(str(m.get("id", ""))):
 			var uid := int(m.get("uid", 0))

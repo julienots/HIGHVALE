@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "toxic_spores"
+display_name = "Spores toxiques"
+description = "Une forêt de champignons vivants et un feu follet farceur."
+order = 6
+enemies = Array[Dictionary]([{"id": "shroomling", "level": 6, "boss": false}, {"id": "shroomling", "level": 6, "boss": false}, {"id": "shroomling", "level": 6, "boss": false}, {"id": "wisp", "level": 6, "boss": false}])
+strategy = "focus_weak"
+rewards = {"gold": 700, "underground_nectar": 60}
+first_clear_rewards = {"prisms": 30}
+fragment_reward = 5

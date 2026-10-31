@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EncounterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/encounter_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "bat_nest"
+display_name = "Nid de chiroptères"
+description = "Une colonie cristalline défend son plafond chantant."
+order = 2
+enemies = Array[Dictionary]([{"id": "crystal_bat", "level": 2, "boss": false}, {"id": "crystal_bat", "level": 2, "boss": false}, {"id": "crystal_bat", "level": 2, "boss": false}])
+strategy = "focus_weak"
+rewards = {"gold": 300, "ancient_shards": 3}
+first_clear_rewards = {"prisms": 20}
+fragment_reward = 3

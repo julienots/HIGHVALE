@@ -114,6 +114,7 @@ func _give_starters() -> void:
 		collection.add_monster(id)
 	for id in STARTER_INGREDIENTS:
 		inventory.add(id, STARTER_INGREDIENTS[id])
+	collection.default_team()
 
 
 ## Remplace la cité courante par une cité vide reliée aux signaux globaux.

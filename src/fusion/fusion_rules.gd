@@ -78,4 +78,5 @@ static func fuse(collection: CollectionState, uid_a: int, uid_b: int, wallet: Wa
 	collection.monsters.erase(uid_a)
 	collection.monsters.erase(uid_b)
 	var uid := collection.add_monster(result, level, variant)
+	collection._clean_team()
 	return {"uid": uid, "id": result, "variant": variant, "new": is_new, "recipe": recipe != null and result == recipe.result}

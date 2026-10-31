@@ -14,6 +14,7 @@ const ENABLED := {
 	"fusion": true,
 	"summoning": true,
 	"divine": true,
+	"combat": true,
 }
 
 const MODULE_NAMES := {
