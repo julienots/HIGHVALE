@@ -10,6 +10,8 @@ extends Resource
 @export var element := GameEnums.Element.NEUTRAL
 @export var hero_class := GameEnums.HeroClass.WARRIOR
 @export var is_god := false
+## Niveau du Temple requis pour l'invoquer (héros venus de la surface).
+@export var requires_temple := 0
 @export var stats: CharacterStats
 @export var skills: Array[SkillData] = []
 @export var max_level := 60

@@ -42,7 +42,9 @@ func _ready() -> void:
 			if e.id == GameState.pending_encounter:
 				encounter = e
 	_build_arena()
-	var team := GameState.collection.build_team_combatants()
+	var team := GameState.collection.build_team_combatants(GameClock.now())
+	if team.is_empty():
+		team = GameState.collection.build_team_combatants()
 	BattleSetup.apply_city_bonus(team, GameState.city)
 	battle.setup(team, BattleSetup.enemies_for(encounter))
 	_build_ui()
@@ -575,6 +577,7 @@ func _finish() -> void:
 	AudioManager.sfx("jingle_victory" if won else "jingle_defeat", 0.0)
 	var body := VBoxContainer.new()
 	body.add_theme_constant_override("separation", 8)
+	var hurt := _record_wounds()
 	if won:
 		Events.action_done.emit("battle_win", 1)
 		var rng := RandomNumberGenerator.new()
@@ -586,6 +589,7 @@ func _finish() -> void:
 			GameState.save()
 			body.add_child(UiTheme.label("Récompenses de l'événement", "HeaderLabel", 24))
 			body.add_child(UiTheme.cost_row(encounter.rewards, null, 24))
+			_wound_note(body, hurt)
 			_end_dialog(body, won)
 			return
 		var mult := EventCalendar.REWARD_BONUS
@@ -603,10 +607,37 @@ func _finish() -> void:
 	else:
 		body.add_child(UiTheme.label("Votre équipe a été repoussée. Améliorez vos héros, nourrissez vos créatures ou changez de composition.", "", 20))
 		body.get_child(0).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_wound_note(body, hurt)
 	_end_dialog(body, won)
+
+
+## Les héros mis K.O. sont blessés et passent par l'Infirmerie.
+func _record_wounds() -> Array:
+	var out := []
+	if not FeatureFlags.is_enabled("healing"):
+		return out
+	var lvl := GameState.city.best_level("infirmary")
+	for c: Combatant in battle.units:
+		if c.side == 0 and c.is_hero and not c.is_alive():
+			GameState.collection.wound_hero(c.source_id, GameClock.now(), lvl)
+			out.append(c.name)
+	if not out.is_empty():
+		GameState.save()
+	return out
+
+
+func _wound_note(body: Control, hurt: Array) -> void:
+	if hurt.is_empty():
+		return
+	var mins := ceili(CollectionState.wound_seconds(GameState.city.best_level("infirmary")) / 60.0)
+	var l := UiTheme.label("Blessés : %s (repos %d min, ou soin immédiat à l'Infirmerie)" % [", ".join(hurt), mins], "HudLabel", 18, Color("ff8a8a"))
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(l)
 
 
 func _end_dialog(body: Control, won: bool) -> void:
 	DialogBox.open(_ui, "Victoire !" if won else ("Défaite…" if battle.winner == 1 else "Match nul"), body, [
-		{"text": "Rejouer", "variation": "SecondaryButton", "action": func(): SceneRouter.go_to(SceneRouter.BATTLE)},
+		{"text": "Rejouer", "variation": "SecondaryButton", "action": func():
+			if not GameState.launch_battle():
+				SceneRouter.go_to(SceneRouter.CITY)},
 		{"text": "Retour à la cité", "variation": "PrimaryButton", "action": func(): SceneRouter.go_to(SceneRouter.CITY)}], 620)

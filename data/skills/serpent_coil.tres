@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "serpent_coil"
+display_name = "Étreinte"
+description = "Paralyse un ennemi."
+kind = 1
+element = 9
+target = 0
+hits = 1
+power = 1.3
+heal_power = 0.0
+shield_power = 0.0
+energy_cost = 60
+energy_gain = 25
+cooldown_turns = 2
+status_effect = 4
+status_chance = 0.6
+status_turns = 1
+cinematic = false

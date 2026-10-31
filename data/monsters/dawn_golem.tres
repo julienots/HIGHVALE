@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_dawn_golem.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_dawn_golem.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/dawn_fist.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/dawn_ward.tres" id="s1"]
+[ext_resource type="Resource" path="res://data/skills/dawn_beam.tres" id="s2"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 1200
+attack = 64
+defense = 74
+speed = 68
+crit_chance = 0.09
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "dawn_golem"
+display_name = "Colosse d'Aurore"
+lore = "Gardien des Ruines d'Aurore, taillé dans le marbre et l'or d'une cité oubliée."
+rarity = 2
+element = 7
+category = 6
+family = "Golems"
+max_level = 50
+food_per_hour = {"underground_nectar": 10}
+habitat_element = 7
+genetic_tags = PackedStringArray("antique", "roche")
+lab_weight = 0.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1"), ExtResource("s2")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

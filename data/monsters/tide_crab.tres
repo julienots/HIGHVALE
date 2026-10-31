@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_tide_crab.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_tide_crab.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/crab_pinch.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/crab_shell.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 580
+attack = 40
+defense = 48
+speed = 78
+crit_chance = 0.05
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "tide_crab"
+display_name = "Crabe des marées"
+lore = "Il garde les rives des lacs souterrains avec ses pinces géantes."
+rarity = 0
+element = 2
+category = 2
+family = "Crustacés"
+max_level = 50
+food_per_hour = {"underground_nectar": 4}
+habitat_element = 2
+genetic_tags = PackedStringArray("aquatique", "carapace")
+lab_weight = 1.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

@@ -69,6 +69,15 @@ func count_of(data_id: String) -> int:
 	return n
 
 
+## Niveau le plus élevé parmi les bâtiments d'un type (0 si aucun).
+func best_level(data_id: String) -> int:
+	var lvl := 0
+	for b in buildings.values():
+		if b.data_id == data_id:
+			lvl = maxi(lvl, b.level)
+	return lvl
+
+
 func is_area_free(cell: Vector2i, size: Vector2i, ignore_uid := 0) -> bool:
 	if not buildable_rect.encloses(Rect2i(cell, size)):
 		return false

@@ -37,12 +37,16 @@ func _ready() -> void:
 	await _frames(2)
 	GameState.pending_zone = "renewal_plains"
 	GameState.pending_stage = 2
+	GameState.collection.team.clear()
+	for id in ["sol", "aria", "luma", "orin", "draven"]:
+		GameState.collection.unlock_hero(id)
+		GameState.collection.toggle_team("h", id)
 	var surf: BattleScene = load("res://scenes/combat/battle.tscn").instantiate()
 	get_tree().root.add_child(surf)
 	surf.auto = true
 	await _frames(120)
 	await _shot("b5_surface")
-	print("BATTLE_DONE winner=", scene.battle.winner, " rounds=", scene.battle.round)
+	print("BATTLE_DONE winner=", surf.battle.winner, " rounds=", surf.battle.round)
 	SaveSystem.delete_save()
 	get_tree().quit()
 

@@ -18,6 +18,7 @@ const ENABLED := {
 	"equipment": true,
 	"exploration": true,
 	"shop": true,
+	"healing": true,
 }
 
 const MODULE_NAMES := {

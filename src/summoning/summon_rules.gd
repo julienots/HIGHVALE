@@ -23,6 +23,8 @@ static func pool(banner: SummonBannerData, rarity: int, now: float) -> Array:
 	for h in DataRegistry.all_heroes():
 		if h.is_god != banner.gods_only or h.rarity != rarity:
 			continue
+		if h.requires_temple > GameState.city.temple_level():
+			continue
 		if el >= 0 and h.element != el:
 			continue
 		out.append(h)

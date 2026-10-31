@@ -98,8 +98,7 @@ func refresh() -> void:
 					GameState.pending_battle = null
 					GameState.pending_zone = z.id
 					GameState.pending_stage = s
-					GameState.save()
-					SceneRouter.go_to(SceneRouter.BATTLE))
+					GameState.launch_battle())
 				stages.add_child(b)
 			stages.add_child(UiTheme.label("Votre équipe : %d" % GameState.collection.team_power(), "HudLabel", 18, UiTheme.GOLD))
 		_content.add_child(card)

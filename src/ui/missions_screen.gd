@@ -125,8 +125,7 @@ func refresh() -> void:
 			b.pressed.connect(func():
 				GameState.pending_battle = enc
 				GameState.pending_zone = ""
-				GameState.save()
-				SceneRouter.go_to(SceneRouter.BATTLE))
+				GameState.launch_battle())
 			_content.add_child(b)
 
 

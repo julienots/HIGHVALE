@@ -89,8 +89,7 @@ func _fill_stages() -> void:
 			GameState.pending_encounter = enc.id
 			GameState.pending_zone = ""
 			GameState.pending_battle = null
-			GameState.save()
-			SceneRouter.go_to(SceneRouter.BATTLE))
+			GameState.launch_battle())
 		row.add_child(go)
 		_content.add_child(card)
 
@@ -113,7 +112,11 @@ func _fill_team() -> void:
 	hs.sort_custom(func(a, b): return coll.hero_power(a) > coll.hero_power(b))
 	for id in hs:
 		var h := DataRegistry.hero(id)
-		grid.add_child(_member_tile(h.portrait, "%s\nNiv. %d" % [h.display_name, coll.hero_level(id)], h.rarity, coll.in_team("h", id), func(): _toggle("h", id)))
+		var hurt := coll.is_wounded(id, GameClock.now())
+		var tile := _member_tile(h.portrait, "%s\n%s" % [h.display_name, "Blessé" if hurt else "Niv. %d" % coll.hero_level(id)], h.rarity, coll.in_team("h", id), func(): _toggle("h", id))
+		if hurt:
+			tile.self_modulate = Color(1.0, 0.45, 0.45)
+		grid.add_child(tile)
 	for uid in coll.monsters:
 		var m: Dictionary = coll.monsters[uid]
 		var d := DataRegistry.monster(m.id)

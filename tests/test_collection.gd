@@ -87,3 +87,36 @@ func test_wild_bonus_rolls() -> void:
 			eggs += 1
 	check(eggs > 0, "les champignons cachent parfois un œuf")
 	check(c.monsters.size() <= c.monster_capacity(city), "jamais plus de créatures que de places")
+
+
+func test_wounds_and_infirmary() -> void:
+	var c := CollectionState.new()
+	c.unlock_hero("bram")
+	c.unlock_hero("lysa")
+	c.team = [{"kind": "h", "id": "bram", "uid": 0}, {"kind": "h", "id": "lysa", "uid": 0}]
+	var t0 := 1_000_000.0
+	c.wound_hero("bram", t0, 0)
+	check(c.is_wounded("bram", t0 + 10), "blessé après un K.O.")
+	eq(c.build_team_combatants(t0 + 10).size(), 1, "le blessé reste à l'Infirmerie")
+	eq(c.build_team_combatants().size(), 2, "sans horloge, toute l'équipe")
+	check(CollectionState.wound_seconds(5) < CollectionState.wound_seconds(0), "l'Infirmerie raccourcit le repos")
+	check(not c.is_wounded("bram", t0 + CollectionState.WOUND_BASE_SECONDS + 1), "guéri après le repos")
+	var w := Wallet.new()
+	eq(c.heal_hero("bram", w, t0 + 10), "Essence vitale insuffisante", "soin payant")
+	w.add("vital_essence", 100)
+	eq(c.heal_hero("bram", w, t0 + 10), "", "soin immédiat")
+	check(not c.is_wounded("bram", t0 + 10), "guéri par le soin")
+	check(w.amount("vital_essence") < 100, "Essence vitale dépensée")
+	c.wound_hero("lysa", t0, 3)
+	var c2 := CollectionState.new()
+	c2.from_dict(c.to_dict())
+	check(c2.is_wounded("lysa", t0 + 10), "blessures sauvegardées")
+
+
+func test_surface_heroes_gated() -> void:
+	for id in ["aria", "sol", "orin"]:
+		eq(DataRegistry.hero(id).requires_temple, 5, "héros de surface : " + id)
+	for z in DataRegistry.zones():
+		check(z.boss_id == "" or DataRegistry.monster(z.boss_id) != null, "boss valide : " + z.id)
+		for m in z.monster_ids:
+			check(DataRegistry.monster(m) != null, "créature valide %s dans %s" % [m, z.id])

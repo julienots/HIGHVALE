@@ -35,6 +35,11 @@ var discovered_recipes: Array = []
 var team: Array = []
 ## Nombre de défis des profondeurs remportés (débloque le suivant).
 var stages_cleared := 0
+## Blessures : id de héros mis K.O. -> instant (unix) de guérison.
+var wounds := {}
+## Durée d'une blessure sans Infirmerie ; chaque niveau d'Infirmerie la réduit de 8 %.
+const WOUND_BASE_SECONDS := 600.0
+const HEAL_ESSENCE_PER_MINUTE := 2
 const TEAM_SIZE := 5
 var _next_monster_uid := 1
 
@@ -316,6 +321,57 @@ func hero_combatant(id: String) -> Combatant:
 	return c
 
 
+# --- Blessures (Infirmerie) ----------------------------------------------------
+
+static func wound_seconds(infirmary_level: int) -> float:
+	return WOUND_BASE_SECONDS * maxf(0.25, 1.0 - 0.08 * infirmary_level)
+
+
+func wound_hero(id: String, now: float, infirmary_level: int) -> void:
+	if owns_hero(id):
+		wounds[id] = now + wound_seconds(infirmary_level)
+		changed.emit()
+
+
+func wound_left(id: String, now: float) -> float:
+	return maxf(0.0, float(wounds.get(id, 0.0)) - now)
+
+
+func is_wounded(id: String, now: float) -> bool:
+	return wound_left(id, now) > 0.0
+
+
+func wounded_heroes(now: float) -> Array:
+	return wounds.keys().filter(func(id): return is_wounded(id, now))
+
+
+func heal_cost(id: String, now: float) -> Dictionary:
+	var left := wound_left(id, now)
+	if left <= 0.0:
+		return {}
+	return {"vital_essence": maxi(1, ceili(left / 60.0)) * HEAL_ESSENCE_PER_MINUTE}
+
+
+## Soin immédiat contre de l'Essence vitale. Retourne "" si réussi, sinon la raison.
+func heal_hero(id: String, wallet: Wallet, now: float) -> String:
+	var cost := heal_cost(id, now)
+	if cost.is_empty():
+		return "Ce héros n'est pas blessé"
+	if not wallet.can_afford(cost):
+		return "Essence vitale insuffisante"
+	wallet.spend(cost)
+	wounds.erase(id)
+	changed.emit()
+	return ""
+
+
+## Retire les blessures guéries.
+func prune_wounds(now: float) -> void:
+	for id in wounds.keys():
+		if not is_wounded(id, now):
+			wounds.erase(id)
+
+
 # --- Équipe -------------------------------------------------------------------
 
 func in_team(kind: String, key: Variant) -> bool:
@@ -362,11 +418,14 @@ func _clean_team() -> void:
 		default_team()
 
 
-## Combattants du joueur pour une bataille.
-func build_team_combatants() -> Array:
+## Combattants du joueur pour une bataille. Avec `now` >= 0, les héros
+## blessés restent à l'Infirmerie.
+func build_team_combatants(now := -1.0) -> Array:
 	_clean_team()
 	var out := []
 	for e in team:
+		if e.kind == "h" and now >= 0.0 and is_wounded(e.id, now):
+			continue
 		if e.kind == "h":
 			out.append(hero_combatant(e.id))
 		else:
@@ -391,7 +450,8 @@ const FRAGMENT_WEIGHTS := [6.0, 3.0, 1.0, 0.3, 0.0]
 ## cristaux, œuf de créature dans les champignons. Retourne ce qui a été obtenu.
 func roll_wild_bonus(kind_id: String, rng: RandomNumberGenerator, city: CityState) -> Dictionary:
 	if kind_id == "crystal" and rng.randf() < 0.6:
-		var id := _weighted_pick(DataRegistry.all_heroes().filter(func(h): return not h.is_god), rng)
+		var tl := city.temple_level()
+		var id := _weighted_pick(DataRegistry.all_heroes().filter(func(h): return not h.is_god and h.requires_temple <= tl), rng)
 		if id != "":
 			var n := rng.randi_range(3, 6)
 			var unlocked := add_fragments(id, n)
@@ -424,7 +484,8 @@ func to_dict() -> Dictionary:
 	for uid in monsters:
 		mons.append({"uid": uid, "id": monsters[uid].id, "level": monsters[uid].level, "variant": monsters[uid].get("variant", "")})
 	return {"heroes": heroes.duplicate(true), "fragments": fragments.duplicate(), "monsters": mons, "next_monster_uid": _next_monster_uid,
-		"pity": pity.duplicate(), "recipes": discovered_recipes.duplicate(), "team": team.duplicate(true), "stages": stages_cleared}
+		"pity": pity.duplicate(), "recipes": discovered_recipes.duplicate(), "team": team.duplicate(true), "stages": stages_cleared,
+		"wounds": wounds.duplicate()}
 
 
 func from_dict(d: Dictionary) -> void:
@@ -442,6 +503,10 @@ func from_dict(d: Dictionary) -> void:
 	pity = d.get("pity", {}).duplicate()
 	discovered_recipes = d.get("recipes", []).duplicate()
 	stages_cleared = int(d.get("stages", 0))
+	wounds.clear()
+	for id in d.get("wounds", {}):
+		if DataRegistry.hero(str(id)):
+			wounds[str(id)] = float(d.wounds[id])
 	team.clear()
 	for e in d.get("team", []):
 		team.append({"kind": str(e.get("kind", "h")), "id": str(e.get("id", "")), "uid": int(e.get("uid", 0))})

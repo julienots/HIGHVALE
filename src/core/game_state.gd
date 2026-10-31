@@ -95,6 +95,16 @@ func reset_game() -> void:
 	Events.game_loaded.emit()
 
 
+## Lance le combat préparé (pending_*) si au moins un combattant est valide.
+func launch_battle() -> bool:
+	if collection.build_team_combatants(GameClock.now()).is_empty():
+		Events.toast_requested.emit("Toute votre équipe est blessée : soignez-la à l'Infirmerie ou ajoutez des créatures.", "error")
+		return false
+	save()
+	SceneRouter.go_to(SceneRouter.BATTLE)
+	return true
+
+
 func save() -> void:
 	if not is_loaded:
 		return

@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/monsters/monster_data.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/combat/character_stats.gd" id="2_stats"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/monster_storm_eagle.glb" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/portraits/monster_storm_eagle.png" id="4_portrait"]
+[ext_resource type="Resource" path="res://data/skills/eagle_dive.tres" id="s0"]
+[ext_resource type="Resource" path="res://data/skills/eagle_gust.tres" id="s1"]
+[ext_resource type="Script" path="res://src/combat/skill_data.gd" id="5_skill"]
+
+[sub_resource type="Resource" id="stats"]
+script = ExtResource("2_stats")
+max_hp = 520
+attack = 64
+defense = 24
+speed = 124
+crit_chance = 0.07
+growth_per_level = 1.07
+
+[resource]
+script = ExtResource("1_script")
+id = "storm_eagle"
+display_name = "Aigle tempête"
+lore = "Il plane au-dessus des Pics tempétueux et plonge plus vite que la foudre."
+rarity = 1
+element = 4
+category = 1
+family = "Rapaces"
+max_level = 50
+food_per_hour = {"underground_nectar": 6}
+habitat_element = 4
+genetic_tags = PackedStringArray("volant", "tempete")
+lab_weight = 0.0
+stats = SubResource("stats")
+skills = Array[ExtResource("5_skill")]([ExtResource("s0"), ExtResource("s1")])
+model_scene = ExtResource("3_model")
+portrait = ExtResource("4_portrait")

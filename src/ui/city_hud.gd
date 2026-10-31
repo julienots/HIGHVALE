@@ -21,6 +21,7 @@ var fusion_screen: FusionScreen
 var summon_screen: SummonScreen
 var stages_screen: StagesScreen
 var forge_screen: ForgeScreen
+var infirmary_screen: InfirmaryScreen
 var exploration_screen: ExplorationScreen
 var missions_screen: MissionsScreen
 var shop_screen: ShopScreen
@@ -78,6 +79,8 @@ func _ready() -> void:
 	root.add_child(stages_screen)
 	forge_screen = ForgeScreen.new()
 	root.add_child(forge_screen)
+	infirmary_screen = InfirmaryScreen.new()
+	root.add_child(infirmary_screen)
 	exploration_screen = ExplorationScreen.new()
 	root.add_child(exploration_screen)
 	missions_screen = MissionsScreen.new()

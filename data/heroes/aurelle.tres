@@ -27,6 +27,7 @@ rarity = 1
 element = 1
 hero_class = 3
 is_god = false
+requires_temple = 0
 max_level = 60
 fragments_to_unlock = 40
 signature_color = Color(0.878, 0.353, 0.188, 1)
