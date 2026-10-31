@@ -364,6 +364,31 @@ func collect(uid: int) -> void:
 		Events.toast_requested.emit("Stockage plein : améliorez vos réserves !", "error")
 
 
+const SCREENS := ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar", "monster_habitat"]
+
+
+func has_screen(data_id: String) -> bool:
+	return data_id in SCREENS
+
+
+func open_building_screen(uid: int) -> void:
+	var b := GameState.city.get_building(uid)
+	if b == null:
+		return
+	deselect()
+	match b.data_id:
+		"laboratory":
+			hud.laboratory_screen.open_screen()
+		"fusion_forge":
+			hud.fusion_screen.open_screen()
+		"hero_sanctuary":
+			hud.summon_screen.open_for(false)
+		"divine_altar":
+			hud.summon_screen.open_for(true)
+		"monster_habitat":
+			hud.collection_screen.show_screen(1)
+
+
 ## Récolte manuelle d'une ressource sauvage.
 func harvest(cell: Vector2i) -> void:
 	deselect()
@@ -381,6 +406,18 @@ func harvest(cell: Vector2i) -> void:
 		i += 1
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
+	var kind := DataRegistry.wild(kind_id)
+	if kind:
+		var items := kind.roll_items(rng)
+		for id in items:
+			var rt := DataRegistry.resource_type(id)
+			if rt:
+				GameState.wallet.add(id, items[id])
+				_float_at(origin + Vector3(0, 0.8 + i * 0.45, 0), "+%d %s" % [items[id], rt.display_name], rt.color.lightened(0.25))
+			else:
+				GameState.inventory.add(id, items[id])
+				_float_at(origin + Vector3(0, 0.8 + i * 0.45, 0), "+%d %s" % [items[id], DataRegistry.ingredient(id).display_name], Color("9bffb0"))
+			i += 1
 	var bonus := GameState.collection.roll_wild_bonus(kind_id, rng, GameState.city)
 	if bonus.has("fragments"):
 		for hid in bonus.fragments:
@@ -587,6 +624,10 @@ func _handle_back() -> void:
 	for c in hud.root.get_children():
 		if c is DialogBox:
 			c.close()
+			return
+	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen]:
+		if s.visible:
+			s.close_screen()
 			return
 	if hud.collection_screen.visible:
 		hud.collection_screen.back()

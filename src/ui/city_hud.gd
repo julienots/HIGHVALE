@@ -16,6 +16,9 @@ var root: Control
 var building_panel: BuildingPanel
 var build_menu: BuildMenu
 var collection_screen: CollectionScreen
+var laboratory_screen: LaboratoryScreen
+var fusion_screen: FusionScreen
+var summon_screen: SummonScreen
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
 var _builders_label: Label
@@ -58,6 +61,12 @@ func _ready() -> void:
 	build_menu.build_requested.connect(func(d): controller.start_new_building(d))
 	collection_screen = CollectionScreen.new()
 	root.add_child(collection_screen)
+	laboratory_screen = LaboratoryScreen.new()
+	root.add_child(laboratory_screen)
+	fusion_screen = FusionScreen.new()
+	root.add_child(fusion_screen)
+	summon_screen = SummonScreen.new()
+	root.add_child(summon_screen)
 	_fps = UiTheme.label("", "DimLabel", 16)
 	_fps.position = Vector2(12, 92)
 	root.add_child(_fps)

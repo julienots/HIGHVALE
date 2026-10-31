@@ -156,6 +156,8 @@ func _rebuild_actions(b: BuildingState) -> void:
 	else:
 		_action("Améliorer", "PrimaryButton", ICON_UPGRADE, func(): controller.open_upgrade(uid))
 	_action("Déplacer", "SecondaryButton", ICON_MOVE, func(): controller.start_move(uid))
+	if b.level >= 1 and controller.has_screen(b.data_id):
+		_action("Ouvrir", "PremiumButton", preload("res://assets/icons/ui/collection.svg"), func(): controller.open_building_screen(uid))
 
 
 func _action(text: String, variation: String, icon: Texture2D, cb: Callable) -> Button:

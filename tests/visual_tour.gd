@@ -112,6 +112,57 @@ func _run() -> void:
 	for c in city.hud.root.get_children():
 		if c is DialogBox:
 			c.close()
+	# Laboratoire, Fusionnerie, invocations (bâtiments accordés pour la visite)
+	for id in ["laboratory", "fusion_forge", "hero_sanctuary", "divine_altar"]:
+		var d := DataRegistry.building(id)
+		GameState.city.add_built(id, city._find_free_cell(Vector2i(8, 8), d.footprint, 0), 1, GameClock.now())
+	for id in ["gold", "vital_essence", "prisms", "divine_dust", "ancient_shards"]:
+		GameState.wallet.set_amount(id, 5000)
+	GameState.inventory.add("magma_core", 1)
+	GameState.inventory.add("ember_stone", 2)
+	var lab: LaboratoryScreen = city.hud.laboratory_screen
+	lab.open_screen()
+	lab._slots = ["ember_stone", "magma_core"]
+	lab.refresh()
+	await _frames(30)
+	await _shot("17_laboratory")
+	lab._start()
+	await _frames(30)
+	await _shot("18_lab_running")
+	GameState.lab.experiment.end = GameClock.now()
+	lab.refresh()
+	lab._claim()
+	await _frames(12)
+	await _shot("19_reveal_charge")
+	await _frames(90)
+	await _shot("20_reveal")
+	for c in lab.get_children():
+		if c is RevealOverlay:
+			c.queue_free()
+	lab.close_screen()
+	var fus: FusionScreen = city.hud.fusion_screen
+	fus.open_screen()
+	fus._picked = GameState.collection.monsters.keys().slice(0, 2)
+	fus.refresh()
+	await _frames(20)
+	await _shot("21_fusion")
+	fus.close_screen()
+	var sum: SummonScreen = city.hud.summon_screen
+	sum.open_for(false)
+	sum._banner = DataRegistry.banner("advanced")
+	sum.refresh()
+	await _frames(20)
+	await _shot("22_summon")
+	sum.open_for(true)
+	await _frames(20)
+	await _shot("23_altar")
+	sum._summon()
+	await _frames(140)
+	await _shot("24_divine_reveal")
+	for c in sum.get_children():
+		if c is RevealOverlay:
+			c.queue_free()
+	sum.close_screen()
 	SettingsPanel.open(city.hud.root, true)
 	await _frames(15)
 	await _shot("11_settings")

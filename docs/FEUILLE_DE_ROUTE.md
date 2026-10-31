@@ -61,12 +61,22 @@ Reste à faire :
 - Équipements, talents et arbres de compétences, variantes visuelles (étape 9).
 - Créatures visibles dans leur Habitat.
 
+## ✅ Étape 6 — Laboratoire et Fusionnerie
+
+- `IngredientData` (12 ingrédients), `Inventory`, `LabRules` (poids par rareté × affinités génétiques × élément × bonus de rareté, normalisés ; jamais de garantie), `LaboratoryState` (emplacements 2 → 4, coût, durée, résultat tiré au lancement, accélération, synthèse).
+- `FusionRules` : recettes secrètes (`data/fusion`), sinon espèce apparentée (tags génétiques communs), 25 % de chances de rareté supérieure, 12 % de mutation ; recettes découvertes mémorisées.
+- Sources : Habitat des monstres (Essence vitale), trouvailles des ressources sauvages (ingrédients), synthèse.
+- Écrans Laboratoire et Fusionnerie, `RevealOverlay`.
+
+## ✅ Étape 7 — Invocation et dieux
+
+- `SummonBannerData` (5 bannières), `SummonRules` : taux par rareté redistribués si une rareté est vide, garantie Épique, doublons → fragments, élément du jour, Éveil divin (fragments 10-20, 5 % d'éveil complet).
+- Trois dieux (Kryos, Vitalia, Pyros) modélisés avec auréoles et ailes ; Éclats antiques et Poussière divine obtenus dans les ressources sauvages et en récompense de chaque niveau du Temple.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |
 |---|---|---|
-| 6 | Laboratoire et Fusionnerie | `IngredientData` (affinités génétiques, bonus de rareté), `MonsterData.genetic_tags` |
-| 7 | Invocations et dieux | `HeroData.is_god`, Sanctuaire et Autel divin dans les données |
 | 8 | Combat au tour par tour et IA | `SkillData` (cibles, effets, altérations), `CharacterStats` |
 | 9 | Progression et exploration, surface | `ZoneData.is_surface`, Portail antique, Tour des explorateurs |
 | 10 | Boutique et événements | monnaie premium Prismes, bâtiment Marché |

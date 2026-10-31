@@ -249,8 +249,11 @@ func _monster_card(uid: int) -> Control:
 	var m: Dictionary = GameState.collection.monsters[uid]
 	var d := DataRegistry.monster(m.id)
 	var card := _card_frame(d.rarity, true)
+	var variant: String = m.get("variant", "")
 	var col := _card_body(card, d.portrait, d.element, d.rarity, d.display_name,
-		"%s  •  Niv. %d" % [GameEnums.MONSTER_CATEGORY_NAMES[d.category], m.level], true)
+		("Variante " + FusionRules.VARIANT_NAMES[variant]) if variant != "" else "%s  •  Niv. %d" % [GameEnums.MONSTER_CATEGORY_NAMES[d.category], m.level], true)
+	if variant != "":
+		col.get_child(1).get_child(1).modulate = FusionRules.VARIANT_COLORS[variant].lightened(0.3)
 	col.add_child(UiTheme.label("Puissance %d" % GameState.collection.monster_power(uid), "HudLabel", 16, UiTheme.GOLD))
 	_clickable(card, "m:%d" % uid)
 	return card
@@ -437,6 +440,17 @@ func _fill_detail() -> void:
 		var uid := int(parts[1])
 		_action(actions, "Nourrir", "SuccessButton", coll.monster_level_cost(uid), coll.monster_level_reason(uid, GameState.wallet),
 			func(): return coll.feed_monster(uid, GameState.wallet))
+		var release := UiTheme.button("Libérer", "DangerButton", null, 20)
+		release.custom_minimum_size = Vector2(0, 58)
+		release.disabled = coll.monsters.size() <= 1
+		release.pressed.connect(func():
+			DialogBox.open(get_parent(), "Libérer la créature ?", "Elle retournera dans les profondeurs et libérera une place.", [
+				{"text": "Garder", "variation": "SecondaryButton"},
+				{"text": "Libérer", "variation": "DangerButton", "action": func():
+					coll.release_monster(uid)
+					GameState.save()
+					_detail.visible = false}]))
+		actions.add_child(release)
 	# Compétences
 	_detail_info.add_child(UiTheme.label("Compétences", "HeaderLabel", 24))
 	for s: SkillData in data.skills:
