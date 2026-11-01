@@ -5,6 +5,7 @@ const SPLASH := "res://scenes/boot/splash.tscn"
 const MAIN_MENU := "res://scenes/menu/main_menu.tscn"
 const CITY := "res://scenes/city/city.tscn"
 const BATTLE := "res://scenes/combat/battle.tscn"
+const RAID := "res://scenes/raid/raid.tscn"
 
 var _fade: ColorRect
 var _busy := false

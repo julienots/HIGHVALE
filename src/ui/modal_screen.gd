@@ -16,6 +16,7 @@ func _build_shell(title: String) -> void:
 	visible = false
 	var bg := ColorRect.new()
 	bg.color = Color(0.02, 0.02, 0.06, 0.75)
+	bg.material = UiFx.backdrop_material()
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	var margin := MarginContainer.new()
@@ -25,6 +26,7 @@ func _build_shell(title: String) -> void:
 	add_child(margin)
 	var panel := PanelContainer.new()
 	margin.add_child(panel)
+	UiFx.glow.call_deferred(panel, UiTheme.GOLD, 12)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 10)
 	panel.add_child(col)
@@ -32,6 +34,7 @@ func _build_shell(title: String) -> void:
 	header.add_theme_constant_override("separation", 12)
 	col.add_child(header)
 	title_label = UiTheme.label(title, "TitleLabel", 38)
+	UiFx.shine(title_label, 0.5, 5.0)
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title_label)
 	var close := UiTheme.button("", "DangerButton", preload("res://assets/icons/ui/cross.svg"))
@@ -51,6 +54,9 @@ func open_screen() -> void:
 			AudioManager.push_music(music)
 	visible = true
 	refresh()
+	var list := UiFx.find_list(body)
+	if list:
+		UiFx.cascade(list)
 	UiSfx.pop_in(get_child(1), 0.2)
 
 

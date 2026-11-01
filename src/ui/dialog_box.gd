@@ -55,6 +55,7 @@ func _build(title: String, width: float) -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new()
 	dim.color = Color(0.02, 0.02, 0.06, 0.6)
+	dim.material = UiFx.backdrop_material(Color(1.0, 0.8, 0.4))
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	var center := CenterContainer.new()
@@ -68,6 +69,7 @@ func _build(title: String, width: float) -> void:
 	_panel.add_child(col)
 	var t := UiTheme.label(title, "TitleLabel")
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	UiFx.shine(t, 0.5, 4.0)
 	col.add_child(t)
 	content = VBoxContainer.new()
 	content.add_theme_constant_override("separation", 10)

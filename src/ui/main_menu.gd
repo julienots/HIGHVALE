@@ -60,6 +60,13 @@ func _build_ui() -> void:
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ui.add_child(shade)
+	var sparkles := ColorRect.new()
+	sparkles.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	sparkles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sm := UiFx.backdrop_material(Color(1.0, 0.85, 0.5))
+	sm.set_shader_parameter("tint", Color(0.0, 0.0, 0.0, 0.0))
+	sparkles.material = sm
+	_ui.add_child(sparkles)
 	var col := VBoxContainer.new()
 	col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -74,6 +81,7 @@ func _build_ui() -> void:
 	_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_logo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	logo_holder.add_child(_logo)
+	UiFx.shine(_logo, 0.45, 4.0)
 	var play := UiTheme.button("Jouer", "PrimaryButton", null, 40)
 	play.custom_minimum_size = Vector2(340, 92)
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -105,6 +113,11 @@ func _build_ui() -> void:
 	version.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_ui.add_child(version)
 	UiSfx.pop_in.call_deferred(play, 0.4)
+	UiFx.cascade(row, 0.12)
+	var pulse := play.create_tween().set_loops()
+	pulse.tween_property(play, "scale", Vector2(1.05, 1.05), 0.7).set_trans(Tween.TRANS_SINE).set_delay(0.6)
+	pulse.tween_property(play, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
+	play.resized.connect(func(): play.pivot_offset = play.size / 2.0)
 
 
 func _show_credits() -> void:

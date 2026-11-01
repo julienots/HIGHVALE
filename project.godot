@@ -7,7 +7,7 @@ config_version=5
 
 config/name="HIGHVALE"
 config/description="Construisez une civilisation souterraine, collectionnez héros et monstres, combattez au tour par tour."
-config/version="0.17.0"
+config/version="0.18.0"
 run/main_scene="res://scenes/boot/splash.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
 boot_splash/bg_color=Color(0, 0, 0, 1)

@@ -410,7 +410,7 @@ func open_building_screen(uid: int) -> void:
 		"monster_habitat":
 			hud.collection_screen.show_screen(1)
 		"arena", "barracks":
-			hud.stages_screen.open_screen()
+			hud.arena_screen.open_screen()
 		"forge":
 			hud.forge_screen.open_screen()
 		"market":
@@ -678,7 +678,7 @@ func _handle_back() -> void:
 		if c is DialogBox:
 			c.close()
 			return
-	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.forge_screen, hud.infirmary_screen, hud.research_screen, hud.exploration_screen, hud.missions_screen, hud.shop_screen]:
+	for s in [hud.laboratory_screen, hud.fusion_screen, hud.summon_screen, hud.stages_screen, hud.arena_screen, hud.forge_screen, hud.infirmary_screen, hud.research_screen, hud.exploration_screen, hud.missions_screen, hud.shop_screen]:
 		if s.visible:
 			s.close_screen()
 			return

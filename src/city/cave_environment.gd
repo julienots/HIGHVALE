@@ -97,37 +97,43 @@ func _ground() -> void:
 
 ## Falaises hautes à l'arrière (côtés x≈0 et z≈0), rochers bas à l'avant pour garder la vue.
 func _cliffs() -> void:
-	var n := grid_size.x
+	var nx := grid_size.x
+	var nz := grid_size.y
 	var cliffs := ["cliff_a", "cliff_b", "cliff_c"]
-	for i in range(-10, n + 12, 3):
+	for i in range(-10, maxi(nx, nz) + 12, 3):
 		var t := float(i)
 		# Première rangée, contre la cité
-		_props.add(cliffs[_rng.randi() % 3], Vector3(t + _rng.randf_range(-0.6, 0.6), 0, -3.2 - _rng.randf_range(0, 1.5)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
-		_props.add(cliffs[_rng.randi() % 3], Vector3(-3.2 - _rng.randf_range(0, 1.5), 0, t + _rng.randf_range(-0.6, 0.6)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
+		if i <= nx + 12:
+			_props.add(cliffs[_rng.randi() % 3], Vector3(t + _rng.randf_range(-0.6, 0.6), 0, -3.2 - _rng.randf_range(0, 1.5)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
+		if i <= nz + 12:
+			_props.add(cliffs[_rng.randi() % 3], Vector3(-3.2 - _rng.randf_range(0, 1.5), 0, t + _rng.randf_range(-0.6, 0.6)), _rng.randf_range(0.8, 1.2), _rng.randf() * TAU)
 		# Arrière-plan, plus massif (une falaise sur deux suffit, plus grande)
 		if i % 6 == 2:
-			_props.add(cliffs[_rng.randi() % 3], Vector3(t, 0, -9.0 - _rng.randf_range(0, 2.5)), _rng.randf_range(2.0, 2.6), _rng.randf() * TAU)
-			_props.add(cliffs[_rng.randi() % 3], Vector3(-9.0 - _rng.randf_range(0, 2.5), 0, t), _rng.randf_range(2.0, 2.6), _rng.randf() * TAU)
+			if i <= nx + 12:
+				_props.add(cliffs[_rng.randi() % 3], Vector3(t, 0, -9.0 - _rng.randf_range(0, 2.5)), _rng.randf_range(2.0, 2.6), _rng.randf() * TAU)
+			if i <= nz + 12:
+				_props.add(cliffs[_rng.randi() % 3], Vector3(-9.0 - _rng.randf_range(0, 2.5), 0, t), _rng.randf_range(2.0, 2.6), _rng.randf() * TAU)
 	# Bordure avant basse : rochers moussus
-	for i in range(0, n + 3, 3):
-		var t := float(i)
-		_props.add("boulder", Vector3(t + _rng.randf(), 0, n + 1.2 + _rng.randf_range(0, 1.5)), _rng.randf_range(0.6, 1.0), _rng.randf() * TAU)
-		_props.add("boulder", Vector3(n + 1.2 + _rng.randf_range(0, 1.5), 0, t + _rng.randf()), _rng.randf_range(0.6, 1.0), _rng.randf() * TAU)
+	for i in range(0, nx + 3, 3):
+		_props.add("boulder", Vector3(float(i) + _rng.randf(), 0, nz + 1.2 + _rng.randf_range(0, 1.5)), _rng.randf_range(0.6, 1.0), _rng.randf() * TAU)
+	for i in range(0, nz + 3, 3):
+		_props.add("boulder", Vector3(nx + 1.2 + _rng.randf_range(0, 1.5), 0, float(i) + _rng.randf()), _rng.randf_range(0.6, 1.0), _rng.randf() * TAU)
 	# Stalagmites
 	for i in 18:
 		var p := _border_point(1.2)
-		var k := 0.5 if p.x > n - 2 or p.z > n - 2 else _rng.randf_range(0.7, 1.3)
+		var k := 0.5 if p.x > grid_size.x - 2 or p.z > grid_size.y - 2 else _rng.randf_range(0.7, 1.3)
 		_props.add("stalagmite", p, k, _rng.randf() * TAU)
 
 
 ## Point aléatoire dans la bande non constructible autour de la cité.
 func _border_point(margin: float) -> Vector3:
 	var b := Rect2(buildable)
-	while true:
+	for attempt in 300:
 		var p := Vector2(_rng.randf_range(-1.0, grid_size.x + 1.0), _rng.randf_range(-1.0, grid_size.y + 1.0))
 		if not b.grow(margin).has_point(p):
 			return Vector3(p.x, 0, p.y)
-	return Vector3.ZERO
+	# Pas de bande libre (zone entièrement constructible) : juste derrière le bord.
+	return Vector3(-1.5, 0, _rng.randf_range(0.0, grid_size.y))
 
 
 func _waterfall(pos: Vector3) -> void:

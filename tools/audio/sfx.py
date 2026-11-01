@@ -413,13 +413,53 @@ def ko():
     return finish(mix(fall, thud), rev=0.2)
 
 
+# --- Assauts ------------------------------------------------------------------------------
+def arrow():
+    twang = sweep(420, 300, 0.12, "saw") * env_exp(0.12, 30, 0.002) * 0.3
+    fly = at(nsweep(0.22, 2500, 5000, 1.4) * np.sin(np.pi * T(0.22) / 0.22) * 0.5, 0.04)
+    return finish(mix(lp(twang, 2500), fly), rev=0.05, loud=-18)
+
+
+def cannon():
+    boom = mix(thump(80, 0.6, 7) * 1.2, bp(noise(0.5), 100, 2500) * env_exp(0.5, 9) * 0.9,
+               bp(noise(0.05), 2000, 8000) * env_exp(0.05, 80) * 0.5)
+    return finish(boom, rev=0.18, rev_time=1.4, loud=-12)
+
+
+def deploy():
+    poof = nsweep(0.35, 3000, 400) * env_exp(0.35, 9, 0.01) * 0.6
+    sparkle = [at(ping(RNG.uniform(2500, 5000), 0.3, 12, 2.4, 0.8) * 0.25, RNG.uniform(0.02, 0.2)) for _ in range(6)]
+    return finish(mix(poof, thump(180, 0.15, 25) * 0.5, *sparkle), rev=0.15, loud=-16)
+
+
+def collapse():
+    t = T(1.4)
+    rumble = lp(noise(1.4), 400) * np.minimum(t / 0.03, 1) * np.exp(-t * 2.5) * 1.6
+    debris = [at(mix(thump(RNG.uniform(140, 300), 0.12, 30) * 0.5, bp(noise(0.05), 800, 5000) * env_exp(0.05, 60) * 0.5),
+                 RNG.uniform(0.05, 1.0)) for _ in range(16)]
+    return finish(mix(rumble, thump(70, 0.8, 5), *debris), rev=0.2, loud=-12)
+
+
+def star_get():
+    parts = [at(bell(hz(p), 0.6, 0.6), i * 0.05) for i, p in enumerate(("E6", "G#6", "B6", "E7"))]
+    parts.append(at(brass(hz("E5"), 0.6, 0.5), 0.0) * 0.6)
+    return finish(mix(*parts), rev=0.3, loud=-12)
+
+
+def horn():
+    t = T(1.6)
+    x = mix(brass(hz("D3"), 1.3, 0.8), brass(hz("A3"), 1.3, 0.5) * 0.6)
+    return finish(x, rev=0.35, rev_time=2.0, loud=-12)
+
+
 SFX = dict(click=click, tab=tab, open=open_, close=close, error=error, notify=notify, build=build, build_done=build_done,
            upgrade=upgrade, collect=collect, coin=coin, collect_res=collect_res, harvest=harvest, purchase=purchase,
            chest=chest, feed=feed, equip=equip, star_up=star_up, levelup=levelup, lab_bubble=lab_bubble,
            lab_start=lab_start, fusion=fusion, summon=summon, hatch=hatch, reveal=reveal, magic=magic,
            whoosh=whoosh, charge=charge, hit=hit, hit_heavy=hit_heavy, crit=crit, slash=slash, fire=fire,
            ice=ice, thunder=thunder, water=water, earth=earth, wind=wind, nature=nature, light=light,
-           shadow=shadow, void=void, heal=heal, shield=shield, buff=buff, debuff=debuff, ko=ko)
+           shadow=shadow, void=void, heal=heal, shield=shield, buff=buff, debuff=debuff, ko=ko,
+           arrow=arrow, cannon=cannon, deploy=deploy, collapse=collapse, star_get=star_get, horn=horn)
 
 if __name__ == "__main__":
     for name in sys.argv[1:] or list(SFX):

@@ -167,6 +167,8 @@ func _card_frame(rarity: int, owned: bool) -> PanelContainer:
 	sb.shadow_color = Color(0, 0, 0, 0.4)
 	sb.shadow_size = 5
 	card.add_theme_stylebox_override("panel", sb)
+	if owned:
+		UiFx.rarity_fx.call_deferred(card, rarity)
 	card.custom_minimum_size = Vector2(186, 268)
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	return card

@@ -5,13 +5,13 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.17.0)
+## État actuel (v0.18.0)
 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Architecture du projet Godot | ✅ terminée |
 | 2 | Cité isométrique jouable | ✅ terminée |
-| 3 | Bâtiments et économie | ✅ les 28 bâtiments sont fonctionnels |
+| 3 | Bâtiments et économie | ✅ les 33 bâtiments sont fonctionnels (dont 4 défenses et les remparts) |
 | 4 | Population et vie de la cité | ✅ terminée |
 | 5 | Collection des héros et des monstres | ✅ 150 héros et 120 créatures |
 | 6 | Laboratoire et Fusionnerie | ✅ terminée |
@@ -38,6 +38,9 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Progression** : équipements forgés (arme, armure, amulette ; 12 objets) et talents à choisir aux niveaux 10, 20 et 30 ; boss à phases (purification, bouclier, rage à 66 % et 33 %).
 - **Exploration** : carte des 5 zones des profondeurs et des 3 régions de la surface (ouvertes au Temple niveau 5), chacune avec 3 combats dont un gardien, ambiance d'arène propre (cristaux, forges, plein jour et forêts à la surface) et butin ; expéditions de héros (1, 4 ou 8 h) depuis la Tour des explorateurs.
 - **Nouveaux bâtiments** : Fosse de minerai sombre (produit le minerai sombre des équipements), Puits de lumière (colonne de soleil venue de la surface : Essence vitale et bien-être) et Ascenseur de surface (une équipe d'exploration de plus, expéditions −6 % par niveau).
+- **Assauts en temps réel** (bouton « Assaut ») : on attaque une base ennemie générée au hasard (donjon, tours, canons, tours de cristal, balistes, enceintes de remparts, bâtiments à piller). Les héros et créatures de l'équipe deviennent des cartes : 4 en main, la suivante affichée, énergie qui se recharge, zone de déploiement hors de la base. Les unités trouvent leur chemin, brisent les remparts qui les bloquent, les défenses tirent (au sol, dans les airs, en zone), les soigneurs soignent. 1 à 3 étoiles (50 %, donjon, 100 %), butin, trophées et ligues (Bronze → Légende), « Suivant » pour un autre adversaire.
+- **Défense de la cité** : les hordes attaquent votre propre cité ; vos tours, canons, tours de cristal, balistes et remparts la défendent, et vous déployez vos héros près du Temple.
+- **Défenses et remparts** : Tour d'archers, Canon de pierre (sol), Tour de cristal (zone), Baliste (longue portée) ; remparts posés en chaîne, sans bâtisseur, qui se raccordent à leurs voisins.
 - **Boutique** : cadeau gratuit toutes les 4 heures, Pack du Fondateur (une fois), 4 packs de la semaine avec compte à rebours (héros vedette, œuf de créature, équipement, caravane de ressources), offres du jour, 4 coffres avec animation d'ouverture, ressources et packs de prismes (paiement réel non activé dans cette version de test). Bouton bien visible sur l'écran de la cité, avec pastille quand le cadeau est prêt.
 - **Musique et sons** : 7 musiques orchestrales originales (thème principal, cité, combat, boss, laboratoire et invocations, boutique, exploration), ambiance sonore de la caverne, jingles (victoire, défaite, niveau, mission, révélations selon la rareté) et 47 effets sonores. Chaque écran a sa musique ; chaque action a son son, y compris un son par élément en combat.
 - **Infirmerie** : les héros mis K.O. sont blessés et se reposent (10 min, −8 % par niveau d'Infirmerie) avant de pouvoir recombattre ; soin immédiat en Essence vitale.

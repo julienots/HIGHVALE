@@ -223,6 +223,7 @@ func _card(icon: Texture2D, title: String, desc: String, rarity: int, price: Dic
 	sb.set_content_margin_all(12)
 	card.add_theme_stylebox_override("panel", sb)
 	card.custom_minimum_size = Vector2(380, 0)
+	UiFx.rarity_fx.call_deferred(card, rarity)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	card.add_child(row)

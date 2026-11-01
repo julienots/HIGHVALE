@@ -189,6 +189,8 @@ static func button(text: String, variation := "Button", icon: Texture2D = null, 
 		b.add_theme_font_size_override("font_size", font_size)
 	b.focus_mode = Control.FOCUS_NONE
 	b.pressed.connect(func(): UiSfx.click(b))
+	if variation in ["PrimaryButton", "PremiumButton", "DangerButton", "SuccessButton"]:
+		b.material = UiFx.shine_material(0.22, randf_range(5.0, 8.0), 50.0)
 	return b
 
 

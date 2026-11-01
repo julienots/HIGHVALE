@@ -26,6 +26,12 @@ static func lines(d: BuildingData, level: int) -> Array:
 		out.append(["Postes d'ouvriers", str(d.worker_slots(level)), preload("res://assets/icons/ui/population.svg")])
 	if d.builders_provided > 0:
 		out.append(["Bâtisseurs", "+%d" % d.builders_provided, preload("res://assets/icons/ui/builder.svg")])
+	if d.is_defense():
+		var targets := "air et sol" if d.defense_air and d.defense_ground else ("sol" if d.defense_ground else "air")
+		out.append(["Dégâts par seconde", "%d" % roundi(d.defense_damage_at(level) / d.defense_rate), preload("res://assets/icons/elements/fire.svg")])
+		out.append(["Portée (%s)" % targets, "%.1f cases" % d.defense_range, preload("res://assets/icons/ui/info.svg")])
+	if d.is_defense() or d.no_builder or d.id == CityState.TEMPLE_ID:
+		out.append(["Points de vie (assaut)", Fmt.amount(roundi(d.raid_hp_at(level) * (2.4 if d.id == CityState.TEMPLE_ID else 1.0))), preload("res://assets/icons/ui/heart.svg")])
 	return out
 
 

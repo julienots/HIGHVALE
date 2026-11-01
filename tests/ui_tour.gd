@@ -24,7 +24,7 @@ func _ready() -> void:
 	for c in city.hud.root.get_children():
 		if c is DialogBox:
 			c.close()
-	for s in [["missions", city.hud.missions_screen], ["shop", city.hud.shop_screen], ["map", city.hud.exploration_screen], ["infirmary", city.hud.infirmary_screen], ["research", city.hud.research_screen]]:
+	for s in [["missions", city.hud.missions_screen], ["shop", city.hud.shop_screen], ["map", city.hud.exploration_screen], ["infirmary", city.hud.infirmary_screen], ["research", city.hud.research_screen], ["arena", city.hud.arena_screen]]:
 		s[1].open_screen()
 		await _frames(15)
 		await RenderingServer.frame_post_draw
@@ -42,10 +42,11 @@ func _ready() -> void:
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(out.path_join("ui_shop_%d.png" % tab))
 	var chest_icon: Texture2D = load(ShopState.CHESTS["legend_chest"][3])
-	RewardOverlay.play(city.hud.root, chest_icon, "Coffre légendaire", {"Fragments de Noctis": 50, "Lame runique": 1}, 3)
+	var ov := RewardOverlay.play(city.hud.root, chest_icon, "Coffre légendaire", {"Fragments de Noctis": 50, "Lame runique": 1}, 3)
 	await get_tree().create_timer(2.5).timeout
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(out.path_join("ui_chest_open.png"))
+	ov.queue_free()
 	shop.close_screen()
 	for id in ["noctis", "aegis", "seren", "malakar", "verdant", "leo", "magnus", "zircon", "vesper", "hilda", "kraken", "lilith"]:
 		GameState.collection.unlock_hero(id)
@@ -59,6 +60,13 @@ func _ready() -> void:
 	await _frames(20)
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(out.path_join("ui_creatures.png"))
+	city.queue_free()
+	await _frames(2)
+	var menu: Node = load("res://scenes/menu/main_menu.tscn").instantiate()
+	get_tree().root.add_child(menu)
+	await _frames(40)
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(out.path_join("ui_menu.png"))
 	SaveSystem.delete_save()
 	print("UI_TOUR_OK")
 	get_tree().quit()

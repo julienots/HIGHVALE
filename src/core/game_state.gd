@@ -26,6 +26,8 @@ var city := CityState.new()
 var profile := {}
 ## Défi choisi avant d'ouvrir la scène de combat.
 var pending_encounter := ""
+## Assaut préparé : { mode: "attack" | "defense", seed, base }
+var pending_raid := {}
 var is_loaded := false
 
 var _tick_accum := 0.0

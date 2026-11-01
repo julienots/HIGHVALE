@@ -152,6 +152,17 @@ Reste au studio : essais sur plusieurs téléphones, clé de publication et fich
 - Boutique : cadeau gratuit (4 h), Pack du Fondateur, packs de la semaine, 4 coffres avec animation d'ouverture (`RewardOverlay`), packs de prismes affichés (paiement réel non activé) ; bouton « Boutique / Cadeau ! » agrandi avec pastille.
 - 64 tests automatisés.
 
+## ✅ v0.18.0 — Assauts en temps réel, défenses et remparts, menus animés
+
+- Défenses de la cité (modèles Blender à tête pivotante) : Tour d'archers, Canon de pierre, Tour de cristal, Baliste ; Remparts 1 × 1 posés en chaîne sans bâtisseur, jonctions automatiques (`WallLinks`) ; donjon ennemi.
+- `RaidSim` (temps réel, pas fixe de 50 ms) : cartes et énergie (cycle de 8 cartes, 4 en main), essaims pour les créatures communes, héros uniques sur le terrain, chemins A* (`AStarGrid2D`) où les remparts coûtent cher et sont brisés s'ils barrent la route, unités volantes au-dessus des murs, défenses air/sol/zone, soigneurs, duels, étoiles, butin.
+- `RaidBaseGen` : bases aléatoires selon les trophées (donjon, 3 à 12 défenses, une ou deux enceintes, bâtiments à piller), noms de chefs ; la cité du joueur sert de base en défense, avec des vagues ennemies.
+- Scène d'assaut : projectiles (flèches, boulets en cloche, carreaux, éclairs), destructions avec poussière, gravats et secousse, butin flottant, barres de vie, zone interdite colorée, étoiles animées, écran de fin ; 6 nouveaux sons (flèche, canon, déploiement, effondrement, étoile, cor de guerre).
+- Écran « Assauts » : ligue et trophées, adversaire tiré au hasard, « Suivant », défense de la cité, défis au tour par tour.
+- Interface : fonds animés (rayons, étincelles), reflets lumineux sur les boutons et les titres, halo pulsé des cartes Épiques et Légendaires, apparitions en cascade, menu principal animé.
+- Les bases ennemies sont générées par le jeu (pas de joueurs en ligne).
+- 69 tests automatisés.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |

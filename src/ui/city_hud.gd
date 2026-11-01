@@ -20,6 +20,7 @@ var laboratory_screen: LaboratoryScreen
 var fusion_screen: FusionScreen
 var summon_screen: SummonScreen
 var stages_screen: StagesScreen
+var arena_screen: ArenaScreen
 var forge_screen: ForgeScreen
 var infirmary_screen: InfirmaryScreen
 var research_screen: ResearchScreen
@@ -80,6 +81,9 @@ func _ready() -> void:
 	root.add_child(summon_screen)
 	stages_screen = StagesScreen.new()
 	root.add_child(stages_screen)
+	arena_screen = ArenaScreen.new()
+	root.add_child(arena_screen)
+	arena_screen.stages = stages_screen
 	forge_screen = ForgeScreen.new()
 	root.add_child(forge_screen)
 	infirmary_screen = InfirmaryScreen.new()
@@ -205,7 +209,7 @@ func _build_bottom() -> void:
 		collection_screen.show_screen())
 	root.add_child(coll)
 	_left_buttons.append(coll)
-	var fight := UiTheme.button("Combats", "DangerButton", preload("res://assets/icons/elements/fire.svg"), 24)
+	var fight := UiTheme.button("Assaut", "DangerButton", preload("res://assets/icons/elements/fire.svg"), 24)
 	fight.add_theme_constant_override("icon_max_width", 40)
 	fight.custom_minimum_size = Vector2(0, 72)
 	fight.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 16)
@@ -213,7 +217,7 @@ func _build_bottom() -> void:
 	fight.position.x += 300
 	fight.pressed.connect(func():
 		controller.deselect()
-		stages_screen.open_screen())
+		arena_screen.open_screen())
 	root.add_child(fight)
 	_left_buttons.append(fight)
 	var explore := UiTheme.button("Carte", "SuccessButton", preload("res://assets/icons/elements/earth.svg"), 24)
