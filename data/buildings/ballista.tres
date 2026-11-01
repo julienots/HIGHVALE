@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/buildings/ballista.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ballista"
+display_name = "Baliste"
+description = "Carreaux géants à très longue portée : idéale pour abattre les héros avant qu'ils n'atteignent vos murs."
+category = 6
+sort_order = 240
+feature = ""
+footprint = Vector2i(2, 2)
+max_level = 10
+unlock_temple_level = 4
+max_count_by_temple = PackedInt32Array(0, 0, 0, 1, 1, 2, 2, 2, 3, 3)
+level_cap_base = 2
+level_cap_per_temple = 2
+base_cost = {"gold": 2500, "stone": 1500, "dark_ore": 80}
+cost_growth = 1.7
+base_build_seconds = 600.0
+build_time_growth = 1.9
+produces = ""
+base_production_per_hour = 0.0
+storage = {}
+population_base = 0
+builders_provided = 0
+no_builder = false
+defense_range = 9.0
+defense_damage = 115.0
+defense_rate = 2.5
+defense_splash = 0.0
+defense_air = true
+defense_ground = true
+defense_projectile = "bolt"
+raid_hp = 1200.0
+model_scene = ExtResource("2_model")
+model_recipe = "ballista"
+primary_color = Color(0.5, 0.42, 0.32, 1)
+accent_color = Color(0.9, 0.8, 0.5, 1)

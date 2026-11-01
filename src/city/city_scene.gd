@@ -17,6 +17,8 @@ var selected_uid := 0
 var _buildings_root: Node3D
 var _grid_overlay: MeshInstance3D
 var _ghost: PlacementGhost
+## Dernier rempart posé (pour proposer le suivant dans le même alignement).
+var _last_wall_cell := Vector2i(-99, -99)
 var _moving_uid := 0
 var _dragging_ghost := false
 var _grab_offset := Vector2i.ZERO
@@ -303,6 +305,7 @@ func confirm_placement() -> void:
 		n.visible = true
 		n.refresh(GameClock.now())
 		n.play_pop()
+		_refresh_walls()
 		_end_placement()
 		GameState.save()
 		return
@@ -311,9 +314,20 @@ func confirm_placement() -> void:
 	if b == null:
 		Events.toast_requested.emit(city.can_build_reason(d, GameState.wallet), "error")
 		return
+	var last := _ghost.cell
 	_end_placement()
 	AudioManager.sfx("build")
 	Fx.dust(self, Vector3(b.cell.x + d.footprint.x / 2.0, 0, b.cell.y + d.footprint.y / 2.0), d.footprint.x / 2.0)
+	# Remparts : pose en chaîne, le suivant est proposé juste à côté.
+	if d.no_builder and city.can_build_reason(d, GameState.wallet) == "":
+		var dir := last - _last_wall_cell if _last_wall_cell != Vector2i(-99, -99) and (last - _last_wall_cell).length_squared() == 1 else Vector2i(1, 0)
+		_last_wall_cell = last
+		_begin_placement(d, 1, last + dir, 0)
+		_move_ghost(_find_free_cell(last + dir, d.footprint, 0))
+		Events.action_done.emit("build", 1)
+		GameState.save()
+		return
+	_last_wall_cell = Vector2i(-99, -99)
 	Events.action_done.emit("build", 1)
 	Events.toast_requested.emit("Construction lancée : %s" % d.display_name, "success")
 	GameState.save()
@@ -597,6 +611,15 @@ func _on_building_added(uid: int) -> void:
 	var b := GameState.city.get_building(uid)
 	if b and not nodes.has(uid):
 		_spawn(b).play_pop()
+	if b and b.data().no_builder:
+		_refresh_walls()
+
+
+## Met à jour les jonctions de tous les remparts.
+func _refresh_walls() -> void:
+	for n in nodes.values():
+		if is_instance_valid(n):
+			n.update_links()
 
 
 func _on_building_removed(uid: int) -> void:
@@ -605,6 +628,7 @@ func _on_building_removed(uid: int) -> void:
 	if nodes.has(uid):
 		nodes[uid].queue_free()
 		nodes.erase(uid)
+	_refresh_walls.call_deferred()
 
 
 func _on_building_changed(uid: int) -> void:

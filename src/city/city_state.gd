@@ -122,7 +122,7 @@ func builders_total() -> int:
 func builders_busy() -> int:
 	var n := 0
 	for b in buildings.values():
-		if b.is_busy():
+		if b.is_busy() and not b.data().no_builder:
 			n += 1
 	return n
 
@@ -160,7 +160,7 @@ func can_build_reason(data: BuildingData, wallet: Wallet) -> String:
 		return "Temple Primordial niveau %d requis" % data.unlock_temple_level
 	if count_of(data.id) >= data.max_count(tl):
 		return "Nombre maximal atteint (%d)" % data.max_count(tl)
-	if not has_free_builder():
+	if not data.no_builder and not has_free_builder():
 		return "Aucun bâtisseur disponible"
 	if not wallet.can_afford(data.cost_for_level(1)):
 		return "Ressources insuffisantes"
@@ -175,7 +175,7 @@ func can_upgrade_reason(b: BuildingState, wallet: Wallet) -> String:
 		return "Niveau maximal atteint"
 	if b.data_id != TEMPLE_ID and b.level >= d.level_cap(temple_level()):
 		return "Améliorez le Temple Primordial"
-	if not has_free_builder():
+	if not d.no_builder and not has_free_builder():
 		return "Aucun bâtisseur disponible"
 	if not wallet.can_afford(d.cost_for_level(b.level + 1)):
 		return "Ressources insuffisantes"

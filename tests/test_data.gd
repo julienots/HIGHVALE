@@ -21,7 +21,7 @@ func test_buildings_reference_valid_resources() -> void:
 		if not d.produces.is_empty():
 			check(DataRegistry.resource_type(d.produces) != null, "%s : production inconnue" % d.id)
 		check(d.max_count(10) >= 1, "%s : jamais constructible" % d.id)
-		check(d.footprint.x >= 2 and d.footprint.y >= 2, "%s : emprise trop petite" % d.id)
+		check(d.footprint.x >= 2 and d.footprint.y >= 2 or d.no_builder, "%s : emprise trop petite" % d.id)
 
 
 func test_level_formulas_increase() -> void:

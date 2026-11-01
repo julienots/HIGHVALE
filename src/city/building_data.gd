@@ -60,6 +60,22 @@ const CATEGORY_NAMES := ["Cœur", "Ressources", "Stockage", "Population", "Créa
 @export var monster_capacity_base := 0
 @export var monster_capacity_per_level := 0
 
+@export_group("Défense et assauts")
+## Construit et amélioré sans bâtisseur, instantanément (remparts).
+@export var no_builder := false
+## Portée (en cases), dégâts par tir au niveau 1 et cadence (secondes entre deux tirs).
+@export var defense_range := 0.0
+@export var defense_damage := 0.0
+@export var defense_rate := 1.0
+## Rayon des dégâts de zone (0 = cible unique) et cibles autorisées.
+@export var defense_splash := 0.0
+@export var defense_air := true
+@export var defense_ground := true
+## Projectile affiché : arrow, cannonball, bolt, lightning.
+@export var defense_projectile := "arrow"
+## Points de vie en assaut au niveau 1 (0 = selon la taille du bâtiment).
+@export var raid_hp := 0.0
+
 @export_group("Visuel")
 ## Modèle 3D définitif (glTF importé). Si absent, le modèle procédural « model_recipe » est utilisé.
 @export var model_scene: PackedScene
@@ -148,3 +164,17 @@ static func nice_round(v: float) -> int:
 		return int(round(v / 5.0) * 5)
 	var magnitude := pow(10.0, floor(log(v) / log(10.0)) - 1)
 	return int(round(v / magnitude) * magnitude)
+
+
+func is_defense() -> bool:
+	return defense_damage > 0.0
+
+
+func defense_damage_at(level: int) -> float:
+	return defense_damage * pow(1.16, maxi(level, 1) - 1)
+
+
+## Points de vie d'un bâtiment pendant un assaut.
+func raid_hp_at(level: int) -> float:
+	var base := raid_hp if raid_hp > 0.0 else 350.0 + 160.0 * footprint.x * footprint.y
+	return base * pow(1.14, maxi(level, 1) - 1)

@@ -134,6 +134,18 @@ func _rebuild_model(d: BuildingData, level: int) -> void:
 	_bobbers.clear()
 	_collect_animated(_model)
 	_apply_overlay()
+	update_links()
+
+
+## Remparts : affiche les jonctions vers les remparts voisins.
+func update_links() -> void:
+	var b := state()
+	if _model == null or b == null or not b.data().no_builder:
+		return
+	var city := GameState.city
+	WallLinks.apply(_model, func(off: Vector2i) -> bool:
+		var o := city.building_at(b.cell + off)
+		return o != null and o.data_id == b.data_id)
 
 
 func _collect_animated(n: Node) -> void:

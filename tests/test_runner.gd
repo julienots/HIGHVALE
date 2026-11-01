@@ -3,7 +3,7 @@ extends Node
 ## Exécute toutes les méthodes test_* des scripts test_*.gd et quitte avec
 ## le code 0 (succès) ou 1 (échec).
 
-const SUITES := [
+const SUITES := ["res://tests/test_raid.gd", 
 	"res://tests/test_scripts_compile.gd",
 	"res://tests/test_data.gd",
 	"res://tests/test_wallet.gd",

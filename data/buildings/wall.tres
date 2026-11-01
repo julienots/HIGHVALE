@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/city/building_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/buildings/wall.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_script")
+id = "wall"
+display_name = "Rempart"
+description = "Muraille de pierre qui ralentit les assaillants : ils doivent la briser pour passer. Posez-les en chaîne, sans bâtisseur."
+category = 6
+sort_order = 200
+feature = ""
+footprint = Vector2i(1, 1)
+max_level = 10
+unlock_temple_level = 1
+max_count_by_temple = PackedInt32Array(25, 50, 75, 100, 125, 150, 175, 200, 225, 250)
+level_cap_base = 2
+level_cap_per_temple = 2
+base_cost = {"stone": 60}
+cost_growth = 1.9
+base_build_seconds = 0.0
+build_time_growth = 1.9
+produces = ""
+base_production_per_hour = 0.0
+storage = {}
+population_base = 0
+builders_provided = 0
+no_builder = true
+defense_range = 0.0
+defense_damage = 0.0
+defense_rate = 1.0
+defense_splash = 0.0
+defense_air = true
+defense_ground = true
+defense_projectile = "arrow"
+raid_hp = 700.0
+model_scene = ExtResource("2_model")
+model_recipe = "wall"
+primary_color = Color(0.55, 0.57, 0.62, 1)
+accent_color = Color(0.85, 0.85, 0.9, 1)
