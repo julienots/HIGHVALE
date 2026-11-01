@@ -10,6 +10,7 @@ var _list: GridContainer
 
 func _ready() -> void:
 	_build_shell("Fusionnerie")
+	music = "music_mystic"
 	var main := HBoxContainer.new()
 	main.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_theme_constant_override("separation", 16)
@@ -103,6 +104,7 @@ func _fuse() -> void:
 		Events.toast_requested.emit(r.error, "error")
 		return
 	_picked.clear()
+	AudioManager.sfx("fusion", 0.0)
 	GameState.save()
 	var d := DataRegistry.monster(r.id)
 	var lines := [("Variante " + FusionRules.VARIANT_NAMES[r.variant] + " !") if r.variant != "" else "Fusion de %s et %s" % [a.display_name, b.display_name]]

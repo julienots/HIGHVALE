@@ -94,6 +94,7 @@ func _process(delta: float) -> void:
 func _reveal() -> void:
 	_phase = 1
 	AudioManager.sfx("reveal", 0.0)
+	AudioManager.reveal(_rarity)
 	_sparks.emitting = true
 	var t := create_tween().set_parallel()
 	_flash.color.a = 0.9 if _rarity >= GameEnums.Rarity.EPIC else 0.6

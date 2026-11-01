@@ -574,6 +574,16 @@ func _do(reason: String, success: String) -> void:
 		Events.toast_requested.emit(reason, "error")
 		return
 	Events.toast_requested.emit(success, "success")
+	if success.begins_with("Évolution"):
+		AudioManager.sfx("star_up", 0.0)
+	elif success.begins_with("Talent"):
+		AudioManager.sfx("buff", 0.0)
+	elif success.ends_with("équipé"):
+		AudioManager.sfx("equip")
+	elif success.begins_with("Nourrir"):
+		AudioManager.sfx("feed")
+	else:
+		AudioManager.sfx("levelup", 0.0)
 	if success.begins_with("Améliorer"):
 		Events.action_done.emit("hero_level", 1)
 	elif success.begins_with("Nourrir"):

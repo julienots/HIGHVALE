@@ -6,6 +6,8 @@ extends Control
 var body: VBoxContainer
 var header: HBoxContainer
 var title_label: Label
+## Musique propre à l'écran (empilée à l'ouverture, retirée à la fermeture).
+var music := ""
 
 
 func _build_shell(title: String) -> void:
@@ -43,12 +45,20 @@ func _build_shell(title: String) -> void:
 
 
 func open_screen() -> void:
+	if not visible:
+		AudioManager.sfx("open", 0.03)
+		if music != "":
+			AudioManager.push_music(music)
 	visible = true
 	refresh()
 	UiSfx.pop_in(get_child(1), 0.2)
 
 
 func close_screen() -> void:
+	if visible:
+		AudioManager.sfx("close", 0.03)
+		if music != "":
+			AudioManager.pop_music()
 	visible = false
 
 

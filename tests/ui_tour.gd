@@ -30,6 +30,23 @@ func _ready() -> void:
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(out.path_join("ui_%s.png" % s[0]))
 		s[1].close_screen()
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(out.path_join("ui_hud.png"))
+	GameState.wallet.add("prisms", 2000)
+	var shop: ShopScreen = city.hud.shop_screen
+	shop.open_screen()
+	for tab in [2, 4]:
+		shop._tab = tab
+		shop.refresh()
+		await _frames(10)
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png(out.path_join("ui_shop_%d.png" % tab))
+	var chest_icon: Texture2D = load(ShopState.CHESTS["legend_chest"][3])
+	RewardOverlay.play(city.hud.root, chest_icon, "Coffre légendaire", {"Fragments de Noctis": 50, "Lame runique": 1}, 3)
+	await get_tree().create_timer(2.5).timeout
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(out.path_join("ui_chest_open.png"))
+	shop.close_screen()
 	for id in ["noctis", "aegis", "seren", "malakar", "verdant", "leo", "magnus", "zircon", "vesper", "hilda", "kraken", "lilith"]:
 		GameState.collection.unlock_hero(id)
 	city.hud.collection_screen.show_screen(0)

@@ -75,6 +75,7 @@ func refresh() -> void:
 					var b := UiTheme.button("Récupérer", "SuccessButton", null, 16)
 					b.pressed.connect(func():
 						q.claim_pass(GameState.wallet)
+						AudioManager.sfx("jingle_quest", 0.0)
 						GameState.save())
 					v.add_child(b)
 				else:
@@ -101,6 +102,7 @@ func refresh() -> void:
 				var r := q.claim_login(GameState.wallet, GameClock.now())
 				if not r.is_empty():
 					Events.toast_requested.emit("Récompense de connexion récupérée !", "reward")
+					AudioManager.sfx("purchase", 0.0)
 				GameState.save())
 			_content.add_child(b)
 		3:
@@ -146,6 +148,7 @@ func _mission_row(id: String) -> void:
 		b.disabled = not q.can_claim(id)
 		b.pressed.connect(func():
 			q.claim(id, GameState.wallet)
+			AudioManager.sfx("jingle_quest", 0.0)
 			GameState.save())
 		row.add_child(b)
 	_content.add_child(row)

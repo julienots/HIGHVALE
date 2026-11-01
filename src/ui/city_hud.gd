@@ -27,6 +27,8 @@ var exploration_screen: ExplorationScreen
 var missions_screen: MissionsScreen
 var shop_screen: ShopScreen
 var _missions_btn: Button
+var _shop_btn: Button
+var _shop_badge: TextureRect
 var _left_buttons: Array[Control] = []
 var _chips := {}  # id -> ResourceChip
 var _temple_label: Label
@@ -112,6 +114,9 @@ func _process(delta: float) -> void:
 		b.visible = _build_button.visible
 	_refresh_counters()
 	_missions_btn.text = "Missions !" if _claimable() else "Missions"
+	var gift := GameState.shop.gift_ready(GameClock.now())
+	_shop_badge.visible = gift
+	_shop_btn.text = "Cadeau !" if gift else "Boutique"
 	_fps.visible = Settings.show_fps
 	if _fps.visible:
 		_fps.text = "%d FPS" % Engine.get_frames_per_second()
@@ -234,12 +239,17 @@ func _build_bottom() -> void:
 		controller.deselect()
 		missions_screen.open_screen())
 	side.add_child(_missions_btn)
-	var shop_btn := UiTheme.button("Boutique", "PremiumButton", DataRegistry.resource_type("prisms").icon, 20)
-	shop_btn.custom_minimum_size = Vector2(170, 58)
-	shop_btn.pressed.connect(func():
+	_shop_btn = UiTheme.button("Boutique", "PremiumButton", preload("res://assets/icons/ui/shop.svg"), 24)
+	_shop_btn.add_theme_constant_override("icon_max_width", 44)
+	_shop_btn.custom_minimum_size = Vector2(200, 72)
+	_shop_btn.pressed.connect(func():
 		controller.deselect()
 		shop_screen.open_screen())
-	side.add_child(shop_btn)
+	side.add_child(_shop_btn)
+	_shop_badge = UiTheme.icon_rect(preload("res://assets/icons/ui/badge.svg"), 30)
+	_shop_badge.position = Vector2(-10, -10)
+	_shop_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_shop_btn.add_child(_shop_badge)
 	_build_button = UiTheme.button("Construire", "PrimaryButton", ICON_BUILD, 30)
 	_build_button.add_theme_constant_override("icon_max_width", 48)
 	_build_button.custom_minimum_size = Vector2(230, 84)

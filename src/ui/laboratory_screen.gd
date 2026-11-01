@@ -15,6 +15,7 @@ var _accum := 0.0
 
 func _ready() -> void:
 	_build_shell("Laboratoire")
+	music = "music_mystic"
 	var main := HBoxContainer.new()
 	main.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_theme_constant_override("separation", 16)
@@ -188,6 +189,8 @@ func _refresh_items() -> void:
 			b.pressed.connect(func():
 				var r := GameState.lab.synthesize(id, GameState.wallet, GameState.inventory)
 				Events.toast_requested.emit(r if r != "" else "%s créé" % ing.display_name, "error" if r != "" else "success")
+				if r == "":
+					AudioManager.sfx("lab_bubble")
 				GameState.save())
 			box.add_child(b)
 			box.add_child(UiTheme.cost_row(LaboratoryState.SYNTHESIS[id], GameState.wallet, 14))
@@ -233,6 +236,7 @@ func _start() -> void:
 		Events.toast_requested.emit(r, "error")
 		return
 	_slots.clear()
+	AudioManager.sfx("lab_start", 0.0)
 	Events.action_done.emit("lab", 1)
 	GameState.save()
 	refresh()
@@ -244,6 +248,7 @@ func _claim() -> void:
 		Events.toast_requested.emit(got.error, "error")
 		return
 	GameState.save()
+	AudioManager.sfx("hatch", 0.0)
 	var d := DataRegistry.monster(got.id)
 	RevealOverlay.play(self, d.model_scene, d.rarity, "Nouvelle espèce !" if got.new else "Une créature est née !", d.display_name,
 		[GameEnums.MONSTER_CATEGORY_NAMES[d.category] + " • " + GameEnums.element_name(d.element)])

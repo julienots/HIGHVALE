@@ -10,6 +10,7 @@ var _detail: VBoxContainer
 
 func _ready() -> void:
 	_build_shell("Sanctuaire des héros")
+	music = "music_mystic"
 	var main := HBoxContainer.new()
 	main.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_theme_constant_override("separation", 16)
@@ -119,6 +120,7 @@ func _summon() -> void:
 		Events.toast_requested.emit(r.error, "error")
 		return
 	Events.action_done.emit("summon", 1)
+	AudioManager.sfx("summon", 0.0)
 	GameState.save()
 	var h := DataRegistry.hero(r.hero)
 	var lines := ["%s • %s" % [GameEnums.HERO_CLASS_NAMES[h.hero_class], GameEnums.element_name(h.element)]]

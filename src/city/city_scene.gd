@@ -60,6 +60,7 @@ func _ready() -> void:
 	Events.game_loaded.connect(_rebuild_city)
 	_rebuild_city()
 	AudioManager.play_music("music_city")
+	AudioManager.play_ambience("amb_cave")
 
 
 func _process(delta: float) -> void:
@@ -362,7 +363,7 @@ func collect(uid: int) -> void:
 	if got > 0:
 		Events.action_done.emit("collect", got)
 		var rt := DataRegistry.resource_type(res)
-		AudioManager.sfx("collect")
+		AudioManager.sfx("collect" if res == "gold" or res == "prisms" else "collect_res")
 		if n:
 			n.float_text("+%s" % Fmt.amount(got), rt.color.lightened(0.2))
 			n.play_pop(1.05)
@@ -540,6 +541,7 @@ func _do_upgrade(uid: int) -> void:
 		Events.toast_requested.emit(reason, "error")
 		return
 	Events.action_done.emit("build", 1)
+	AudioManager.sfx("upgrade", 0.0)
 	Events.toast_requested.emit("Amélioration lancée", "success")
 	GameState.save()
 
@@ -569,6 +571,7 @@ func _do_speed_up(uid: int) -> void:
 	if not GameState.city.speed_up(b, GameState.wallet, GameClock.now(), GameState.config()):
 		Events.toast_requested.emit("Pas assez de prismes", "error")
 		return
+	AudioManager.sfx("magic", 0.0)
 	GameState.save()
 
 
@@ -616,7 +619,7 @@ func _on_task_finished(uid: int) -> void:
 		return
 	n.refresh(GameClock.now())
 	n.play_pop(1.15)
-	AudioManager.sfx("levelup", 0.0)
+	AudioManager.sfx("build_done", 0.0)
 	Fx.burst(self, n.global_position + Vector3(0, 1.0, 0), UiTheme.GOLD, 50, 4.0, 0.08, 1.0, 1.2)
 	Fx.burst(self, n.global_position + Vector3(0, 0.3, 0), Color("7fdcff"), 30, 2.5)
 	n.float_text("Niveau %d !" % b.level, UiTheme.GOLD)

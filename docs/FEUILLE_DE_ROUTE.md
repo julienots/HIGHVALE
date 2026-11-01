@@ -143,6 +143,15 @@ Reste au studio : essais sur plusieurs téléphones, clé de publication et fich
 - Les créatures de surface, jusque-là impossibles à obtenir, sortent maintenant du Laboratoire et des zones.
 - Exploration : chaque zone compte 7 à 10 espèces ; une victoire peut faire rejoindre une créature de la zone (25 à 50 % selon l'étape, s'il reste de la place).
 
+## ✅ v0.17.0 — Bande-son orchestrale et grande boutique
+
+- Moteur audio `tools/audio/synth.py` : oscillateurs à bande limitée, cordes, cuivres, chœur à formants, harpe, célesta, flûte, clarinette, cloches FM, marimba, kalimba, timbales, taikos, cymbales ; réverbération à convolution ; mastering par niveau moyen et limiteur doux, équilibré pour les haut-parleurs de téléphone (les graves inaudibles sont remplacés par leurs harmoniques).
+- 7 musiques en boucle sans couture autour du thème de HIGHVALE (ré mineur) : menu, cité, combat, boss, laboratoire et invocations, boutique, exploration ; ambiance de caverne ; 7 jingles dont 4 révélations selon la rareté.
+- 47 effets sonores (interface, construction, collecte, achats, coffres, laboratoire, fusion, invocation, éclosion, coups, critiques, 9 sons d'éléments, soins, boucliers, états, K.O.).
+- `AudioManager` : pile de musiques par écran, canal d'ambiance, son par élément, anti-répétition ; sons branchés sur toutes les actions.
+- Boutique : cadeau gratuit (4 h), Pack du Fondateur, packs de la semaine, 4 coffres avec animation d'ouverture (`RewardOverlay`), packs de prismes affichés (paiement réel non activé) ; bouton « Boutique / Cadeau ! » agrandi avec pastille.
+- 64 tests automatisés.
+
 ## ⏳ Étapes suivantes
 
 | Étape | Contenu | Fondations déjà en place |

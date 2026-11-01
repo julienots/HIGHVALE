@@ -5,7 +5,7 @@ Godot 4 (GDScript), rendu « Mobile », 2.5D isométrique, cible Android (APK).
 
 Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans une caverne gigantesque, après la Fracture Primordiale.
 
-## État actuel (v0.16.0)
+## État actuel (v0.17.0)
 
 | Étape | Contenu | État |
 |---|---|---|
@@ -38,6 +38,8 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 - **Progression** : équipements forgés (arme, armure, amulette ; 12 objets) et talents à choisir aux niveaux 10, 20 et 30 ; boss à phases (purification, bouclier, rage à 66 % et 33 %).
 - **Exploration** : carte des 5 zones des profondeurs et des 3 régions de la surface (ouvertes au Temple niveau 5), chacune avec 3 combats dont un gardien, ambiance d'arène propre (cristaux, forges, plein jour et forêts à la surface) et butin ; expéditions de héros (1, 4 ou 8 h) depuis la Tour des explorateurs.
 - **Nouveaux bâtiments** : Fosse de minerai sombre (produit le minerai sombre des équipements), Puits de lumière (colonne de soleil venue de la surface : Essence vitale et bien-être) et Ascenseur de surface (une équipe d'exploration de plus, expéditions −6 % par niveau).
+- **Boutique** : cadeau gratuit toutes les 4 heures, Pack du Fondateur (une fois), 4 packs de la semaine avec compte à rebours (héros vedette, œuf de créature, équipement, caravane de ressources), offres du jour, 4 coffres avec animation d'ouverture, ressources et packs de prismes (paiement réel non activé dans cette version de test). Bouton bien visible sur l'écran de la cité, avec pastille quand le cadeau est prêt.
+- **Musique et sons** : 7 musiques orchestrales originales (thème principal, cité, combat, boss, laboratoire et invocations, boutique, exploration), ambiance sonore de la caverne, jingles (victoire, défaite, niveau, mission, révélations selon la rareté) et 47 effets sonores. Chaque écran a sa musique ; chaque action a son son, y compris un son par élément en combat.
 - **Infirmerie** : les héros mis K.O. sont blessés et se reposent (10 min, −8 % par niveau d'Infirmerie) avant de pouvoir recombattre ; soin immédiat en Essence vitale.
 - **Recherches** : la Bibliothèque (production, durée des chantiers, stockage, bien-être) et l'Académie (coût d'entraînement des héros, attaque et PV en combat, places de créatures) développent 8 technologies, plafonnées par le niveau du bâtiment.
 - **Missions et événements** : 4 missions du jour et 3 de la semaine suivies automatiquement, récompenses de connexion sur 7 jours, passe saisonnier de 20 paliers, événement hebdomadaire tournant (+50 % de récompenses de combat, boss d'événement quotidien).
@@ -60,7 +62,7 @@ Le joueur bâtit une civilisation souterraine autour du Temple Primordial, dans 
 
 Les héros, créatures et compétences sont générés par `python3 tools/data/gen_collection.py` à partir de données lisibles (`tools/data/hero_roster.py` : nom, titre, histoire, apparence ; statistiques et compétences dérivées de la classe, de l'élément et de la rareté). Le même script écrit les scripts Blender des héros du roster.
 
-La bande-son est générée par `python3 tools/audio/make_audio.py` (numpy et ffmpeg). Les modèles sont produits par des scripts Blender versionnés (`tools/blender/`), ce qui permet de les régénérer, de les retoucher dans Blender et de garantir un style cohérent :
+La bande-son originale est entièrement synthétisée par `python3 tools/audio/make_audio.py` (numpy, scipy, ffmpeg) : `synth.py` (cordes, cuivres, chœur, harpe, célesta, flûte, cloches, percussions orchestrales, réverbération à convolution, mastering adapté aux haut-parleurs de téléphone), `compose.py` (7 musiques construites autour d'un même thème, ambiance de caverne, jingles) et `sfx.py` (47 effets sonores).
 
 Catégories : `models/` (bâtiments), `props/` (décors de la caverne), `characters/` (habitants).
 

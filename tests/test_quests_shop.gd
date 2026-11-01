@@ -60,3 +60,43 @@ func test_weekly_event() -> void:
 	var enc := EventCalendar.boss_encounter(T0, CollectionState.new())
 	check(enc.enemies[0].boss, "boss d'événement")
 	check(EventCalendar.ends_in(T0) <= 7.0 * QuestState.DAY, "durée d'une semaine")
+
+
+func test_shop_gift_starter_weekly_chests() -> void:
+	var s := ShopState.new()
+	s.roll(T0)
+	var w := Wallet.new()
+	for k in ["gold", "prisms", "ancient_shards", "stone", "fungal_wood"]:
+		w.set_amount(k, 100000)
+	var inv := Inventory.new()
+	var coll := CollectionState.new()
+	var city := CityState.new()
+	city.configure(DataRegistry.config)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	# Cadeau gratuit toutes les 4 heures
+	check(s.gift_ready(T0), "cadeau disponible")
+	var g := s.claim_gift(w, inv, rng, T0)
+	check(not g.has("error") and g.size() >= 2, "cadeau récupéré")
+	check(s.claim_gift(w, inv, rng, T0 + 60).has("error"), "pas deux cadeaux de suite")
+	check(s.gift_ready(T0 + ShopState.GIFT_SECONDS), "cadeau revenu 4 h plus tard")
+	# Pack du Fondateur : une seule fois
+	eq(s.buy_starter(w, coll), "", "pack du Fondateur")
+	eq(s.buy_starter(w, coll), "Déjà acheté", "une seule fois")
+	check(coll.fragments.get("isolde", 0) > 0 or coll.owns_hero("isolde"), "fragments du héros offerts")
+	# Packs de la semaine
+	var offers := s.weekly_offers()
+	eq(offers.size(), 4, "4 packs de la semaine")
+	var res_pack: Dictionary = offers[3]
+	eq(s.buy_weekly(res_pack, w, inv, coll, city), "", "pack acheté")
+	eq(s.buy_weekly(res_pack, w, inv, coll, city), "Déjà acheté cette semaine", "limite hebdomadaire")
+	# Coffres
+	for id in ShopState.CHESTS:
+		var got := s.open_chest(id, w, inv, coll, rng)
+		check(not got.has("error") and not got.is_empty(), "coffre ouvert : " + id)
+	# Sauvegarde
+	var s2 := ShopState.new()
+	s2.from_dict(s.to_dict())
+	check(s2.starter_bought and not s2.gift_ready(T0 + 60) and "w_res" in s2.week_bought, "boutique sauvegardée")
+	s.roll(T0 + ShopState.WEEK)
+	check(s.week_bought.is_empty(), "packs renouvelés la semaine suivante")

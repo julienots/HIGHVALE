@@ -12,6 +12,7 @@ var _tick := 0.0
 
 func _ready() -> void:
 	_build_shell("Bibliothèque")
+	music = "music_mystic"
 	_active_box = VBoxContainer.new()
 	_active_box.add_theme_constant_override("separation", 6)
 	body.add_child(_active_box)
@@ -122,6 +123,8 @@ func _card(id: String) -> Control:
 	b.disabled = reason != ""
 	b.pressed.connect(func():
 		var res := r.start(id, city, GameState.wallet, GameClock.now())
-		Events.toast_requested.emit(res if res != "" else "Recherche lancée : %s" % t.name, "error" if res != "" else "success"))
+		Events.toast_requested.emit(res if res != "" else "Recherche lancée : %s" % t.name, "error" if res != "" else "success")
+		if res == "":
+			AudioManager.sfx("magic"))
 	row.add_child(b)
 	return card

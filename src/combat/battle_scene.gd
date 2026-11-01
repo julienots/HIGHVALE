@@ -30,6 +30,8 @@ var _picking_skill: SkillData
 var _waiting_input := false
 
 
+## États bénéfiques (son « buff ») ; les autres jouent « debuff ».
+const GOOD_STATUSES := [GameEnums.StatusEffect.REGEN, GameEnums.StatusEffect.SHIELD, GameEnums.StatusEffect.TAUNT]
 ## Échelle commune des héros (silhouette d'environ 0,5 unité).
 const HERO_SCALE := 2.1
 
@@ -53,7 +55,8 @@ func _ready() -> void:
 	battle.setup(team, BattleSetup.enemies_for(encounter))
 	_build_ui()
 	_spawn_units()
-	AudioManager.play_music("music_battle")
+	AudioManager.stop_ambience(0.5)
+	AudioManager.play_music("music_boss" if battle.units.any(func(c): return c.is_boss) else "music_battle")
 	_run.call_deferred()
 
 
@@ -276,6 +279,7 @@ func _play(events: Array) -> void:
 				_hit(e.target, e.amount, e.crit, e.advantage)
 				await get_tree().create_timer(0.12).timeout
 			"dot":
+				AudioManager.sfx("debuff", 0.1, -8.0)
 				_float(e.target, "-%d" % e.amount, Color("ff9a4a"), 1.0)
 				_flash(e.target)
 				await get_tree().create_timer(0.35).timeout
@@ -286,11 +290,15 @@ func _play(events: Array) -> void:
 				_glow(e.target, Color("5bd36b"))
 				await get_tree().create_timer(0.15).timeout
 			"shield":
+				AudioManager.sfx("shield")
 				_float(e.target, "Bouclier", Color("cfe8ff"), 0.9)
 				_set_shield(e.target)
 			"status":
+				AudioManager.sfx("buff" if e.effect in GOOD_STATUSES else "debuff", 0.05, -3.0)
 				_float(e.target, STATUS_NAMES.get(e.effect, ""), UnitBar.STATUS_COLORS.get(e.effect, Color.WHITE), 0.9, 0.5)
 			"phase":
+				AudioManager.sfx("hit_heavy", 0.0)
+				AudioManager.sfx("charge", 0.0)
 				_float(e.target, "Phase %d : le boss s'enrage !" % e.phase, Color("ff5a5a"), 1.2)
 				_glow(e.target, Color("ff5a5a"))
 				_shake(0.15)
@@ -300,6 +308,7 @@ func _play(events: Array) -> void:
 				_float(e.target, "Passe son tour", Color("c8d0e0"), 0.9)
 				await get_tree().create_timer(0.5).timeout
 			"death":
+				AudioManager.sfx("ko")
 				_die(e.target)
 				await get_tree().create_timer(0.3).timeout
 	for c: Combatant in battle.units:
@@ -316,11 +325,13 @@ func _animate_cast(actor: Combatant, skill: SkillData, target: Combatant) -> voi
 	var rig: CharacterRig = _rigs[actor.uid]
 	_actor_label.text = "%s : %s" % [actor.name, skill.display_name]
 	if skill.cinematic:
+		AudioManager.sfx("charge", 0.0)
 		await _cinematic(rig, skill)
 	var color: Color = ELEMENT_COLORS[skill.element]
 	var support := skill.power <= 0.0
 	var home := rig.position
 	if support:
+		AudioManager.sfx("magic", 0.05, -4.0)
 		_glow(actor, color)
 		await get_tree().create_timer(0.35).timeout
 		return
@@ -333,12 +344,13 @@ func _animate_cast(actor: Combatant, skill: SkillData, target: Combatant) -> voi
 		tw.tween_property(rig, "position", dest, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		tw.tween_property(rig, "position", dest + (t_rig.position - dest) * 0.25, 0.06)
 		await tw.finished
+		AudioManager.element(skill.element, -4.0)
 		var back := create_tween()
 		back.tween_property(rig, "position", home, 0.3).set_delay(0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	else:
 		var from := rig.global_position + Vector3(0, 0.7, 0)
 		var dest := (t_rig.global_position if t_rig and not aoe else _side_center(1 - actor.side)) + Vector3(0, 0.6, 0)
-		AudioManager.sfx("magic")
+		AudioManager.element(skill.element)
 		var orb := MeshKit.part(self, MeshKit.sphere(0.18 if not aoe else 0.32, false, 12), MeshKit.glow_mat(color, 4.0), from)
 		var light := OmniLight3D.new()
 		light.light_color = color
@@ -385,7 +397,7 @@ func _side_center(side: int) -> Vector3:
 
 func _hit(t: Combatant, amount: int, crit: bool, adv: int) -> void:
 	_flash(t)
-	AudioManager.sfx("crit" if crit else "hit")
+	AudioManager.sfx("crit" if crit else ("hit_heavy" if adv > 0 else "hit"))
 	Fx.burst(self, _rigs[t.uid].global_position + Vector3(0, 0.6, 0), Color("fff1c0") if crit else Color("ffd0a0"), 26 if crit else 14, 3.0)
 	var text := "%s%d" % ["CRITIQUE ! " if crit else "-", amount]
 	_float(t, text, Color("ffe04a") if crit else Color.WHITE, 1.4 if crit else 1.1)

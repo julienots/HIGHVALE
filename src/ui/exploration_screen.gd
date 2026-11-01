@@ -10,6 +10,7 @@ var _accum := 0.0
 
 func _ready() -> void:
 	_build_shell("Exploration")
+	music = "music_explore"
 	_tabs = HBoxContainer.new()
 	_tabs.add_theme_constant_override("separation", 8)
 	header.add_child(_tabs)
@@ -126,6 +127,7 @@ func _fill_expeditions() -> void:
 				var got := ex.claim(idx, GameState.collection, GameState.wallet, GameClock.now())
 				if got.has("resources"):
 					Events.toast_requested.emit("Expédition de retour : butin récupéré !", "reward")
+					AudioManager.sfx("collect", 0.0)
 				GameState.save()
 				refresh())
 			row.add_child(b)
@@ -156,6 +158,8 @@ func _fill_expeditions() -> void:
 				b.pressed.connect(func():
 					var r := ex.start(z, hero_id, hours, city, GameState.collection, GameClock.now())
 					Events.toast_requested.emit(r if r != "" else "%s part en expédition" % DataRegistry.hero(hero_id).display_name, "error" if r != "" else "success")
+					if r == "":
+						AudioManager.sfx("wind")
 					GameState.save()
 					refresh())
 				row.add_child(b)
