@@ -68,3 +68,20 @@ summary { color: var(--muted); margin-top: 12px; cursor: pointer; }
 .logo { font-size: 56px; }
 
 .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; z-index: 30; font-weight: 600; max-width: 90vw; }
+
+/* --- Connexion à Claude --- */
+.status { display: flex; align-items: center; gap: 12px; }
+.status .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); flex: none; }
+.status .dot.online { background: var(--ok); box-shadow: 0 0 0 4px rgba(48,164,108,.2); }
+.status .dot.connecting { background: #f5a524; }
+.status .dot.error { background: var(--danger); }
+.status .txt { flex: 1; } .status .txt small { display: block; color: var(--muted); }
+.switch { position: relative; width: 52px; height: 30px; flex: none; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch span { position: absolute; inset: 0; background: var(--panel2); border-radius: 30px; transition: .2s; }
+.switch span::before { content: ""; position: absolute; width: 24px; height: 24px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+.switch input:checked + span { background: var(--ok); }
+.switch input:checked + span::before { transform: translateX(22px); }
+.pill { display: inline-block; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--panel2); color: var(--muted); }
+.busy { text-align: center; color: var(--muted); padding: 8px; font-size: 13px; }
+.storage { font-size: 13px; color: var(--muted); }

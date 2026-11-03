@@ -5,15 +5,17 @@ plugins {
 
 android {
     namespace = "fr.videostudio.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "fr.videostudio.app"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "2.0.0"
+        buildConfigField("String", "RELAY_URL", "\"https://pwnjdmemczrhuhsyuboc.supabase.co/functions/v1/video-studio\"")
     }
+    buildFeatures { buildConfig = true }
 
     buildTypes {
         release {
@@ -27,4 +29,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+}
+
+dependencies {
+    val media3 = "1.11.1"
+    implementation("androidx.media3:media3-transformer:$media3")
+    implementation("androidx.media3:media3-effect:$media3")
+    implementation("androidx.media3:media3-common:$media3")
 }

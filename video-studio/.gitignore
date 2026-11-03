@@ -1,5 +1,3 @@
-server/node_modules/
-server/data/
 android/.gradle/
 android/build/
 android/app/build/

@@ -1,103 +1,61 @@
-# 🎬 Video Studio — tes vidéos + Claude monteur
+# 🎬 Video Studio — tes vidéos sur ton téléphone, Claude au montage
 
-Une app Android où tu envoies tes vidéos, photos et musiques, et un **serveur MCP** que tu connectes à Claude. Claude peut alors **regarder** tes vidéos (images, planches contact, scènes, silences) et **faire des montages** (coupes, transitions, textes, musique, format TikTok 9:16…). Les montages apparaissent directement dans l'app.
+Une app Android où tu ajoutes tes vidéos, photos et musiques. Tu connectes Claude via MCP, et Claude peut **regarder** tes vidéos et **faire des montages** (coupes, vitesse, fondus, textes, musique, format TikTok 9:16…).
+
+**Tout reste sur ton téléphone** : les fichiers ne sont jamais envoyés en ligne, il n'y a pas de limite de taille, et c'est le téléphone qui calcule les montages (encodage matériel Android / Media3). Pas besoin de PC.
 
 ```
- Téléphone (APK)  ──upload──▶  Serveur Video Studio  ◀──MCP──  Claude
-                  ◀─montages──  (Node.js + ffmpeg)
+ Claude ──MCP──▶ Relais (Supabase, gratuit) ◀──connexion── App Android
+                 ne transporte que les commandes          stocke + monte
+                 et de petites images d'aperçu            les vidéos
 ```
 
-## 1. Lancer le serveur
+## Installation
 
-Le serveur doit tourner sur une machine allumée (PC, mini-PC, VPS…) **et être joignable en HTTPS depuis Internet** pour que Claude puisse s'y connecter.
+1. Télécharge **`video-studio/VideoStudio.apk`** sur ton téléphone (Android 10 ou plus) et installe-le (autorise « applis inconnues » si demandé).
+2. Ajoute tes fichiers avec **＋**, ou depuis la galerie : *Partager → Video Studio*.
+3. Onglet **Claude** :
+   - active **« Connecté à Claude »** (une notification indique que la connexion est active) ;
+   - **Copier** l'adresse, puis sur claude.ai : **Paramètres → Connecteurs → Ajouter un connecteur personnalisé**, colle-la (nom : *Video Studio*).
+4. Dans une conversation avec le connecteur activé :
+   > « Regarde mes vidéos de vacances et fais un best-of de 30 s en vertical avec la musique *summer*. »
 
-### Option A — Docker (le plus simple, avec HTTPS gratuit)
+Le montage apparaît dans l'onglet **Montages** et dans la galerie (`Movies/VideoStudio`).
 
-```bash
-cd video-studio
-ACCESS_TOKEN="choisis-un-long-mot-de-passe" docker compose up -d --build
-docker compose logs tunnel | grep trycloudflare.com
-```
+Pour Claude Code : `claude mcp add --transport http video-studio <adresse copiée>`
 
-La dernière commande affiche ton adresse publique, par exemple `https://abc-def.trycloudflare.com`.
-⚠️ Avec ce tunnel « rapide », l'adresse change à chaque redémarrage. Pour une adresse fixe : un [tunnel Cloudflare nommé](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (gratuit, nécessite un nom de domaine) ou un hébergeur (Railway, Render, Fly.io, VPS) avec un disque persistant monté sur `/data`.
+## Bon à savoir
 
-### Option B — Sans Docker
-
-Il faut Node.js 20+ et ffmpeg installés.
-
-```bash
-cd video-studio/server
-npm install
-ACCESS_TOKEN="choisis-un-long-mot-de-passe" npm start
-# dans un autre terminal, pour l'HTTPS public :
-cloudflared tunnel --url http://localhost:8787
-```
-
-### Variables d'environnement
-
-| Variable | Rôle | Défaut |
-|---|---|---|
-| `ACCESS_TOKEN` | Jeton secret (app + Claude) | généré dans `data/token.txt` |
-| `PORT` | Port HTTP | `8787` |
-| `DATA_DIR` | Où sont stockés les fichiers | `./data` |
-| `PUBLIC_URL` | Adresse publique (liens de téléchargement) | déduite de la requête |
-| `MAX_UPLOAD_MB` | Taille max d'un fichier | `4096` |
-
-## 2. Installer l'app Android
-
-1. Télécharge **`video-studio/VideoStudio.apk`** sur ton téléphone.
-2. Ouvre-le, autorise « Installer des applis inconnues » si Android le demande.
-3. Au premier lancement : entre l'adresse du serveur (`https://…`) et ton jeton.
-
-Dans l'app :
-- **＋** pour ajouter des vidéos / photos / musiques (plusieurs à la fois).
-- Depuis la **galerie** : *Partager → Video Studio* envoie directement les fichiers.
-- Touche un fichier pour le lire, le renommer, écrire des **notes pour Claude** (« garder le moment du gâteau vers 1:20 »), le télécharger ou le supprimer.
-- Onglet **Montages** : les vidéos créées par Claude (avec la progression du rendu en cours).
-- Onglet **Claude** : l'adresse MCP à copier.
-
-L'interface marche aussi dans un navigateur à l'adresse du serveur.
-
-## 3. Connecter Claude
-
-1. Dans l'app, onglet **Claude** → **Copier** (adresse du type `https://…/mcp/<jeton>`).
-2. Sur claude.ai : **Paramètres → Connecteurs → Ajouter un connecteur personnalisé**, colle l'adresse.
-3. Dans une conversation, active le connecteur *Video Studio* et demande :
-   > « Regarde mes vidéos de vacances et fais un best-of de 30 s en vertical avec la musique *summer* et des fondus. »
-
-Pour **Claude Code** :
-```bash
-claude mcp add --transport http video-studio https://…/mcp/<jeton>
-```
+- L'app doit être **connectée** (interrupteur activé + Internet) quand tu demandes quelque chose à Claude. Sinon Claude te dira que le téléphone n'est pas joignable.
+- Pour un long montage : garde l'app ouverte et le téléphone branché.
+- Les fichiers ajoutés avec **＋** ne sont pas copiés (l'app garde juste un accès). « Retirer » un fichier l'enlève de l'app sans toucher à l'original. Les fichiers reçus par *Partager* sont copiés dans le dossier de l'app.
+- L'adresse du connecteur contient une clé secrète propre à ton téléphone : ne la partage pas. « Créer une nouvelle adresse secrète » invalide l'ancienne.
 
 ## Outils MCP disponibles pour Claude
 
 | Outil | Description |
 |---|---|
-| `list_media` | Liste des fichiers (filtre par type, recherche, notes) |
-| `get_media_info` | Détails d'un fichier (durée, résolution, son, recette d'un montage) |
+| `list_media`, `get_media_info` | Bibliothèque, notes de l'utilisateur, recette des montages |
 | `view_frame` | Voir l'image à un instant précis |
-| `view_storyboard` | Planche contact horodatée : « regarder » une vidéo |
-| `detect_scenes` | Changements de plan |
-| `analyze_audio` | Silences (pour couper les blancs) et volume |
-| `create_montage` | Le montage : clips coupés, vitesse, volume, transitions (fondu, glissé, zoom…), textes, musique avec atténuation auto sous la voix, fondus, formats 16:9 / 9:16 / 1:1 / 4:5, recadrage ou fond flouté, brouillon 480p ou final 1080p |
-| `get_job` / `list_jobs` | Suivi des rendus |
-| `update_media` / `delete_media` | Renommer, annoter, supprimer |
-| `import_from_url` | Importer un fichier depuis un lien direct |
-| `get_download_link` | Lien de téléchargement signé |
+| `view_storyboard` | Planche contact horodatée pour « regarder » une vidéo |
+| `detect_scenes` | Changements de plan (par échantillonnage) |
+| `analyze_audio` | Silences (couper les blancs) et niveau sonore |
+| `create_montage` + `get_job` / `list_jobs` | Montage : clips coupés, vitesse 0.25–4×, volume/muet, fondus au noir entre clips, textes par clip ou sur la timeline, musique de fond en boucle, fondus d'ouverture/fin, 16:9 / 9:16 / 1:1 / 4:5 / 4:3, recadrage ou bandes noires, brouillon 480p ou final 1080p |
+| `update_media`, `delete_media` | Renommer, annoter, retirer |
+| `import_from_url` | Télécharger un fichier vers le téléphone |
+| `device_status` | Connexion, batterie, espace libre |
 
-## Sécurité
+## Structure
 
-- Le jeton protège l'app **et** l'adresse MCP : ne partage pas l'adresse `…/mcp/<jeton>`.
-- Les liens de téléchargement donnés par Claude sont signés par fichier (ils ne révèlent pas le jeton).
-- Pour changer le jeton : modifie `ACCESS_TOKEN`, redémarre, puis mets à jour l'app et le connecteur Claude.
+- `android/` — l'app (Kotlin, WebView pour l'interface, Media3 Transformer pour le montage, service de connexion au relais).
+- `relay/` — le relais MCP : Edge Function Supabase (`index.ts`) et sa base (`schema.sql`). Déployé sur le projet Supabase `video-studio-relay`.
 
 ## Recompiler l'APK
 
 ```bash
 cd video-studio/android
-./gradlew assembleRelease     # nécessite le SDK Android (ANDROID_HOME)
-# → app/build/outputs/apk/release/app-release.apk
+./gradlew assembleRelease     # nécessite le SDK Android 36 (ANDROID_HOME)
 ```
-Le workflow GitHub `.github/workflows/video-studio-apk.yml` le compile aussi automatiquement (onglet *Actions* → artefact *VideoStudio-apk*). L'APK est signé avec une clé de debug : si tu installes une version compilée ailleurs, désinstalle d'abord l'ancienne.
+Le workflow GitHub `.github/workflows/video-studio-apk.yml` le compile aussi (onglet *Actions* → artefact *VideoStudio-apk*). L'APK est signé avec une clé de debug : si tu installes une version compilée ailleurs, désinstalle d'abord l'ancienne.
+
+Pour utiliser ton propre relais : déploie `relay/index.ts` comme Edge Function `video-studio` (sans vérification JWT), applique `relay/schema.sql`, et change `RELAY_URL` dans `android/app/build.gradle.kts`.

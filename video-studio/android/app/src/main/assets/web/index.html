@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Video Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="main">
+    <header>
+      <h1>🎬 Video Studio</h1>
+      <span id="claudePill" class="pill">Claude : déconnecté</span>
+    </header>
+
+    <nav class="tabs">
+      <button data-tab="library" class="active">Mes fichiers</button>
+      <button data-tab="montages">Montages</button>
+      <button data-tab="claude">Claude</button>
+    </nav>
+
+    <div id="busy" class="busy hidden"></div>
+
+    <div id="tab-library" class="tab">
+      <div class="filters">
+        <button data-filter="" class="chip active">Tout</button>
+        <button data-filter="video" class="chip">Vidéos</button>
+        <button data-filter="image" class="chip">Photos</button>
+        <button data-filter="audio" class="chip">Musiques</button>
+      </div>
+      <div id="grid" class="grid"></div>
+      <p id="empty" class="empty hidden">Aucun fichier pour l'instant.<br>Appuie sur <b>＋</b> pour choisir des vidéos, photos et musiques,<br>ou utilise <b>Partager → Video Studio</b> depuis ta galerie.<br><br><small>Les fichiers restent sur ton téléphone : aucune limite de taille.</small></p>
+    </div>
+
+    <div id="tab-montages" class="tab hidden">
+      <div id="jobs"></div>
+      <div id="montageGrid" class="grid"></div>
+      <p id="emptyMontages" class="empty hidden">Pas encore de montage.<br>Demande à Claude : « Fais-moi un montage de mes vidéos de vacances en format TikTok ».<br><br><small>Les montages sont aussi enregistrés dans ta galerie (Movies/VideoStudio).</small></p>
+    </div>
+
+    <div id="tab-claude" class="tab hidden">
+      <div class="card status">
+        <span id="dot" class="dot"></span>
+        <div class="txt"><b>Connecté à Claude</b><small id="statusTxt">Désactivé</small></div>
+        <label class="switch"><input id="connectToggle" type="checkbox"><span></span></label>
+      </div>
+      <div class="card">
+        <h2>Ajouter Video Studio dans Claude</h2>
+        <p>Copie cette adresse et ajoute-la comme <b>connecteur personnalisé</b> dans Claude (une seule fois) :</p>
+        <div class="copy-row">
+          <code id="mcpUrl">…</code>
+          <button id="copyMcp" class="btn small">Copier</button>
+        </div>
+        <ol class="steps">
+          <li>Sur <b>claude.ai</b> ou l'app Claude : <b>Paramètres → Connecteurs → Ajouter un connecteur personnalisé</b>.</li>
+          <li>Nom : <i>Video Studio</i>, URL : l'adresse ci-dessus. Valide.</li>
+          <li>Active <b>« Connecté à Claude »</b> ci-dessus, puis demande ton montage dans une conversation.</li>
+        </ol>
+        <p class="warn">⚠️ Cette adresse donne accès à tes fichiers dans l'app : ne la partage avec personne.</p>
+      </div>
+      <div class="card">
+        <h2>Bon à savoir</h2>
+        <ul class="ideas">
+          <li>Tes vidéos <b>ne quittent jamais ton téléphone</b> : Claude ne reçoit que de petites images pour « voir » leur contenu.</li>
+          <li>Les montages sont calculés <b>par ton téléphone</b> : garde l'app ouverte et le téléphone branché pour les longues vidéos.</li>
+          <li>Écris dans les <b>notes</b> d'une vidéo ce qu'elle contient ou ce que tu veux en faire : Claude les lit.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Idées de demandes</h2>
+        <ul class="ideas">
+          <li>« Regarde mes vidéos et fais un best-of de 30 secondes en 9:16 avec la musique <i>summer</i>. »</li>
+          <li>« Coupe les blancs dans la vidéo <i>interview</i> et ajoute un titre au début. »</li>
+          <li>« Fais un diaporama des photos du week-end avec des fondus. »</li>
+        </ul>
+      </div>
+      <button id="resetToken" class="btn ghost">Créer une nouvelle adresse secrète</button>
+      <p class="muted" style="text-align:center;font-size:12px" id="version"></p>
+    </div>
+
+    <button id="fab" class="fab" title="Ajouter">＋</button>
+  </section>
+
+  <div id="sheet" class="sheet hidden">
+    <div class="sheet-body">
+      <button id="closeSheet" class="close">✕</button>
+      <div id="player"></div>
+      <input id="mName" class="name-input">
+      <p id="mMeta" class="muted"></p>
+      <label for="mNotes">Notes / instructions pour Claude</label>
+      <textarea id="mNotes" rows="3" placeholder="Ex. : anniversaire de Léa, garder le moment du gâteau vers 1:20"></textarea>
+      <div class="actions">
+        <button id="saveMedia" class="btn primary">Enregistrer</button>
+        <button id="shareMedia" class="btn">Partager</button>
+        <button id="delMedia" class="btn danger">Retirer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
