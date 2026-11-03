@@ -28,7 +28,7 @@
   function card(it) {
     const thumb = it.hasThumb ? `style="background-image:url('/thumb/${it.id}')"` : '';
     return `<div class="item" data-id="${it.id}">
-      <div class="thumb" ${thumb}>${it.hasThumb ? '' : icon(it.type)}</div>
+      <div class="thumb" ${thumb}>${it.hasThumb ? '' : `<span class="ic">${icon(it.type)}</span>`}</div>
       <span class="type">${icon(it.type)}</span>
       ${it.duration ? `<span class="badge">${fmtDur(it.duration)}</span>` : ''}
       <div class="label">${esc(it.name)}<small>${it.notes ? esc(it.notes) : new Date(it.createdAt).toLocaleDateString('fr-FR')}</small></div>
