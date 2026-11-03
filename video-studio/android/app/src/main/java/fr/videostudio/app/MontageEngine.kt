@@ -97,7 +97,9 @@ class MontageEngine(private val ctx: Context) {
         try {
             run(job, spec)
         } catch (e: Throwable) {
-            job.status = "error"; job.error = e.message ?: e.toString()
+            android.util.Log.e("VideoStudio", "Montage impossible", e)
+            job.status = "error"
+            job.error = (e.message ?: e.toString()) + " [" + e.stackTrace.take(3).joinToString(" < ") { "${it.className.substringAfterLast('.')}.${it.methodName}:${it.lineNumber}" } + "]"
             running = false
             main.post { pump() }
         }
@@ -193,7 +195,11 @@ class MontageEngine(private val ctx: Context) {
             b.setEffects(Effects(audio, video)).build()
         }
 
-        val sequences = mutableListOf(EditedMediaItemSequence.Builder(items).build())
+        // Types de pistes explicites (sinon une photo dans la séquence est refusée par Media3)
+        val sequences = mutableListOf(
+            EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO))
+                .addItems(items).build()
+        )
         val music = spec.optJSONObject("music")
         if (music != null) {
             val mm = lib.mustGet(music.getString("media_id"))
@@ -206,7 +212,7 @@ class MontageEngine(private val ctx: Context) {
                 .setRemoveVideo(true)
                 .setEffects(Effects(listOf(MusicGain(music.optDouble("volume", 0.5), total, mfo)), listOf()))
                 .build()
-            sequences.add(EditedMediaItemSequence.Builder(listOf(musicItem)).setIsLooping(true).build())
+            sequences.add(EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO)).addItem(musicItem).setIsLooping(true).build())
         }
 
         val gIn = spec.optDouble("fade_in", 0.0)
@@ -223,6 +229,8 @@ class MontageEngine(private val ctx: Context) {
         val transformer = Transformer.Builder(ctx)
             .setVideoMimeType(MimeTypes.VIDEO_H264)
             .setAudioMimeType(MimeTypes.AUDIO_AAC)
+            // Tolère les téléphones lents (et l'encodage logiciel) sans abandonner le rendu
+            .setMaxDelayBetweenMuxerSamplesMs(180_000)
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                     Thread {
