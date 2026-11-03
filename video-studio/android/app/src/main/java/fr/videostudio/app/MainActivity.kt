@@ -85,7 +85,8 @@ class MainActivity : Activity() {
         web.loadUrl("https://$HOST/index.html")
         App.onChanged(changed)
 
-        if (App.prefs(this).getBoolean("connected", false)) RelayService.start(this)
+        // Démarré après l'affichage pour ne pas bloquer le thread principal pendant l'init de la WebView
+        if (App.prefs(this).getBoolean("connected", false)) root.postDelayed({ RelayService.start(this) }, 1500)
         handleShare(intent)
     }
 

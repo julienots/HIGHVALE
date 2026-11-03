@@ -31,7 +31,9 @@ class RelayService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        startForeground(1, notification("Connecté à Claude — en attente de demandes"), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        val n = notification("Connecté à Claude — en attente de demandes")
+        if (android.os.Build.VERSION.SDK_INT >= 34) startForeground(1, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        else startForeground(1, n)
         if (!running) {
             running = true
             wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager)
