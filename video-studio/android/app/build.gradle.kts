@@ -18,6 +18,10 @@ android {
     buildFeatures { buildConfig = true }
 
     buildTypes {
+        debug {
+            // Tests en émulateur : relais local (RELAY_URL=http://10.0.2.2:9000/video-studio)
+            System.getenv("RELAY_URL")?.let { buildConfigField("String", "RELAY_URL", "\"$it\"") }
+        }
         release {
             isMinifyEnabled = false
             // Signé avec la clé de debug pour pouvoir installer l'APK directement
