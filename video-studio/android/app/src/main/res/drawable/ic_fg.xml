@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Clap de cinéma + bouton lecture -->
+    <path android:fillColor="#FFFFFF" android:pathData="M32,46h44v26a4,4 0,0 1,-4 4H36a4,4 0,0 1,-4 -4z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M31.2,40.6l42.4,-9.8l2.2,8.8l-42.4,9.8z" />
+    <path android:fillColor="#FF5A36" android:pathData="M48,52l14,9l-14,9z" />
+</vector>
