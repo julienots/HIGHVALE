@@ -1,0 +1,6 @@
+lib/
+out/
+data/
+work/
+harness.log
+remote.git/

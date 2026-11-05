@@ -1,0 +1,83 @@
+const URL_ = 'http://127.0.0.1:18765/mcp';
+let id = 1;
+async function rpc(method, params, token = 'testtoken') {
+  const r = await fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream', Authorization: `Bearer ${token}` }, body: JSON.stringify({ jsonrpc: '2.0', id: id++, method, params }) });
+  if (r.status !== 200) return { status: r.status };
+  return r.json();
+}
+async function call(name, args = {}) {
+  const r = await rpc('tools/call', { name, arguments: args });
+  const t = r.result.content[0].text;
+  if (r.result.isError) throw new Error(`${name}: ${t}`);
+  try { return JSON.parse(t); } catch { return t; }
+}
+const ok = (c, m) => { if (!c) throw new Error('ÉCHEC : ' + m); console.log('✓', m); };
+const bad = await rpc('initialize', {}, 'faux');
+ok(bad.status === 401, 'mauvais jeton refusé (401)');
+const init = await rpc('initialize', { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } });
+ok(init.result.serverInfo.name === 'gixcloud', 'initialize');
+const notif = await fetch(URL_, { method: 'POST', headers: { Authorization: 'Bearer testtoken', 'Content-Type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }) });
+ok(notif.status === 202, 'notification → 202');
+const list = await rpc('tools/list', {});
+ok(list.result.tools.length > 40, `tools/list : ${list.result.tools.length} outils`);
+const repo = await call('create_repository', { name: 'demo', description: 'Démo téléphone' });
+ok(repo.full_name === 'moi/demo' && repo.last_commit, 'create_repository + README');
+await call('push_files', { repo: 'demo', message: 'Code', files: [{ path: 'src/a.js', content: 'console.log(1)\n' }, { path: 'bin.dat', content: Buffer.from([0, 1, 2]).toString('base64'), encoding: 'base64' }] });
+const dir = await call('get_file_contents', { repo: 'demo', path: 'src' });
+ok(dir.entries[0].name === 'a.js', 'push_files + liste de dossier');
+ok((await call('get_file_contents', { repo: 'demo', path: 'bin.dat' })).encoding === 'base64', 'fichier binaire en base64');
+const iss = await call('create_issue', { repo: 'demo', title: 'Afficher 2', labels: ['bug'] });
+ok(iss.number === 1, 'create_issue');
+await call('create_branch', { repo: 'demo', branch: 'fix' });
+const f = await call('get_file_contents', { repo: 'demo', path: 'src/a.js', ref: 'fix' });
+await call('create_or_update_file', { repo: 'demo', branch: 'fix', path: 'src/a.js', content: 'console.log(2)\n', sha: f.sha, message: 'Affiche 2' });
+let refused = false; try { await call('create_or_update_file', { repo: 'demo', branch: 'fix', path: 'src/a.js', content: 'x', sha: f.sha }); } catch { refused = true; }
+ok(refused, 'sha périmé refusé');
+await call('create_or_update_file', { repo: 'demo', path: 'NOTES.md', content: 'notes\n' });
+const pr = await call('create_pull_request', { repo: 'demo', title: 'Correction', head: 'fix', body: 'Fixes #1' });
+ok(pr.number === 2 && pr.mergeable === true && pr.state === 'open', 'create_pull_request (fusion possible)');
+const prd = await call('get_pull_request', { repo: 'demo', number: 2 });
+ok(prd.files[0].file === 'src/a.js' && /\+console\.log\(2\)/.test(prd.diff), 'get_pull_request : fichiers + diff');
+await call('create_review', { repo: 'demo', number: 2, event: 'APPROVE' });
+const m = await call('merge_pull_request', { repo: 'demo', number: 2, delete_branch: true });
+ok(m.merged && m.closed_issues[0] === 1, 'merge_pull_request + « Fixes #1 » ferme le ticket');
+ok((await call('get_file_contents', { repo: 'demo', path: 'src/a.js' })).content === 'console.log(2)\n', 'contenu fusionné');
+ok((await call('get_file_contents', { repo: 'demo', path: 'NOTES.md' })).content === 'notes\n', 'fusion à 3 voies conserve main');
+ok((await call('list_branches', { repo: 'demo' })).length === 1, 'branche source supprimée');
+await call('create_branch', { repo: 'demo', branch: 'c1' });
+await call('create_or_update_file', { repo: 'demo', branch: 'c1', path: 'NOTES.md', content: 'A\n' });
+await call('create_or_update_file', { repo: 'demo', path: 'NOTES.md', content: 'B\n' });
+const cpr = await call('create_pull_request', { repo: 'demo', title: 'Conflit', head: 'c1' });
+ok(cpr.mergeable === false && cpr.conflicts.includes('NOTES.md'), 'conflit détecté');
+const sq = await call('create_branch', { repo: 'demo', branch: 'sq' });
+await call('create_or_update_file', { repo: 'demo', branch: 'sq', path: 'x.txt', content: '1\n' });
+await call('create_or_update_file', { repo: 'demo', branch: 'sq', path: 'x.txt', content: '2\n' });
+const spr = await call('create_pull_request', { repo: 'demo', title: 'Squash', head: 'sq' });
+const sm = await call('merge_pull_request', { repo: 'demo', number: spr.number, merge_method: 'squash' });
+const top = (await call('list_commits', { repo: 'demo', limit: 1 }))[0];
+ok(top.sha === sm.commit && /Squash/.test(top.message), 'squash');
+const c = await call('get_commit', { repo: 'demo', sha: top.sha });
+ok(c.files[0].file === 'x.txt' && c.parents.length === 1, 'get_commit');
+const cmp = await call('compare', { repo: 'demo', base: 'c1', head: 'main' });
+ok(cmp.ahead_by > 0, 'compare');
+ok((await call('search_code', { query: 'console.log' }))[0].path === 'src/a.js', 'search_code');
+await call('create_tag', { repo: 'demo', tag: 'v0.1', message: 'première' });
+ok((await call('list_tags', { repo: 'demo' }))[0].name === 'v0.1', 'tags');
+const rel = await call('create_release', { repo: 'demo', tag: 'v1.0.0' });
+ok(/Squash|Affiche 2/.test(rel.body), 'create_release (notes générées)');
+await call('upload_release_asset', { repo: 'demo', tag: 'v1.0.0', name: 'notes.txt', content_base64: Buffer.from('hello').toString('base64') });
+const dl = await fetch(`http://127.0.0.1:18765${(await call('get_release', { repo: 'demo', tag: 'latest' })).assets[0].download}`, { headers: { Authorization: 'Bearer testtoken' } });
+ok(dl.status === 200 && (await dl.text()) === 'hello', 'téléchargement d’un fichier de version par HTTP');
+const fk = await call('fork_repository', { repo: 'demo', new_owner: 'ami' });
+await call('create_or_update_file', { repo: 'ami/demo', path: 'fork.txt', content: 'du fork\n' });
+const fpr = await call('create_pull_request', { repo: 'demo', title: 'Du fork', head: 'ami/demo:main' });
+await call('merge_pull_request', { repo: 'demo', number: fpr.number });
+ok((await call('get_file_contents', { repo: 'demo', path: 'fork.txt' })).content === 'du fork\n', 'fork + PR depuis le fork');
+await call('delete_file', { repo: 'demo', path: 'src' });
+ok(!(await call('get_tree', { repo: 'demo' })).files.includes('src/a.js'), 'delete_file (dossier)');
+ok((await call('list_issues', { repo: 'demo', state: 'closed' })).length === 1, 'list_issues');
+let del = false; try { await call('delete_repository', { repo: 'ami/demo', confirm: 'non' }); } catch { del = true; }
+ok(del, 'suppression exige confirmation');
+await call('delete_repository', { repo: 'ami/demo', confirm: 'ami/demo' });
+ok((await call('list_repositories')).length === 1, 'delete_repository');
+console.log('TOUT EST OK');

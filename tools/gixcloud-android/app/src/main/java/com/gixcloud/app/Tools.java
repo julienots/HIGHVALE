@@ -46,8 +46,8 @@ public final class Tools {
     interface Handler { Object run(JSONObject a) throws Exception; }
 
     static final class Tool {
-        final String name, description; final JSONObject schema; final Handler h; final boolean readOnly, destructive;
-        Tool(String n, String d, JSONObject s, Handler h, boolean ro, boolean de) { name = n; description = d; schema = s; this.h = h; readOnly = ro; destructive = de; }
+        final String name, description; final JSONObject schema; final Handler h; final boolean readOnly, destructive, admin;
+        Tool(String n, String d, JSONObject s, Handler h, boolean ro, boolean de, boolean ad) { name = n; description = d; schema = s; this.h = h; readOnly = ro; destructive = de; admin = ad; }
     }
 
     final Gix gix;
@@ -64,14 +64,15 @@ public final class Tools {
         registerPulls();
         registerReleases();
         registerApk();
+        new ToolsMore(this);
     }
 
     // ---------- Infrastructure ----------
 
-    private static final String[] REPO = {"repo", "s", "Nom du dépôt, ou « propriétaire/dépôt ».", "1"};
-    private static final String[] OWNER = {"owner", "s", "Propriétaire (facultatif)."};
+    static final String[] REPO = {"repo", "s", "Nom du dépôt, ou « propriétaire/dépôt ».", "1"};
+    static final String[] OWNER = {"owner", "s", "Propriétaire (facultatif)."};
 
-    private void def(String name, String desc, String flags, String[][] params, Handler h) {
+    void def(String name, String desc, String flags, String[][] params, Handler h) {
         JSONObject props = new JSONObject();
         JSONArray req = new JSONArray();
         try {
@@ -106,7 +107,7 @@ public final class Tools {
                 if (p.length > 3) req.put(p[0]);
             }
             JSONObject schema = new JSONObject().put("type", "object").put("properties", props).put("required", req);
-            tools.put(name, new Tool(name, desc, schema, h, flags.contains("r"), flags.contains("d")));
+            tools.put(name, new Tool(name, desc, schema, h, flags.contains("r"), flags.contains("d"), flags.contains("a")));
         } catch (Exception e) { throw new RuntimeException(e); }
     }
 
@@ -128,7 +129,27 @@ public final class Tools {
     public Object call(String name, JSONObject args) throws Exception {
         Tool t = tools.get(name);
         if (t == null) throw new Err("Outil inconnu : " + name);
-        return t.h.run(args == null ? new JSONObject() : args);
+        Auth.User u = Auth.current(gix);
+        String need = t.admin ? "admin" : t.readOnly ? "read" : "write";
+        if (!u.can(need)) throw new Err("Permission refusée : « " + name + " » demande un jeton " + need + " (le vôtre : " + u.perm + ").");
+        JSONObject a = args == null ? new JSONObject() : args;
+        Object res = t.h.run(a);
+        if (!t.readOnly && !name.equals("delete_repository") && !name.endsWith("_token")) recordEvent(name, a, res);
+        return res;
+    }
+
+    /** Chaque écriture apparaît dans le fil d'activité du dépôt (et déclenche ses webhooks). */
+    private void recordEvent(String name, JSONObject a, Object res) {
+        try {
+            String repo = s(a, "repo") != null ? s(a, "repo") : name.equals("create_repository") ? s(a, "name") : null;
+            if (repo == null || name.contains("gist") || name.contains("wiki") && false) return;
+            GitStore.Id id = st.id(s(a, "owner"), repo);
+            if (!st.exists(id)) return;
+            JSONObject p = new JSONObject();
+            for (String k : new String[]{"number", "branch", "base", "head", "title", "tag", "path", "event", "name", "sha", "merge_method", "state"}) if (a.has(k)) p.put(k, a.get(k));
+            if (res instanceof JSONObject) for (String k : new String[]{"number", "commit", "merged"}) if (((JSONObject) res).has(k)) p.put("result_" + k, ((JSONObject) res).get(k));
+            gix.events.emit(id, name, p);
+        } catch (Exception ignored) { }
     }
 
     static String s(JSONObject a, String k) { return a.has(k) && !a.isNull(k) ? a.optString(k, null) : null; }
@@ -226,7 +247,7 @@ public final class Tools {
             return repoInfo(r, id);
         }));
 
-        def("delete_repository", "Supprime définitivement un dépôt. Exige confirm = « propriétaire/dépôt ».", "d", new String[][]{REPO, OWNER,
+        def("delete_repository", "Supprime définitivement un dépôt. Exige confirm = « propriétaire/dépôt ».", "ad", new String[][]{REPO, OWNER,
                 {"confirm", "s", "Nom complet « propriétaire/dépôt » pour confirmer.", "1"}}, a -> {
             GitStore.Id id = id(a);
             if (!st.exists(id)) throw new Err("Dépôt introuvable : " + id.full());
@@ -513,8 +534,8 @@ public final class Tools {
         if (r.exactRef(Constants.R_TAGS + tag) != null) throw new Err("Le tag " + tag + " existe déjà.");
         ObjectId c = GitStore.need(r, ref);
         try (Git g = new Git(r); RevWalk rw = new RevWalk(r)) {
-            org.eclipse.jgit.api.TagCommand tc = g.tag().setName(tag).setObjectId(rw.parseCommit(c)).setTagger(st.person());
-            if (message != null && !message.isEmpty()) tc.setMessage(message).setAnnotated(true); else tc.setAnnotated(false);
+            org.eclipse.jgit.api.TagCommand tc = g.tag().setName(tag).setObjectId(rw.parseCommit(c));
+            if (message != null && !message.isEmpty()) tc.setMessage(message).setAnnotated(true).setTagger(st.person()); else tc.setAnnotated(false);
             tc.call();
         }
         return new JSONObject().put("tag", tag).put("commit", c.getName());
@@ -538,7 +559,7 @@ public final class Tools {
 
     JSONObject comment(JSONObject it, String body) throws Exception {
         JSONArray cs = it.getJSONArray("comments");
-        JSONObject c = new JSONObject().put("id", cs.length() + 1).put("author", gix.authorName()).put("body", body).put("created_at", GitStore.now());
+        JSONObject c = new JSONObject().put("id", cs.length() + 1).put("author", Auth.current(gix).name).put("body", body).put("created_at", GitStore.now());
         cs.put(c);
         it.put("updated_at", c.get("created_at"));
         return c;
@@ -567,14 +588,14 @@ public final class Tools {
 
     private void registerIssues() {
         def("create_issue", "Ouvre un ticket (bug, idée, tâche).", "", new String[][]{REPO, OWNER, {"title", "s", "Titre.", "1"},
-                {"body", "s", "Description (Markdown)."}, {"labels", "as", "Étiquettes."}, {"assignees", "as", "Assignés."}}, a -> {
+                {"body", "s", "Description (Markdown)."}, {"labels", "as", "Étiquettes."}, {"assignees", "as", "Assignés."}, {"milestone", "s", "Jalon (titre)."}}, a -> {
             GitStore.Id id = id(a);
             if (!st.exists(id)) throw new Err("Dépôt introuvable : " + id.full());
             return st.updateMeta(id, m -> {
                 int n = m.getInt("next_number");
                 m.put("next_number", n + 1);
                 JSONObject it = new JSONObject().put("number", n).put("title", s(a, "title")).put("body", s(a, "body", "")).put("state", "open")
-                        .put("labels", jarr(strs(a, "labels"))).put("assignees", jarr(strs(a, "assignees"))).put("author", gix.authorName())
+                        .put("labels", jarr(strs(a, "labels"))).put("assignees", jarr(strs(a, "assignees"))).put("milestone", s(a, "milestone", "")).put("author", Auth.current(gix).name)
                         .put("created_at", GitStore.now()).put("updated_at", GitStore.now()).put("comments", new JSONArray());
                 m.getJSONArray("issues").put(it);
                 return summary(it);
@@ -589,9 +610,11 @@ public final class Tools {
 
         def("update_issue", "Modifie un ticket : titre, description, état, étiquettes, assignés.", "", new String[][]{REPO, OWNER,
                 {"number", "i", "Numéro.", "1"}, {"title", "s", "Titre."}, {"body", "s", "Description."}, {"state", "e:open|closed", "État."},
-                {"labels", "as", "Étiquettes."}, {"assignees", "as", "Assignés."}}, a -> st.updateMeta(id(a), m -> {
+                {"labels", "as", "Étiquettes."}, {"assignees", "as", "Assignés."}, {"milestone", "s", "Jalon (vide pour retirer)."},
+                {"locked", "b", "Verrouiller la conversation."}}, a -> st.updateMeta(id(a), m -> {
             JSONObject it = find(m, "issues", a.getInt("number"));
-            for (String k : new String[]{"title", "body"}) if (a.has(k)) it.put(k, a.getString(k));
+            if (a.has("locked")) it.put("locked", a.getBoolean("locked"));
+            for (String k : new String[]{"title", "body", "milestone"}) if (a.has(k)) it.put(k, a.getString(k));
             for (String k : new String[]{"labels", "assignees"}) if (a.has(k)) it.put(k, a.getJSONArray(k));
             if (a.has("state") && !a.getString("state").equals(it.optString("state"))) {
                 it.put("state", a.getString("state"));
@@ -605,6 +628,7 @@ public final class Tools {
                 {"number", "i", "Numéro.", "1"}, {"body", "s", "Commentaire.", "1"}}, a -> st.updateMeta(id(a), m -> {
             JSONObject it;
             try { it = find(m, "issues", a.getInt("number")); } catch (Err e) { it = find(m, "pulls", a.getInt("number")); }
+            if (it.optBoolean("locked") && !Auth.current(gix).can("admin")) throw new Err("Conversation verrouillée.");
             return comment(it, s(a, "body"));
         }));
     }
@@ -655,7 +679,7 @@ public final class Tools {
                 int n = m.getInt("next_number");
                 JSONObject pr = new JSONObject().put("number", n).put("title", s(a, "title")).put("body", s(a, "body", "")).put("state", "open")
                         .put("draft", b(a, "draft")).put("head", fh).put("head_repo", fhr).put("base", base).put("labels", new JSONArray())
-                        .put("author", gix.authorName()).put("created_at", GitStore.now()).put("updated_at", GitStore.now())
+                        .put("author", Auth.current(gix).name).put("created_at", GitStore.now()).put("updated_at", GitStore.now())
                         .put("comments", new JSONArray()).put("reviews", new JSONArray());
                 ObjectId h = prHead(r, id, pr);
                 if (GitStore.isAncestor(r, h, baseSha)) throw new Err("Aucun commit à fusionner : " + fh + " est déjà contenu dans " + base + ".");
@@ -684,7 +708,7 @@ public final class Tools {
             mc.remove("tree");
             pr.put("head_sha", h.getName());
             for (java.util.Iterator<String> it = mc.keys(); it.hasNext(); ) { String k = it.next(); pr.put(k, mc.get(k)); }
-            pr.put("commits", cmp.get("commits")).put("files", cmp.get("files"));
+            pr.put("commits", cmp.get("commits")).put("files", cmp.get("files")).put("checks", ToolsMore.latestChecks(st.readMeta(id), h.getName()));
             if (cmp.has("diff")) pr.put("diff", cmp.get("diff"));
             return pr;
         }));
@@ -705,7 +729,7 @@ public final class Tools {
                 {"comments", "ac", "Commentaires sur des lignes : {path, line?, body}."}}, a -> st.updateMeta(id(a), m -> {
             JSONObject pr = find(m, "pulls", a.getInt("number"));
             JSONArray rv = pr.getJSONArray("reviews");
-            JSONObject x = new JSONObject().put("id", rv.length() + 1).put("author", gix.authorName()).put("state", s(a, "event")).put("body", s(a, "body", ""))
+            JSONObject x = new JSONObject().put("id", rv.length() + 1).put("author", Auth.current(gix).name).put("state", s(a, "event")).put("body", s(a, "body", ""))
                     .put("comments", a.optJSONArray("comments") == null ? new JSONArray() : a.getJSONArray("comments")).put("created_at", GitStore.now());
             rv.put(x);
             return x;
@@ -724,6 +748,26 @@ public final class Tools {
             if (!mc.getBoolean("mergeable")) {
                 if ("conflicts".equals(mc.getString("merge_state"))) throw new Err("Conflits dans : " + mc.getJSONArray("conflicts").join(", ").replace("\"", "") + ". Résolvez-les sur la branche " + pr.getString("head") + ".");
                 throw new Err("Rien à fusionner.");
+            }
+            JSONObject prot = m.optJSONObject("protection") == null ? null : m.getJSONObject("protection").optJSONObject(pr.getString("base"));
+            if (m.optBoolean("archived")) throw new Err("Dépôt archivé (lecture seule).");
+            if (prot != null) {
+                int need = prot.optInt("required_approvals", 0), got = 0;
+                JSONArray rvs = pr.getJSONArray("reviews");
+                java.util.Map<String, String> lastByAuthor = new java.util.HashMap<>();
+                for (int x = 0; x < rvs.length(); x++) if (!"COMMENT".equals(rvs.getJSONObject(x).optString("state"))) lastByAuthor.put(rvs.getJSONObject(x).optString("author"), rvs.getJSONObject(x).optString("state"));
+                for (String v : lastByAuthor.values()) if ("APPROVE".equals(v)) got++;
+                if (lastByAuthor.containsValue("REQUEST_CHANGES")) throw new Err("Des changements ont été demandés dans une revue.");
+                if (got < need) throw new Err("Branche protégée : " + need + " approbation(s) requise(s), " + got + " obtenue(s).");
+                JSONArray req = prot.optJSONArray("required_checks");
+                if (req != null && req.length() > 0) {
+                    JSONArray runs = ToolsMore.latestChecks(m, h.getName());
+                    for (int x = 0; x < req.length(); x++) {
+                        String want = req.getString(x); String concl = null;
+                        for (int y = 0; y < runs.length(); y++) if (want.equals(runs.getJSONObject(y).optString("name"))) concl = runs.getJSONObject(y).optString("conclusion");
+                        if (!"success".equals(concl)) throw new Err("Vérification requise « " + want + " » : " + (concl == null ? "absente" : concl) + " sur " + h.getName().substring(0, 7) + ".");
+                    }
+                }
             }
             String method = s(a, "merge_method", "merge");
             int n = pr.getInt("number");
@@ -801,7 +845,7 @@ public final class Tools {
                 JSONArray rels = m.getJSONArray("releases");
                 for (int x = 0; x < rels.length(); x++) if (tag.equals(rels.getJSONObject(x).getString("tag"))) throw new Err("Une version existe déjà pour " + tag + ".");
                 JSONObject rel = new JSONObject().put("tag", tag).put("name", s(a, "name", tag)).put("body", fb).put("commit", c.getName())
-                        .put("prerelease", b(a, "prerelease")).put("author", gix.authorName()).put("created_at", GitStore.now());
+                        .put("prerelease", b(a, "prerelease")).put("author", Auth.current(gix).name).put("created_at", GitStore.now());
                 JSONArray assets = new JSONArray();
                 for (String n : strs(a, "apks")) assets.put(attach(id, tag, n, apkBytes(n)));
                 rel.put("assets", assets);

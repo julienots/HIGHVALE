@@ -20,13 +20,15 @@ import java.util.TimeZone;
 
 /** État global de l'application : dossiers, réglages, moteur git, outils. */
 public final class Gix {
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "2.0.0";
     private static Gix instance;
 
     public final Context app;
     public final File root;
     public final SharedPreferences prefs;
     public final GitStore store;
+    public final Auth auth;
+    public final Events events;
     public final Tools tools;
 
     private Gix(Context ctx) {
@@ -37,6 +39,8 @@ public final class Gix {
         installSystemReader(new File(root, "config"));
         if (!prefs.contains("token")) prefs.edit().putString("token", newToken()).apply();
         store = new GitStore(this);
+        auth = new Auth(this);
+        events = new Events(this);
         tools = new Tools(this);
     }
 

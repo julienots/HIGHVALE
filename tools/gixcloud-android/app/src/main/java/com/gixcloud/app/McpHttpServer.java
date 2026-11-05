@@ -42,7 +42,9 @@ public final class McpHttpServer {
     public volatile String lastClient = "";
     public volatile int requests = 0;
 
-    public McpHttpServer(Gix gix) { this.gix = gix; }
+    private final GitHttp gitHttp;
+
+    public McpHttpServer(Gix gix) { this.gix = gix; this.gitHttp = new GitHttp(gix); }
 
     public boolean isRunning() { return running; }
 
@@ -113,16 +115,29 @@ public final class McpHttpServer {
 
             if (method.equals("OPTIONS")) { send(out, 204, "text/plain", new byte[0], null); return; }
             if (path.equals("/") && method.equals("GET")) {
-                String body = "GIXCLOUD " + Gix.VERSION + " — serveur MCP actif.\nPoint d'accès : POST /mcp (en-tête Authorization: Bearer <jeton>)\n";
+                String body = "GIXCLOUD " + Gix.VERSION + " — serveur MCP actif.\nPoint d'accès : POST /mcp (en-tête Authorization: Bearer <jeton>)\nGit : git clone http://<IP>:" + gix.port() + "/git/<propriétaire>/<dépôt>.git (mot de passe = jeton)\n";
                 send(out, 200, "text/plain; charset=utf-8", body.getBytes(StandardCharsets.UTF_8), null);
                 return;
             }
-            if (!authorized(h, query)) {
+            Auth.User user = authorized(h, query);
+            if (GitHttp.handles(path)) {
+                if (user == null && !GitHttp.isPublic(path)) {
+                    drain(in, h);
+                    send(out, 401, "text/plain; charset=utf-8", "Authentification requise : mot de passe = jeton GIXCLOUD\n".getBytes(StandardCharsets.UTF_8),
+                            new String[]{"WWW-Authenticate", "Basic realm=\"GIXCLOUD\""});
+                    return;
+                }
+                Auth.set(user != null ? user : new Auth.User("public", "read"));
+                try { gitHttp.handle(method, path, query, h, in, out, user != null ? user : new Auth.User("public", "read")); } finally { Auth.clear(); }
+                return;
+            }
+            if (user == null) {
                 drain(in, h);
                 send(out, 401, "application/json", "{\"error\":\"Jeton GIXCLOUD manquant ou invalide\"}".getBytes(StandardCharsets.UTF_8),
                         new String[]{"WWW-Authenticate", "Bearer realm=\"gixcloud\""});
                 return;
             }
+            Auth.set(user);
 
             if (path.equals("/mcp")) {
                 if (method.equals("GET")) { send(out, 405, "text/plain", "Utilisez POST".getBytes(StandardCharsets.UTF_8), new String[]{"Allow", "POST"}); return; }
@@ -136,6 +151,7 @@ public final class McpHttpServer {
                 return;
             }
             if (path.startsWith("/upload/") && (method.equals("PUT") || method.equals("POST"))) {
+                if (!user.can("write")) { drain(in, h); send(out, 403, "text/plain", "Jeton en lecture seule".getBytes(StandardCharsets.UTF_8), null); return; }
                 String name = new File(URLDecoder.decode(path.substring(8), "UTF-8")).getName();
                 if (!name.endsWith(".apk")) name += ".apk";
                 File f = new File(gix.store.apks, name);
@@ -181,17 +197,24 @@ public final class McpHttpServer {
                 return;
             }
             send(out, 404, "text/plain", "Introuvable".getBytes(StandardCharsets.UTF_8), null);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        } finally { Auth.clear(); }
     }
 
-    private boolean authorized(Map<String, String> h, String query) {
+    private Auth.User authorized(Map<String, String> h, String query) {
         String tok = null;
         String auth = h.get("authorization");
         if (auth != null && auth.regionMatches(true, 0, "Bearer ", 0, 7)) tok = auth.substring(7).trim();
+        if (auth != null && auth.regionMatches(true, 0, "Basic ", 0, 6)) {
+            try {
+                String dec = new String(java.util.Base64.getDecoder().decode(auth.substring(6).trim()), StandardCharsets.UTF_8);
+                tok = dec.contains(":") ? dec.substring(dec.indexOf(':') + 1) : dec;
+                if (tok.isEmpty()) tok = dec.substring(0, Math.max(0, dec.indexOf(':')));
+            } catch (Exception ignored) { }
+        }
         if (tok == null) tok = h.get("x-gixcloud-token");
         if (tok == null) for (String kv : query.split("&")) if (kv.startsWith("token=")) tok = kv.substring(6);
-        if (tok == null) return false;
-        return MessageDigest.isEqual(tok.getBytes(StandardCharsets.UTF_8), gix.token().getBytes(StandardCharsets.UTF_8));
+        return gix.auth.check(tok);
     }
 
     private static byte[] readBody(InputStream in, Map<String, String> h, long max) throws Exception {

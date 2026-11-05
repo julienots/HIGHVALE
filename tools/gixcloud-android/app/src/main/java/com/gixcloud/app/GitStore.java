@@ -89,7 +89,14 @@ public final class GitStore {
         } catch (Exception e) { throw new Tools.Err(e.getMessage()); }
     }
 
+    /** Dépôts visibles (sans les gists ni les wikis). */
     public List<Id> list() {
+        List<Id> out = new ArrayList<>();
+        for (Id id : listAll()) if (!id.owner.equals("gist") && !id.repo.endsWith(".wiki")) out.add(id);
+        return out;
+    }
+
+    public List<Id> listAll() {
         List<Id> out = new ArrayList<>();
         File[] owners = repos.listFiles();
         if (owners == null) return out;
@@ -182,9 +189,27 @@ public final class GitStore {
         return n;
     }
 
-    public PersonIdent person() { return new PersonIdent(gix.authorName(), gix.authorEmail()); }
+    public PersonIdent person() {
+        String n = Auth.current(gix).name;
+        return new PersonIdent(n, n.equals(gix.authorName()) ? gix.authorEmail() : n.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", ".") + "@gixcloud.local");
+    }
+
+    /** Retrouve l'identifiant d'un dépôt ouvert (repos/<owner>/<repo>.git). */
+    public Id idOf(Repository r) {
+        File d = r.getDirectory();
+        return new Id(d.getParentFile().getName(), d.getName().replaceAll("\\.git$", ""));
+    }
+
+    /** Refuse les écritures directes sur un dépôt archivé ou une branche protégée « PR obligatoire ». */
+    public void guard(Repository r, String branch) {
+        JSONObject m = readMeta(idOf(r));
+        if (m.optBoolean("archived")) throw new Tools.Err("Dépôt archivé : lecture seule.");
+        JSONObject p = m.optJSONObject("protection") == null ? null : m.optJSONObject("protection").optJSONObject(branch);
+        if (p != null && p.optBoolean("require_pull_request")) throw new Tools.Err("Branche protégée « " + branch + " » : passez par une pull request.");
+    }
 
     public ObjectId commit(Repository r, String branch, List<Change> changes, String message, String from) throws Exception {
+        guard(r, branch);
         String ref = Constants.R_HEADS + branch;
         ObjectId current = resolve(r, ref);
         ObjectId parent = current != null ? current : (from != null ? resolve(r, from) : null);

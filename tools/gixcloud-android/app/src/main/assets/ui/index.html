@@ -16,8 +16,8 @@
   header h1 span { color: var(--accent); }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bad); }
   .dot.on { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
-  nav { display: flex; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 49px; z-index: 2; }
-  nav button { flex: 1; background: none; border: 0; color: var(--muted); padding: 11px 4px; font: inherit; font-size: 14px; border-bottom: 2px solid transparent; }
+  nav { display: flex; overflow-x: auto; scrollbar-width: none; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 49px; z-index: 2; }
+  nav button { flex: 1 0 auto; background: none; border: 0; color: var(--muted); padding: 11px 10px; font: inherit; font-size: 13.5px; white-space: nowrap; border-bottom: 2px solid transparent; }
   nav button.active { color: var(--text); border-bottom-color: var(--accent); }
   main { padding: 16px; max-width: 760px; margin: 0 auto; }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
@@ -57,6 +57,7 @@
 <nav>
   <button data-tab="ia" class="active">IA / MCP</button>
   <button data-tab="repos">Dépôts</button>
+  <button data-tab="activite">Activité</button>
   <button data-tab="apk">APK</button>
   <button data-tab="reglages">Réglages</button>
 </nav>
@@ -95,6 +96,7 @@ function render() {
     if (tab === 'ia') m.innerHTML = viewIA(s);
     else if (tab === 'repos') m.innerHTML = viewRepo(stack[stack.length - 1] || { v: 'repos' });
     else if (tab === 'apk') m.innerHTML = viewApk();
+    else if (tab === 'activite') m.innerHTML = viewActivity();
     else m.innerHTML = viewSettings(s);
   } catch (e) { m.innerHTML = `<div class="card err">${esc(e.message)}</div>`; }
   bind();
@@ -125,6 +127,9 @@ function viewIA(s) {
   <div class="card"><h2>Claude Code (ordinateur, même Wi-Fi)</h2><pre>${esc(cc)}</pre><button class="btn ghost" data-copy="${esc(cc)}">Copier la commande</button></div>
   <div class="card"><h2>Claude Desktop, Cursor, autres IA (fichier de configuration MCP)</h2><pre>${esc(desk)}</pre><button class="btn ghost" data-copy="${esc(desk)}">Copier la configuration</button>
     <p class="muted">Les IA qui acceptent une URL MCP directement : utilisez l’URL et l’en-tête ci-dessus.</p></div>
+  <div class="card"><h2>Git (clone, push, pull) comme sur GitHub</h2>
+    <pre>git clone http://${ip}:${s.port}/git/${esc(s.owner)}/&lt;dépôt&gt;.git</pre>
+    <p class="muted">Identifiant : n’importe lequel — mot de passe : le jeton. Marche avec git, Android Studio, VS Code, GitHub Desktop…</p></div>
   <div class="card"><h2>Envoyer un APK depuis l’ordinateur</h2>
     <pre>curl -T monappli.apk -H "Authorization: Bearer ${esc(s.token)}" http://${ip}:${s.port}/upload/monappli.apk</pre>
     <p class="muted">Ou depuis GIXCLOUD sur PC : <code>send_apk</code> avec to = <code>gixcloud://${ip}:${s.port}?token=…</code></p></div>`;
@@ -148,7 +153,9 @@ function viewRepo(st) {
     const head = st.v === 'repo' ? `<div class="card"><div class="muted">${esc(info.description || '')}</div>
       <div class="row" style="margin-top:8px"><span class="tag">${info.branches} branche(s)</span><span class="tag">${info.open_issues} ticket(s)</span><span class="tag">${info.open_pulls} PR</span><span class="tag">${info.releases} version(s)</span></div>
       ${info.last_commit ? `<p class="muted">Dernier commit : ${esc(info.last_commit.message)} — ${esc(info.last_commit.author)}</p>` : ''}
-      <div class="row"><button class="btn ghost" data-go='${esc(JSON.stringify({ v: 'issues', repo: st.repo }))}'>Tickets</button><button class="btn ghost" data-go='${esc(JSON.stringify({ v: 'pulls', repo: st.repo }))}'>Pull requests</button><button class="btn ghost" data-go='${esc(JSON.stringify({ v: 'commits', repo: st.repo }))}'>Commits</button></div></div>` : '';
+      <div class="row">${[['issues', 'Tickets'], ['pulls', 'Pull requests'], ['commits', 'Commits'], ['branches', 'Branches'], ['releases', 'Versions'], ['wiki', 'Wiki'], ['events', 'Activité']].map(([v, l]) => `<button class="btn ghost" data-go='${esc(JSON.stringify({ v, repo: st.repo }))}'>${l}</button>`).join('')}</div>
+      <pre>${esc(gx('get_clone_urls', { repo: st.repo }).clone_command)}</pre><button class="btn ghost" data-copy="${esc(gx('get_clone_urls', { repo: st.repo }).clone_command)}">Copier git clone</button>
+      <button class="btn ghost" data-go='${esc(JSON.stringify({ v: 'newfile', repo: st.repo }))}'>Nouveau fichier</button></div>` : '';
     const entries = (d.entries || []).sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'dir' ? -1 : 1));
     return crumbs + head + `<div class="card list">${entries.map((e) => `<div data-go='${esc(JSON.stringify({ v: e.type === 'dir' ? 'dir' : 'file', repo: st.repo, path: e.path, ref: st.ref }))}'><span>${e.type === 'dir' ? '📁' : '📄'}</span><div class="grow title">${esc(e.name)}</div><span class="muted">${e.size != null ? e.size + ' o' : ''}</span></div>`).join('') || '<p class="muted">Dépôt vide.</p>'}</div>`;
   }
@@ -164,18 +171,65 @@ function viewRepo(st) {
   }
   if (st.v === 'issues' || st.v === 'pulls') {
     const items = gx(st.v === 'issues' ? 'list_issues' : 'list_pull_requests', { repo: st.repo, state: 'all' });
-    return crumbs + `<div class="card list">${items.map((i) => `<div data-go='${esc(JSON.stringify({ v: st.v === 'issues' ? 'issue' : 'pull', repo: st.repo, number: i.number }))}'><span class="tag ${i.state}">${i.state}</span><div class="grow"><div class="title">#${i.number} ${esc(i.title)}</div><div class="muted">${esc(i.author)} · ${i.comments} commentaire(s)</div></div></div>`).join('') || '<p class="muted">Rien pour l’instant.</p>'}</div>`;
+    return crumbs + `<div class="card"><button class="btn" data-go='${esc(JSON.stringify({ v: st.v === 'issues' ? 'newissue' : 'newpull', repo: st.repo }))}'>${st.v === 'issues' ? 'Nouveau ticket' : 'Nouvelle pull request'}</button></div><div class="card list">${items.map((i) => `<div data-go='${esc(JSON.stringify({ v: st.v === 'issues' ? 'issue' : 'pull', repo: st.repo, number: i.number }))}'><span class="tag ${i.state}">${i.state}</span><div class="grow"><div class="title">#${i.number} ${esc(i.title)}</div><div class="muted">${esc(i.author)} · ${i.comments} commentaire(s)</div></div></div>`).join('') || '<p class="muted">Rien pour l’instant.</p>'}</div>`;
   }
   if (st.v === 'issue' || st.v === 'pull') {
     const it = gx(st.v === 'issue' ? 'get_issue' : 'get_pull_request', { repo: st.repo, number: st.number, include_diff: false });
-    const extra = st.v === 'pull' ? `<p class="muted">${esc(it.head)} → ${esc(it.base)} ${it.state === 'open' ? (it.mergeable ? '· fusion possible' : '· ' + esc(it.state === 'open' && it.conflicts ? 'conflits : ' + it.conflicts.join(', ') : '')) : ''}</p>
-      ${it.state === 'open' && it.mergeable ? '<button class="btn" data-act="merge">Fusionner</button>' : ''}` : '';
+    const extra = st.v === 'pull' ? `<p class="muted">${esc(it.head_repo && !it.head_repo.endsWith('/' + st.repo.split('/').pop()) || (it.head_repo && it.head_repo !== st.repo && st.repo.includes('/')) ? it.head_repo + ':' : '')}${esc(it.head)} → ${esc(it.base)} ${it.state === 'open' ? (it.mergeable ? '· fusion possible' : '· ' + esc(it.state === 'open' && it.conflicts ? 'conflits : ' + it.conflicts.join(', ') : '')) : ''}</p>
+      ${(it.checks || []).map((c) => `<span class="tag ${c.conclusion === 'success' ? 'open' : 'closed'}">${esc(c.name)} : ${esc(c.conclusion)}</span>`).join(' ')}
+      ${(it.reviews || []).map((r) => `<div class="muted">Revue de ${esc(r.author)} : ${esc(r.state)} ${esc(r.body || '')}</div>`).join('')}
+      <p class="row">${it.state === 'open' ? '<button class="btn ghost" data-act="approve">Approuver</button>' : ''}${it.state === 'open' && it.mergeable ? '<button class="btn" data-act="merge">Fusionner</button>' : ''}</p>` : '';
     return crumbs + `<div class="card"><div class="row"><span class="tag ${it.state}">${it.state}</span><h2 style="margin:0">#${it.number} ${esc(it.title)}</h2></div>
       <pre>${esc(it.body || '(pas de description)')}</pre>${extra}</div>
       <div class="card list">${(it.comments || []).map((c) => `<div><div class="grow"><div class="muted">${esc(c.author)} · ${esc(c.created_at)}</div><div>${esc(c.body)}</div></div></div>`).join('') || '<p class="muted">Aucun commentaire.</p>'}</div>
       <div class="card"><textarea id="cm" style="min-height:80px" placeholder="Commentaire"></textarea><p><button class="btn" data-act="comment">Commenter</button></p></div>`;
   }
+  if (st.v === 'branches') {
+    const bs = gx('list_branches', { repo: st.repo });
+    return crumbs + `<div class="card list">${bs.map((b) => `<div data-go='${esc(JSON.stringify({ v: 'repo', repo: st.repo, ref: b.name }))}'><div class="grow"><div class="title">${esc(b.name)} ${b.default ? '<span class="tag open">défaut</span>' : ''}</div><div class="muted">${esc(b.message)}</div></div></div>`).join('')}</div>
+      <div class="card"><label>Nouvelle branche</label><input id="nb" placeholder="ma-branche"><p><button class="btn" data-act="newbranch">Créer depuis ${esc(info.default_branch)}</button></p></div>`;
+  }
+  if (st.v === 'releases') {
+    const rs = gx('list_releases', { repo: st.repo });
+    return crumbs + `<div class="card list">${rs.map((r) => `<div><div class="grow"><div class="title">${esc(r.name)} <span class="tag">${esc(r.tag)}</span></div><div class="muted">${(r.assets || []).map((x) => esc(x.name)).join(', ') || 'aucun fichier'}</div></div></div>`).join('') || '<p class="muted">Aucune version.</p>'}</div>
+      <div class="card"><label>Nouvelle version (tag)</label><input id="rt" placeholder="v1.0.0"><p><button class="btn" data-act="newrelease">Publier</button></p></div>`;
+  }
+  if (st.v === 'wiki') {
+    const pages = gx('list_wiki_pages', { repo: st.repo });
+    return crumbs + `<div class="card list">${pages.map((p) => `<div data-go='${esc(JSON.stringify({ v: 'wikipage', repo: st.repo, title: p }))}'><div class="grow title">📖 ${esc(p)}</div></div>`).join('') || '<p class="muted">Wiki vide.</p>'}</div>
+      <div class="card"><button class="btn" data-go='${esc(JSON.stringify({ v: 'wikipage', repo: st.repo, title: '' }))}'>Nouvelle page</button></div>`;
+  }
+  if (st.v === 'wikipage') {
+    let content = '';
+    if (st.title) try { content = gx('get_wiki_page', { repo: st.repo, title: st.title }).content; } catch { }
+    return crumbs + `<div class="card"><label>Titre</label><input id="wt" value="${esc(st.title)}"><label>Contenu (Markdown)</label><textarea id="wc">${esc(content)}</textarea><p><button class="btn" data-act="savewiki">Enregistrer</button></p></div>`;
+  }
+  if (st.v === 'events') {
+    return crumbs + eventsList(gx('list_events', { repo: st.repo, limit: 100 }));
+  }
+  if (st.v === 'newissue') {
+    return crumbs + `<div class="card"><h2>Nouveau ticket</h2><label>Titre</label><input id="it"><label>Description</label><textarea id="ib" style="min-height:120px"></textarea><label>Étiquettes (séparées par des virgules)</label><input id="il" placeholder="bug, idée"><p><button class="btn" data-act="createissue">Créer</button></p></div>`;
+  }
+  if (st.v === 'newpull') {
+    const bs = gx('list_branches', { repo: st.repo }).map((b) => b.name);
+    const opts = bs.map((b) => `<option>${esc(b)}</option>`).join('');
+    return crumbs + `<div class="card"><h2>Nouvelle pull request</h2><label>Depuis (head)</label><select id="ph">${opts}</select><label>Vers (base)</label><select id="pb">${bs.map((b) => `<option ${b === info.default_branch ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>
+      <label>Titre</label><input id="pt"><label>Description (« Fixes #3 » ferme le ticket 3)</label><textarea id="pd" style="min-height:100px"></textarea><p><button class="btn" data-act="createpull">Ouvrir</button></p></div>`;
+  }
+  if (st.v === 'newfile') {
+    return crumbs + `<div class="card"><h2>Nouveau fichier</h2><label>Chemin</label><input id="np" placeholder="dossier/fichier.txt"><label>Contenu</label><textarea id="nc"></textarea><p><button class="btn" data-act="createfile">Commit</button></p></div>`;
+  }
   return '';
+}
+
+function eventsList(evs) {
+  return `<div class="card list">${evs.map((e) => `<div><div class="grow"><div class="title">${esc(e.actor)} · ${esc(e.type.replace(/_/g, ' '))}</div><div class="muted">${esc(e.repo)} · ${esc((e.created_at || '').slice(0, 16).replace('T', ' '))} ${esc(e.payload.title || e.payload.ref || e.payload.path || e.payload.branch || '')}</div></div></div>`).join('') || '<p class="muted">Rien pour l’instant.</p>'}</div>`;
+}
+
+function viewActivity() {
+  const n = gx('list_notifications', { limit: 100 });
+  return `<div class="card"><div class="row"><h2 style="flex:1;margin:0">${n.unread} nouveauté(s)</h2><button class="btn ghost" data-act="readall">Tout marquer lu</button></div></div>` +
+    (n.unread ? eventsList(n.notifications) : eventsList(gx('list_events', { limit: 50 })));
 }
 
 // ---------- APK ----------
@@ -195,6 +249,11 @@ function viewSettings(s) {
     <label>Propriétaire par défaut des dépôts</label><input id="owner" value="${esc(s.owner)}">
     <label>Auteur des commits</label><input id="author" value="${esc(s.author)}">
     <p class="row"><button class="btn" data-act="save">Enregistrer</button><button class="btn danger" data-act="token">Nouveau jeton</button></p>
+  </div>
+  <div class="card"><h2>Jetons d’accès (un par IA ou personne)</h2>
+    <div class="list">${gx('list_tokens').map((t) => `<div><div class="grow"><div class="title">${esc(t.name)}</div><div class="muted">${esc(t.perm)} · ${esc(t.prefix)}… ${t.last_used ? '· utilisé ' + esc(t.last_used.slice(0, 16).replace('T', ' ')) : ''}</div></div>${t.hash === undefined && !String(t.name).includes('principal') ? `<button class="btn ghost" data-revoke="${esc(t.name)}">Révoquer</button>` : ''}</div>`).join('')}</div>
+    <label>Nom</label><input id="tn" placeholder="Claude, Cursor, PC-bureau…"><label>Permission</label><select id="tp"><option value="write">write (lire et écrire)</option><option value="read">read (lecture seule)</option><option value="admin">admin (tout)</option></select>
+    <p><button class="btn" data-act="newtoken">Créer le jeton</button></p><div id="newtok"></div>
     <p class="muted">GIXCLOUD ${esc(s.version)} · aucune donnée ne quitte le téléphone : pas de compte, pas de cloud, pas de serveur externe.</p></div>`;
 }
 
@@ -206,6 +265,7 @@ function bind() {
   document.querySelectorAll('[data-install]').forEach((b) => b.onclick = () => act(() => alert(gx('install_apk', { apk: b.dataset.install }).result)));
   document.querySelectorAll('[data-dl]').forEach((b) => b.onclick = () => act(() => alert('Copié dans ' + gx('save_apk_to_downloads', { apk: b.dataset.dl }).saved)));
   document.querySelectorAll('[data-del]').forEach((b) => b.onclick = () => confirm('Supprimer ' + b.dataset.del + ' ?') && act(() => gx('delete_apk', { apk: b.dataset.del })));
+  document.querySelectorAll('[data-revoke]').forEach((b) => b.onclick = () => confirm('Révoquer ' + b.dataset.revoke + ' ?') && act(() => gx('revoke_token', { name: b.dataset.revoke })));
   const srv = $('#srv'); if (srv) srv.onchange = () => { GX.setServer(srv.checked); setTimeout(render, 700); };
   document.querySelectorAll('[data-act]').forEach((b) => b.onclick = () => act(() => actions[b.dataset.act]()));
 }
@@ -217,6 +277,15 @@ const actions = {
   comment: () => { const c = cur(); gx('add_issue_comment', { repo: c.repo, number: c.number, body: $('#cm').value }); },
   merge: () => { const c = cur(); const r = gx('merge_pull_request', { repo: c.repo, number: c.number }); alert('Fusionné : ' + r.commit.slice(0, 7)); },
   pick: () => GX.pickApk(),
+  approve: () => { const c = cur(); gx('create_review', { repo: c.repo, number: c.number, event: 'APPROVE' }); },
+  newbranch: () => { const c = cur(); gx('create_branch', { repo: c.repo, branch: $('#nb').value.trim() }); },
+  newrelease: () => { const c = cur(); gx('create_release', { repo: c.repo, tag: $('#rt').value.trim() }); },
+  savewiki: () => { const c = cur(); gx('write_wiki_page', { repo: c.repo, title: $('#wt').value.trim(), content: $('#wc').value }); stack.pop(); },
+  createissue: () => { const c = cur(); const r = gx('create_issue', { repo: c.repo, title: $('#it').value, body: $('#ib').value, labels: $('#il').value.split(',').map((x) => x.trim()).filter(Boolean) }); stack.pop(); stack.push({ v: 'issue', repo: c.repo, number: r.number }); },
+  createpull: () => { const c = cur(); const r = gx('create_pull_request', { repo: c.repo, head: $('#ph').value, base: $('#pb').value, title: $('#pt').value, body: $('#pd').value }); stack.pop(); stack.push({ v: 'pull', repo: c.repo, number: r.number }); },
+  createfile: () => { const c = cur(); gx('create_or_update_file', { repo: c.repo, path: $('#np').value.trim(), content: $('#nc').value }); stack.pop(); },
+  readall: () => gx('mark_notifications_read'),
+  newtoken: () => { const r = gx('create_token', { name: $('#tn').value.trim(), permission: $('#tp').value }); setTimeout(() => { $('#newtok').innerHTML = `<pre>${esc(r.token)}</pre><button class="btn ghost" data-copy="${esc(r.token)}">Copier</button><p class="err">Copiez-le maintenant : il ne sera plus affiché.</p>`; bind(); }, 50); },
   save: () => { GX.settings(JSON.stringify({ lan: $('#lan').checked, port: parseInt($('#port').value, 10) || 8765, owner: $('#owner').value.trim() || 'moi', author: $('#author').value.trim() || 'GIXCLOUD' })); setTimeout(render, 900); },
   token: () => { if (confirm('Les IA déjà connectées devront utiliser le nouveau jeton. Continuer ?')) { GX.settings(JSON.stringify({ new_token: true })); setTimeout(render, 900); } },
 };
