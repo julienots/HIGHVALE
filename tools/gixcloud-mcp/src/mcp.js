@@ -70,6 +70,7 @@ export function startServer({ name, version, instructions, tools }) {
     }
   }
 
+  const pending = new Set();
   const rl = readline.createInterface({ input: process.stdin });
   rl.on('line', (line) => {
     if (!line.trim()) return;
@@ -80,8 +81,12 @@ export function startServer({ name, version, instructions, tools }) {
       out({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'JSON invalide' } });
       return;
     }
-    for (const m of Array.isArray(msg) ? msg : [msg]) handle(m);
+    for (const m of Array.isArray(msg) ? msg : [msg]) {
+      const p = handle(m).finally(() => pending.delete(p));
+      pending.add(p);
+    }
   });
-  rl.on('close', () => process.exit(0));
+  // Fin de l'entrée : on termine les appels en cours avant de quitter.
+  rl.on('close', () => Promise.allSettled([...pending]).then(() => process.exit(0)));
   log(`prêt (${tools.length} outils)`);
 }

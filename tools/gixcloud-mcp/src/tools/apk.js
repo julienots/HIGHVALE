@@ -247,7 +247,7 @@ async function executeBuild(r, b, a) {
         after.push(`joint à la version ${a.release_tag}`);
       });
     }
-    if (a.send_to) for (const o of outputs) after.push(...sendFile(o.path, a.send_to));
+    if (a.send_to) for (const o of outputs) after.push(...(await sendFile(o.path, a.send_to)));
     if (a.install) for (const o of outputs.slice(0, 1)) after.push(installApk(o.path, a.device));
     return finish({ status: 'success', outputs, after });
   } catch (e) {
@@ -297,7 +297,27 @@ function tail(file, lines = 80) {
 
 // ---------- Envoi / installation ----------
 
-function sendFile(file, dest) {
+/** Envoi à l'application GIXCLOUD du téléphone, par le Wi-Fi local : gixcloud://IP:PORT?token=JETON[&install=1] */
+async function sendToPhoneApp(file, dest) {
+  const u = new URL(dest.replace(/^gixcloud:/, 'http:'));
+  const token = u.searchParams.get('token') || process.env.GIXCLOUD_PHONE_TOKEN;
+  if (!token) throw new ToolError('Jeton manquant : gixcloud://IP:PORT?token=… (affiché dans l’appli GIXCLOUD, onglet IA / MCP).');
+  const install = u.searchParams.get('install') === '1';
+  const url = `http://${u.host}/upload/${encodeURIComponent(path.basename(file))}${install ? '?install=1' : ''}`;
+  let res;
+  try {
+    res = await fetch(url, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/vnd.android.package-archive', 'Content-Length': String(fs.statSync(file).size) }, body: fs.readFileSync(file) });
+  } catch (e) {
+    throw new ToolError(`Téléphone injoignable sur ${u.host} : ${e.cause?.message || e.message}. Même Wi-Fi ? Serveur GIXCLOUD activé dans l’appli ?`);
+  }
+  const text = await res.text();
+  if (res.status === 401) throw new ToolError('Jeton refusé par le téléphone.');
+  if (!res.ok) throw new ToolError(`Le téléphone a répondu ${res.status} : ${text}`);
+  return [`envoyé à l’appli GIXCLOUD du téléphone (${u.host})${install ? ', installation proposée sur le téléphone' : ''}`];
+}
+
+async function sendFile(file, dest) {
+  if (/^(gixcloud|https?):\/\//.test(dest)) return sendToPhoneApp(file, dest);
   const msgs = [];
   if (dest === 'device' || dest.startsWith('device:')) {
     const serial = dest.split(':')[1];
@@ -476,10 +496,10 @@ export const apkTools = [
     apk: S.str('Chemin de l’APK ou nom dans la boîte de sortie (défaut : le plus récent).'),
   }, [], (a) => apkInfo(resolveApk(a)), RO),
 
-  tool('send_apk', 'Envoie un APK en local : copie dans un dossier (Téléchargements, clé USB, dossier partagé…) et/ou sur le téléphone par câble/Wi-Fi (adb), sans aucun serveur.', {
+  tool('send_apk', 'Envoie un APK en local : copie dans un dossier (Téléchargements, clé USB…), sur le téléphone par adb, ou directement dans l’appli GIXCLOUD du téléphone par le Wi-Fi (gixcloud://IP:PORT?token=…&install=1).', {
     apk: S.str('Chemin ou nom de l’APK (défaut : le plus récent).'),
-    to: S.str('Dossier de destination, « device » (dossier Download du téléphone) ou « device:SERIE ».'),
-  }, ['to'], (a) => ({ apk: resolveApk(a), result: sendFile(resolveApk(a), a.to) })),
+    to: S.str('Dossier de destination, « device » / « device:SERIE » (adb), ou « gixcloud://IP:PORT?token=JETON » (appli GIXCLOUD du téléphone, ajouter &install=1 pour proposer l’installation).'),
+  }, ['to'], async (a) => ({ apk: resolveApk(a), result: await sendFile(resolveApk(a), a.to) })),
 
   tool('delete_apk', 'Supprime un APK de la boîte de sortie.', { apk: S.str('Nom du fichier.') }, ['apk'], (a) => {
     const p = path.join(APK_DIR, path.basename(a.apk));
@@ -646,7 +666,7 @@ export const apkTools = [
     steps.push(`APK : ${files.map((f) => path.basename(f)).join(', ')}`);
     const rel = collabTools.find((t) => t.name === 'create_release').handler({ repo: r.full, tag: revParse(r.gitDir, `refs/tags/${tag}`) ? `${tag}-${Date.now()}` : tag, target: branch, body: a.notes, assets: files });
     steps.push(`version publiée ${rel.tag}`);
-    if (a.send_to) for (const f of files) steps.push(...sendFile(f, a.send_to));
+    if (a.send_to) for (const f of files) steps.push(...(await sendFile(f, a.send_to)));
     if (a.install) steps.push(installApk(files[0], undefined));
     return { steps, release: rel.tag, apks: files };
   }),

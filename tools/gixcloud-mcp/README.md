@@ -109,12 +109,16 @@ Types de projets reconnus automatiquement : **Gradle/Android Studio** (Java/Kotl
 | `build_apk` | Construit l’APK d’une branche, d’un tag ou d’une PR ; peut le joindre à une version, le copier, l’installer |
 | `list_builds`, `get_build` | Historique et journaux des builds |
 | `list_apks`, `apk_info`, `delete_apk` | Boîte de sortie ; analyse (paquet, version, SDK, permissions, ABI, signature, SHA-256) |
-| `send_apk` | **Envoi local** : copie dans un dossier (Téléchargements, clé USB, dossier synchronisé) ou dans `Download` du téléphone par adb |
+| `send_apk` | **Envoi local** : copie dans un dossier (Téléchargements, clé USB…), dans `Download` du téléphone par adb, ou directement dans l’**appli GIXCLOUD du téléphone** par le Wi-Fi : `gixcloud://IP:8765?token=…&install=1` |
 | `list_devices`, `connect_device` | Téléphones connectés (USB ou débogage sans fil avec code d’appairage) |
 | `install_apk`, `uninstall_app`, `device_logs` | Installer/lancer, désinstaller, lire les journaux et plantages |
 | `create_keystore`, `sign_apk` | Clé de signature et signature (zipalign + apksigner) |
 | `set_app_version` | Monte versionCode/versionName (Gradle ou Godot) avec un commit |
 | `publish_apk_release` | Tout-en-un : version → build → signature → tag + release → envoi/installation |
+
+## L’appli GIXCLOUD sur le téléphone
+
+Voir [../gixcloud-android/README.md](../gixcloud-android/README.md) : la même forge sur Android, avec un serveur MCP intégré auquel les IA se branchent par le Wi-Fi.
 
 ## Où sont mes données ?
 
