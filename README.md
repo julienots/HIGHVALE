@@ -118,3 +118,7 @@ Ou en une commande : `tools/build_apk.sh /chemin/vers/godot debug`.
 - Développement : Super Essence Studio
 - Moteur : [Godot Engine](https://godotengine.org) (MIT)
 - Polices : Lilita One et Fredoka, licence SIL Open Font (voir `assets/fonts/`)
+
+## Outils : LocalHub (GitHub local pour Claude)
+
+`tools/localhub-mcp/` est un serveur MCP sans dépendance : dépôts git, tickets, pull requests et versions en local, plus création, build, signature et envoi d’APK. Voir [tools/localhub-mcp/README.md](tools/localhub-mcp/README.md).
