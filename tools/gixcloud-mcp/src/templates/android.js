@@ -209,7 +209,7 @@ public class MainActivity extends Activity {
   }
 
   add('.gitignore', '*.iml\n.gradle/\n/local.properties\n.idea/\n/build/\n/app/build/\n*.apk\n*.aab\n*.jks\n*.keystore\n');
-  add('localhub.json', JSON.stringify({ build: { type: 'gradle', debug_task: 'assembleDebug', release_task: 'assembleRelease' } }, null, 2) + '\n');
+  add('gixcloud.json', JSON.stringify({ build: { type: 'gradle', debug_task: 'assembleDebug', release_task: 'assembleRelease' } }, null, 2) + '\n');
   add('gradlew', fs.readFileSync(path.join(WRAPPER, 'gradlew')), '100755');
   add('gradlew.bat', fs.readFileSync(path.join(WRAPPER, 'gradlew.bat')));
   add('gradle/wrapper/gradle-wrapper.jar', fs.readFileSync(path.join(WRAPPER, 'gradle-wrapper.jar')));

@@ -162,7 +162,7 @@ export const repoTools = [
     return repoInfo(nid);
   }),
 
-  tool('import_repository', 'Importe un dépôt existant (dossier local, fichier .bundle ou URL git) dans LocalHub.', {
+  tool('import_repository', 'Importe un dépôt existant (dossier local, fichier .bundle ou URL git) dans GIXCLOUD.', {
     source: S.str('Chemin d’un dépôt/dossier git local, d’un .bundle, ou URL git.'),
     name: S.str('Nom du dépôt créé (défaut : déduit de la source).'),
     owner: S.str('Propriétaire.'),
@@ -184,7 +184,7 @@ export const repoTools = [
 
   tool('export_repository', 'Exporte un dépôt en un seul fichier .bundle (sauvegarde, transfert sur clé USB ou téléphone).', {
     ...REPO,
-    destination: S.str('Dossier ou fichier de destination (défaut : ~/LocalHub/exports).'),
+    destination: S.str('Dossier ou fichier de destination (défaut : ~/GIXCLOUD/exports).'),
   }, ['repo'], (a) => {
     const r = requireRepo(a);
     let dest = a.destination || path.join(HOME, 'exports');

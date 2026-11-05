@@ -1,5 +1,5 @@
 // Tests de bout en bout : on lance le serveur MCP et on l’utilise comme Claude le ferait.
-// APK réel : LOCALHUB_TEST_APK=1 ANDROID_HOME=… npm test
+// APK réel : GIXCLOUD_TEST_APK=1 ANDROID_HOME=… npm test
 
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -11,7 +11,7 @@ import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
 const SERVER = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'server.js');
-const home = fs.mkdtempSync(path.join(os.tmpdir(), 'localhub-test-'));
+const home = fs.mkdtempSync(path.join(os.tmpdir(), 'gixcloud-test-'));
 let proc;
 let nextId = 1;
 const pending = new Map();
@@ -30,19 +30,19 @@ async function call(name, args = {}) {
 }
 
 before(async () => {
-  proc = spawn(process.execPath, [SERVER], { env: { ...process.env, LOCALHUB_HOME: home, LOCALHUB_OWNER: 'moi' }, stdio: ['pipe', 'pipe', 'inherit'] });
+  proc = spawn(process.execPath, [SERVER], { env: { ...process.env, GIXCLOUD_HOME: home, GIXCLOUD_OWNER: 'moi' }, stdio: ['pipe', 'pipe', 'inherit'] });
   readline.createInterface({ input: proc.stdout }).on('line', (l) => {
     const m = JSON.parse(l);
     pending.get(m.id)?.(m);
     pending.delete(m.id);
   });
   const init = await rpc('initialize', { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '0' } });
-  assert.equal(init.result.serverInfo.name, 'localhub');
+  assert.equal(init.result.serverInfo.name, 'gixcloud');
 });
 
 after(() => {
   proc.stdin.end();
-  if (process.env.LOCALHUB_KEEP) return console.error('données gardées :', home);
+  if (process.env.GIXCLOUD_KEEP) return console.error('données gardées :', home);
   fs.rmSync(home, { recursive: true, force: true });
 });
 
@@ -152,10 +152,10 @@ test('application Android : modèle, version, analyse APK', async () => {
   assert.equal(v.version_name, '1.1.0');
   assert.equal(v.version_code, 2);
   const env = await call('android_environment');
-  assert.ok(env.localhub_home);
+  assert.ok(env.gixcloud_home);
 });
 
-test('build réel d’un APK (si SDK Android présent)', { skip: !process.env.LOCALHUB_TEST_APK, timeout: 30 * 60000 }, async () => {
+test('build réel d’un APK (si SDK Android présent)', { skip: !process.env.GIXCLOUD_TEST_APK, timeout: 30 * 60000 }, async () => {
   const b = await call('build_apk', { repo: 'mon-appli', variant: 'debug', wait_seconds: 1700, send_to: path.join(home, 'envoi') });
   assert.equal(b.status, 'success', JSON.stringify(b, null, 2));
   const info = await call('apk_info', {});

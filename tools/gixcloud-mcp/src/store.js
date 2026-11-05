@@ -1,20 +1,20 @@
 // Stockage local : dépôts git bare + métadonnées JSON (tickets, PR, versions, builds).
 //
-//   $LOCALHUB_HOME/                    (défaut ~/LocalHub)
+//   $GIXCLOUD_HOME/                    (défaut ~/GIXCLOUD)
 //     repos/<owner>/<repo>.git          dépôt bare (clonable : git clone <chemin>)
 //     meta/<owner>/<repo>.json          tickets, pull requests, versions, builds
 //     releases/<owner>/<repo>/<tag>/    fichiers joints aux versions (APK…)
 //     builds/<owner>/<repo>/            journaux de build et d'intégration
-//     apk/                              boîte de sortie des APK (LOCALHUB_APK_DIR)
+//     apk/                              boîte de sortie des APK (GIXCLOUD_APK_DIR)
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ToolError } from './mcp.js';
 
-export const HOME = path.resolve(process.env.LOCALHUB_HOME || path.join(os.homedir(), 'LocalHub'));
-export const APK_DIR = path.resolve(process.env.LOCALHUB_APK_DIR || path.join(HOME, 'apk'));
-export const DEFAULT_OWNER = sanitize(process.env.LOCALHUB_OWNER || os.userInfo().username || 'local');
+export const HOME = path.resolve(process.env.GIXCLOUD_HOME || path.join(os.homedir(), 'GIXCLOUD'));
+export const APK_DIR = path.resolve(process.env.GIXCLOUD_APK_DIR || path.join(HOME, 'apk'));
+export const DEFAULT_OWNER = sanitize(process.env.GIXCLOUD_OWNER || os.userInfo().username || 'local');
 
 const NAME_RE = /^[A-Za-z0-9._-]{1,100}$/;
 

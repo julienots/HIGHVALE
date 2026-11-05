@@ -1,6 +1,6 @@
-# LocalHub — ton GitHub 100 % local pour Claude (MCP)
+# GIXCLOUD — ton GitHub 100 % local pour Claude (MCP)
 
-LocalHub est un **serveur MCP** qui donne à Claude tout ce que fait GitHub — dépôts, fichiers,
+GIXCLOUD est un **serveur MCP** qui donne à Claude tout ce que fait GitHub — dépôts, fichiers,
 branches, commits, tickets, pull requests, revues, versions — **plus une usine à APK Android**.
 Tout reste sur ton ordinateur : **aucun serveur, aucun compte, aucun port réseau ouvert**.
 Claude le lance lui-même et lui parle par l’entrée/sortie standard (stdio).
@@ -12,14 +12,14 @@ Claude le lance lui-même et lui parle par l’entrée/sortie standard (stdio).
 ## Installation
 
 ```bash
-# copie le dossier tools/localhub-mcp où tu veux, puis :
-node /chemin/vers/localhub-mcp/src/server.js   # test : affiche « prêt (66 outils) », Ctrl+C pour quitter
+# copie le dossier tools/gixcloud-mcp où tu veux, puis :
+node /chemin/vers/gixcloud-mcp/src/server.js   # test : affiche « prêt (66 outils) », Ctrl+C pour quitter
 ```
 
 ### Claude Code
 
 ```bash
-claude mcp add localhub -s user -- node /chemin/vers/localhub-mcp/src/server.js
+claude mcp add gixcloud -s user -- node /chemin/vers/gixcloud-mcp/src/server.js
 ```
 
 ### Claude Desktop
@@ -29,12 +29,12 @@ Réglages → Développeur → Modifier la configuration (`claude_desktop_config
 ```json
 {
   "mcpServers": {
-    "localhub": {
+    "gixcloud": {
       "command": "node",
-      "args": ["/chemin/vers/localhub-mcp/src/server.js"],
+      "args": ["/chemin/vers/gixcloud-mcp/src/server.js"],
       "env": {
-        "LOCALHUB_HOME": "/chemin/vers/LocalHub",
-        "LOCALHUB_APK_DIR": "/chemin/vers/Téléchargements/APK",
+        "GIXCLOUD_HOME": "/chemin/vers/GIXCLOUD",
+        "GIXCLOUD_APK_DIR": "/chemin/vers/Téléchargements/APK",
         "ANDROID_HOME": "/chemin/vers/Android/Sdk"
       }
     }
@@ -42,20 +42,20 @@ Réglages → Développeur → Modifier la configuration (`claude_desktop_config
 }
 ```
 
-Sous Windows, écris les chemins avec des `\\` (ex. `"C:\\Users\\moi\\localhub-mcp\\src\\server.js"`).
-Redémarre Claude Desktop : les outils « localhub » apparaissent.
+Sous Windows, écris les chemins avec des `\\` (ex. `"C:\\Users\\moi\\gixcloud-mcp\\src\\server.js"`).
+Redémarre Claude Desktop : les outils « gixcloud » apparaissent.
 
 ### Réglages (variables d’environnement, toutes facultatives)
 
 | Variable | Rôle | Défaut |
 |---|---|---|
-| `LOCALHUB_HOME` | Où sont stockés dépôts et données | `~/LocalHub` |
-| `LOCALHUB_APK_DIR` | Boîte de sortie des APK produits | `~/LocalHub/apk` |
-| `LOCALHUB_OWNER` | Ton nom de propriétaire par défaut | nom d’utilisateur |
-| `LOCALHUB_USER_NAME` / `LOCALHUB_USER_EMAIL` | Auteur des commits | config git globale |
+| `GIXCLOUD_HOME` | Où sont stockés dépôts et données | `~/GIXCLOUD` |
+| `GIXCLOUD_APK_DIR` | Boîte de sortie des APK produits | `~/GIXCLOUD/apk` |
+| `GIXCLOUD_OWNER` | Ton nom de propriétaire par défaut | nom d’utilisateur |
+| `GIXCLOUD_USER_NAME` / `GIXCLOUD_USER_EMAIL` | Auteur des commits | config git globale |
 | `ANDROID_HOME` | SDK Android (sinon cherché aux emplacements habituels) | — |
-| `LOCALHUB_GODOT` | Exécutable Godot 4 (projets Godot comme HIGHVALE) | `godot` |
-| `LOCALHUB_KEYSTORE_PASSWORD` | Mot de passe de la clé de signature | — |
+| `GIXCLOUD_GODOT` | Exécutable Godot 4 (projets Godot comme HIGHVALE) | `godot` |
+| `GIXCLOUD_KEYSTORE_PASSWORD` | Mot de passe de la clé de signature | — |
 
 ## Pour construire des APK
 
@@ -67,7 +67,7 @@ Les applis créées par `create_android_app` contiennent le wrapper Gradle : rie
 Au tout premier build, Gradle télécharge ses composants (une seule fois, quelques minutes).
 
 Types de projets reconnus automatiquement : **Gradle/Android Studio** (Java/Kotlin), **Godot 4**,
-**Flutter**, **Capacitor**, ou n’importe quelle commande via un fichier `localhub.json` :
+**Flutter**, **Capacitor**, ou n’importe quelle commande via un fichier `gixcloud.json` :
 
 ```json
 {
@@ -119,8 +119,8 @@ Types de projets reconnus automatiquement : **Gradle/Android Studio** (Java/Kotl
 ## Où sont mes données ?
 
 ```
-~/LocalHub/
-  repos/<propriétaire>/<dépôt>.git    dépôts git (git clone ~/LocalHub/repos/moi/appli.git)
+~/GIXCLOUD/
+  repos/<propriétaire>/<dépôt>.git    dépôts git (git clone ~/GIXCLOUD/repos/moi/appli.git)
   meta/<propriétaire>/<dépôt>.json    tickets, PR, versions, builds
   releases/…                          fichiers joints aux versions
   workspaces/…                        copies de travail des builds (caches Gradle conservés)
@@ -129,7 +129,7 @@ Types de projets reconnus automatiquement : **Gradle/Android Studio** (Java/Kotl
   apk/                                APK produits
 ```
 
-Sauvegarder tout LocalHub = copier ce dossier. **Garde une copie de `keys/`** : sans la clé,
+Sauvegarder tout GIXCLOUD = copier ce dossier. **Garde une copie de `keys/`** : sans la clé,
 impossible de publier une mise à jour d’une appli déjà installée.
 
 ## Sur Android avec Termux
@@ -137,7 +137,7 @@ impossible de publier une mise à jour d’une appli déjà installée.
 ```bash
 pkg install nodejs git openjdk-17
 termux-setup-storage   # pour envoyer les APK dans ~/storage/downloads
-LOCALHUB_APK_DIR=~/storage/downloads node localhub-mcp/src/server.js
+GIXCLOUD_APK_DIR=~/storage/downloads node gixcloud-mcp/src/server.js
 ```
 
 Sur le téléphone, la gestion de dépôts, tickets, PR et versions marche entièrement ; la
@@ -148,5 +148,5 @@ sur l’ordinateur et envoie l’APK au téléphone avec `send_apk` (« device �
 
 ```bash
 npm test                                            # forge (dépôts, PR, fusions, conflits, forks…)
-LOCALHUB_TEST_APK=1 ANDROID_HOME=~/Android/Sdk npm test   # + build réel, signature et release d’un APK
+GIXCLOUD_TEST_APK=1 ANDROID_HOME=~/Android/Sdk npm test   # + build réel, signature et release d’un APK
 ```

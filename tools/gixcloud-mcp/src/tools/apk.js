@@ -22,7 +22,7 @@ const EXE = IS_WIN ? '.exe' : '';
 
 export function androidSdk() {
   const candidates = [
-    process.env.LOCALHUB_ANDROID_SDK,
+    process.env.GIXCLOUD_ANDROID_SDK,
     process.env.ANDROID_HOME,
     process.env.ANDROID_SDK_ROOT,
     path.join(os.homedir(), 'Android', 'Sdk'),
@@ -108,8 +108,8 @@ function detectProject(gitDir, sha) {
   const files = git(gitDir, ['ls-tree', '-r', '--name-only', sha]).split('\n').filter(Boolean);
   const set = new Set(files);
   let cfg = {};
-  const lh = readTreeFile(gitDir, sha, 'localhub.json');
-  if (lh) { try { cfg = JSON.parse(lh).build || {}; } catch { throw new ToolError('localhub.json invalide.'); } }
+  const lh = readTreeFile(gitDir, sha, 'gixcloud.json');
+  if (lh) { try { cfg = JSON.parse(lh).build || {}; } catch { throw new ToolError('gixcloud.json invalide.'); } }
   if (cfg.type) return { ...cfg, files };
   if (set.has('pubspec.yaml') && /flutter:/.test(readTreeFile(gitDir, sha, 'pubspec.yaml') || '')) return { type: 'flutter', files };
   if (set.has('project.godot')) {
@@ -173,8 +173,8 @@ function buildCommand(proj, variant, ws, a) {
     case 'flutter':
       return { cmd: which('flutter') || 'flutter', args: ['build', 'apk', release ? '--release' : '--debug'] };
     case 'godot': {
-      const godot = process.env.LOCALHUB_GODOT || which('godot') || which('godot4');
-      if (!godot) throw new ToolError('Godot introuvable : définissez LOCALHUB_GODOT (chemin de l’exécutable Godot 4).');
+      const godot = process.env.GIXCLOUD_GODOT || which('godot') || which('godot4');
+      if (!godot) throw new ToolError('Godot introuvable : définissez GIXCLOUD_GODOT (chemin de l’exécutable Godot 4).');
       const out = path.join(ws, 'build', `${a.repo}-${variant}.apk`);
       ensureDir(path.dirname(out));
       return { cmd: godot, args: ['--headless', `--export-${release ? 'release' : 'debug'}`, proj.preset, out], pre: [{ cmd: godot, args: ['--headless', '--import'] }] };
@@ -182,10 +182,10 @@ function buildCommand(proj, variant, ws, a) {
     case 'capacitor':
       return { cmd: IS_WIN ? 'npx.cmd' : 'npx', args: ['cap', 'build', 'android'], pre: [{ cmd: IS_WIN ? 'npm.cmd' : 'npm', args: ['install'] }, { cmd: IS_WIN ? 'npx.cmd' : 'npx', args: ['cap', 'sync', 'android'] }] };
     case 'custom':
-      if (!proj.command) throw new ToolError('localhub.json : « build.command » manquant.');
+      if (!proj.command) throw new ToolError('gixcloud.json : « build.command » manquant.');
       return { cmd: IS_WIN ? 'cmd' : 'sh', args: IS_WIN ? ['/c', proj.command] : ['-c', proj.command] };
     default:
-      throw new ToolError('Type de projet non reconnu. Ajoutez un localhub.json : {"build":{"type":"custom","command":"…"}} ou utilisez create_android_app.');
+      throw new ToolError('Type de projet non reconnu. Ajoutez un gixcloud.json : {"build":{"type":"custom","command":"…"}} ou utilisez create_android_app.');
   }
 }
 
@@ -363,8 +363,8 @@ function loadKey(name, password) {
   const cfgFile = path.join(keysDir(), `${name}.json`);
   if (!fs.existsSync(cfgFile)) throw new ToolError(`Clé « ${name} » introuvable (create_keystore).`);
   const cfg = JSON.parse(fs.readFileSync(cfgFile, 'utf8'));
-  const pw = password || cfg.password || process.env.LOCALHUB_KEYSTORE_PASSWORD;
-  if (!pw) throw new ToolError('Mot de passe du keystore requis (paramètre password ou variable LOCALHUB_KEYSTORE_PASSWORD).');
+  const pw = password || cfg.password || process.env.GIXCLOUD_KEYSTORE_PASSWORD;
+  if (!pw) throw new ToolError('Mot de passe du keystore requis (paramètre password ou variable GIXCLOUD_KEYSTORE_PASSWORD).');
   return { file: cfg.file, alias: cfg.alias, password: pw };
 }
 
@@ -397,7 +397,7 @@ export const apkTools = [
     const ver = (cmd, args) => { const p = which(cmd); if (!p) return null; const r = spawnSync(p, args, { encoding: 'utf8', shell: IS_WIN }); return `${p} — ${(r.stdout + r.stderr).split('\n').find((l) => l.trim() && !/JAVA_TOOL_OPTIONS/.test(l))?.trim() || 'ok'}`; };
     const sdk = androidSdk();
     return {
-      localhub_home: HOME,
+      gixcloud_home: HOME,
       apk_outbox: APK_DIR,
       android_sdk: sdk,
       build_tools: sdk && fs.existsSync(path.join(sdk, 'build-tools')) ? fs.readdirSync(path.join(sdk, 'build-tools')) : [],
@@ -407,7 +407,7 @@ export const apkTools = [
       adb: adbPath(),
       apksigner: buildTool('apksigner'),
       zipalign: buildTool('zipalign'),
-      godot: process.env.LOCALHUB_GODOT || which('godot') || which('godot4'),
+      godot: process.env.GIXCLOUD_GODOT || which('godot') || which('godot4'),
       flutter: which('flutter'),
       conseils: sdk ? [] : ['SDK Android non trouvé : installez Android Studio (ou les « command line tools ») et définissez ANDROID_HOME.'],
     };
@@ -552,7 +552,7 @@ export const apkTools = [
     password: S.str('Mot de passe (6 caractères minimum).'),
     alias: S.str('Alias (défaut : name).'),
     dname: S.str('Identité, ex. « CN=Prénom Nom, O=Studio, C=FR ».'),
-    remember_password: S.bool('Enregistrer le mot de passe en clair dans ~/LocalHub/keys (pratique, moins sûr).'),
+    remember_password: S.bool('Enregistrer le mot de passe en clair dans ~/GIXCLOUD/keys (pratique, moins sûr).'),
   }, ['name', 'password'], (a) => {
     if (a.password.length < 6) throw new ToolError('Mot de passe trop court (6 caractères minimum).');
     const name = a.name.replace(/[^\w.-]/g, '_');
@@ -652,11 +652,11 @@ export const apkTools = [
   }),
 
   // ---- « Actions » locales : intégration continue ----
-  tool('run_workflow', 'Lance une commande de vérification (tests, lint…) sur une branche ou une PR dans une copie de travail isolée, comme GitHub Actions mais en local. Par défaut : « ci » de localhub.json.', {
+  tool('run_workflow', 'Lance une commande de vérification (tests, lint…) sur une branche ou une PR dans une copie de travail isolée, comme GitHub Actions mais en local. Par défaut : « ci » de gixcloud.json.', {
     ...REPO,
     ref: S.str('Branche, tag ou commit.'),
     pr: S.int('Pull request à vérifier.'),
-    command: S.str('Commande shell (défaut : champ « ci » de localhub.json).'),
+    command: S.str('Commande shell (défaut : champ « ci » de gixcloud.json).'),
     wait_seconds: S.int('Attente maximale (défaut 600).'),
   }, ['repo'], async (a) => {
     const r = requireRepo(a);
@@ -678,10 +678,10 @@ export const apkTools = [
       try {
         let cmd = a.command;
         if (!cmd) {
-          const lh = readTreeFile(r.gitDir, run_.commit, 'localhub.json');
+          const lh = readTreeFile(r.gitDir, run_.commit, 'gixcloud.json');
           cmd = lh && JSON.parse(lh).ci;
         }
-        if (!cmd) return finish({ status: 'failed', error: 'Aucune commande : donnez command ou ajoutez "ci" dans localhub.json.' });
+        if (!cmd) return finish({ status: 'failed', error: 'Aucune commande : donnez command ou ajoutez "ci" dans gixcloud.json.' });
         const ws = prepareWorkspace(r, run_.commit);
         const res = await runLogged(IS_WIN ? 'cmd' : 'sh', IS_WIN ? ['/c', cmd] : ['-c', cmd], { cwd: ws, logFile: run_.log, timeoutMs: 60 * 60000 });
         return finish({ status: res.code === 0 ? 'success' : 'failed', command: cmd, exit_code: res.code });

@@ -9,8 +9,8 @@ import { ToolError } from './mcp.js';
 export const ZERO = '0000000000000000000000000000000000000000';
 
 export function identity() {
-  const name = process.env.LOCALHUB_USER_NAME || readGlobal('user.name') || os.userInfo().username || 'localhub';
-  const email = process.env.LOCALHUB_USER_EMAIL || readGlobal('user.email') || `${name}@localhub.local`;
+  const name = process.env.GIXCLOUD_USER_NAME || readGlobal('user.name') || os.userInfo().username || 'gixcloud';
+  const email = process.env.GIXCLOUD_USER_EMAIL || readGlobal('user.email') || `${name}@gixcloud.local`;
   return { name, email };
 }
 
@@ -77,7 +77,7 @@ export function commitChanges(gitDir, branch, changes, message, { from } = {}) {
   const ref = `refs/heads/${branch}`;
   let parent = revParse(gitDir, ref);
   if (!parent && from) parent = resolveRef(gitDir, from);
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'localhub-idx-'));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'gixcloud-idx-'));
   const env = { GIT_INDEX_FILE: path.join(tmp, 'index') };
   try {
     if (parent) git(gitDir, ['read-tree', parent], { env });

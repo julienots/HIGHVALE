@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// LocalHub — un « GitHub » 100 % local, utilisable par Claude via MCP (stdio).
+// GIXCLOUD — un « GitHub » 100 % local, utilisable par Claude via MCP (stdio).
 // Dépôts git, fichiers, branches, commits, tickets, pull requests, revues,
 // versions… et en plus : création, build, signature, analyse, envoi et
 // installation d’APK Android. Aucun serveur, aucun compte, aucun réseau requis.
@@ -13,9 +13,9 @@ import { HOME, APK_DIR, ensureDir } from './store.js';
 ensureDir(HOME);
 
 startServer({
-  name: 'localhub',
+  name: 'gixcloud',
   version: '1.0.0',
-  instructions: `LocalHub : forge git locale (équivalent de GitHub sans serveur) + usine à APK.
+  instructions: `GIXCLOUD : forge git locale (équivalent de GitHub sans serveur) + usine à APK.
 Données dans ${HOME} ; APK produits dans ${APK_DIR}.
 - « repo » accepte « nom » ou « propriétaire/nom ».
 - Dépôts clonables avec git : get_repository donne clone_command (chemin local).

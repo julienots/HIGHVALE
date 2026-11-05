@@ -1,13 +1,13 @@
 {
-  "name": "localhub-mcp",
+  "name": "gixcloud-mcp",
   "version": "1.0.0",
   "description": "GitHub 100 % local pour Claude (MCP) : dépôts, tickets, pull requests, versions, et build/envoi d'APK Android.",
   "type": "module",
-  "bin": { "localhub-mcp": "src/server.js" },
+  "bin": { "gixcloud-mcp": "src/server.js" },
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test test/localhub.test.js"
+    "test": "node --test test/gixcloud.test.js"
   },
   "engines": { "node": ">=18" },
   "license": "MIT"
